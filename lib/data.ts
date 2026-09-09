@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/database";
 
 export type ProductRow = Database["public"]["Tables"]["products"]["Row"];
@@ -15,7 +15,7 @@ export interface ProductWithCategory extends ProductRow {
  * non-null price (FR-1.3 — price IS NULL is excluded from every listing).
  */
 export async function getCatalogue(): Promise<ProductWithCategory[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, category:categories(id, slug, name_en, name_ta)")
@@ -28,7 +28,7 @@ export async function getCatalogue(): Promise<ProductWithCategory[]> {
 }
 
 export async function getActiveCategories(): Promise<CategoryRow[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("categories")
     .select("*")
@@ -57,7 +57,7 @@ export async function getCategoryWithCounts() {
  * states.
  */
 export async function getProductBySlug(slug: string): Promise<ProductWithCategory | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, category:categories(id, slug, name_en, name_ta)")
@@ -74,7 +74,7 @@ export async function getRelatedProducts(
   excludeProductId: string,
   limit = 6,
 ): Promise<ProductWithCategory[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, category:categories(id, slug, name_en, name_ta)")
@@ -90,7 +90,7 @@ export async function getRelatedProducts(
 }
 
 export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, category:categories(id, slug, name_en, name_ta)")
@@ -105,7 +105,7 @@ export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]>
 }
 
 export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, category:categories(id, slug, name_en, name_ta)")
@@ -125,13 +125,13 @@ export interface Setting {
 }
 
 export async function getSetting<T = unknown>(key: string, fallback: T): Promise<T> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase.from("settings").select("value").eq("key", key).maybeSingle();
   return (data?.value as T) ?? fallback;
 }
 
 export async function getSettings(): Promise<Record<string, unknown>> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase.from("settings").select("key, value");
   const map: Record<string, unknown> = {};
   for (const row of data ?? []) map[row.key] = row.value;

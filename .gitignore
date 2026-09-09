@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated per-captain kits (scripts/generate-qr.ts) — not source
+/public/captain-kits/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { getSettings } from "@/lib/data";
 
 const bodySchema = z.object({
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
   }
 
   const { productIds } = parsed.data;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("id, status, price, is_discountable, name_en, name_ta, unit, image_url, sku, slug")
