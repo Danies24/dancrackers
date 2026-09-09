@@ -15,7 +15,8 @@
     "supabase:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > types/database.ts",
     "import:catalogue": "tsx scripts/import-catalogue.ts",
-    "generate:qr": "tsx scripts/generate-qr.ts"
+    "generate:qr": "tsx scripts/generate-qr.ts",
+    "admin:create-user": "tsx scripts/create-admin-user.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -27,6 +28,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.43.0",
     "next": "16.3.4",
+    "papaparse": "^5.7.0",
     "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -41,6 +43,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.20.1",
+    "@types/papaparse": "^5.5.2",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
