@@ -11,7 +11,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
   return (
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid-cols-4">
-        <div>
+        <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon">
             {siteConfig.name}
           </h3>
@@ -27,7 +27,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
             </li>
           </ul>
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon">Products</h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             {topCategories.slice(0, 6).map((cat) => (
@@ -42,7 +42,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
             )}
           </ul>
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon">Information</h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             <li>
@@ -62,14 +62,16 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
             </li>
           </ul>
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon">Contact</h3>
-          <ul className="space-y-2 text-sm text-ink-soft">
+          <ul className="space-y-2 break-words text-sm text-ink-soft">
             <li>
               <a href={`tel:+${siteConfig.operator.phoneE164}`}>{siteConfig.operator.phoneDisplay}</a>
             </li>
             <li>
-              <a href={`mailto:${siteConfig.operator.email}`}>{siteConfig.operator.email}</a>
+              <a href={`mailto:${siteConfig.operator.email}`} className="break-all">
+                {siteConfig.operator.email}
+              </a>
             </li>
             <li>{siteConfig.operator.address}</li>
           </ul>
