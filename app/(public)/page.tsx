@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ProductRail } from "@/components/product/product-rail";
+import { ShieldCheck, Tag, Truck, Headphones, ArrowRight, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getBestsellers, getCategoryWithCounts, getFeatured } from "@/lib/data";
+import { SparkField } from "@/components/marketing/spark-field";
+import { ExploreCrackers } from "@/components/marketing/explore-crackers";
+import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
+import { getCatalogue, getCategoryWithCounts } from "@/lib/data";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -11,51 +14,60 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-export default async function HomePage() {
-  const [categories, bestsellers, featured] = await Promise.all([
-    getCategoryWithCounts(),
-    getBestsellers(),
-    getFeatured(),
-  ]);
+const TRUST_INDICATORS = [
+  "Wide Range of Products",
+  "Best Wholesale Prices",
+  "Trusted & Reliable",
+  "Pan India Supply",
+];
 
-  const giftBoxCategory = categories.find((c) => c.slug === "gift-box");
-  const giftBoxRailProducts = featured.filter((p) => p.category?.slug === "gift-box");
+const TRUST_FEATURES = [
+  { icon: ShieldCheck, color: "text-teal bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
+  { icon: Tag, color: "text-maroon bg-maroon-tint", title: "Competitive Pricing", body: "Best rates for bulk orders." },
+  { icon: Truck, color: "text-blue bg-blue-tint", title: "Pan India Delivery", body: "We deliver across India." },
+  { icon: Headphones, color: "text-pink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
+];
+
+export default async function HomePage() {
+  const [categories, products] = await Promise.all([getCategoryWithCounts(), getCatalogue()]);
   const catalogueEmpty = categories.every((c) => c.productCount === 0);
+  const showcaseProducts = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller));
 
   return (
     <div>
-      {/* 1. Hero */}
-      <section className="bg-gradient-to-b from-maroon-tint to-cream px-4 py-12 text-center md:py-20">
-        <h1 className="mx-auto max-w-2xl font-display text-3xl font-semibold text-ink md:text-5xl">
-          {siteConfig.tagline}
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-ink-soft">
-          Browse the full price list, build your order, and we will call you to confirm. Supplied
-          by {siteConfig.supplier.name}, Sivakasi.
-        </p>
-        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href="/products">
-            <Button size="default">Browse Crackers →</Button>
-          </Link>
-          <Link href="/how-it-works">
-            <Button variant="secondary">How ordering works</Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* 2. Trust strip */}
-      <section className="border-y border-border bg-surface">
-        <div className="scrollbar-none mx-auto flex max-w-6xl gap-6 overflow-x-auto px-4 py-4 text-sm text-ink-soft">
-          {[
-            "Direct from licensed Sivakasi mills",
-            "Every price on the site, no hidden rates",
-            "A real person calls you within 2 hours",
-            "Pay the supplier directly — never to us",
-          ].map((t) => (
-            <span key={t} className="shrink-0 whitespace-nowrap">
-              {t}
-            </span>
-          ))}
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-cream px-4 pb-14 pt-16 text-center md:pb-20 md:pt-24">
+        <SparkField />
+        <div className="relative mx-auto max-w-3xl">
+          <span className="inline-block rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-semibold tracking-wide text-gold">
+            DIWALI 2026
+          </span>
+          <h1 className="mx-auto mt-5 max-w-2xl font-display text-4xl font-bold leading-[1.1] text-ink md:text-6xl">
+            Celebrate <br />
+            <span className="text-gradient-festival">Brighter Together</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-lg text-base text-ink-soft md:text-lg">
+            Premium crackers. Safer celebrations. Happier moments. Supplied by {siteConfig.supplier.name}, Sivakasi.
+          </p>
+          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a href="#enquiry">
+              <Button size="default">
+                Send Enquiry <ArrowRight size={16} aria-hidden />
+              </Button>
+            </a>
+            <Link href="/products">
+              <Button variant="secondary">
+                View Products <PlayCircle size={16} aria-hidden />
+              </Button>
+            </Link>
+          </div>
+          <div className="mx-auto mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+            {TRUST_INDICATORS.map((t) => (
+              <div key={t} className="rounded-2xl border border-border bg-surface/60 px-3 py-3 text-xs font-medium text-ink-soft">
+                {t}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -70,54 +82,58 @@ export default async function HomePage() {
           </p>
         </section>
       ) : (
-        <>
-          {/* 3. Shop by category */}
-          <section className="mx-auto max-w-6xl px-4 py-10">
-            <h2 className="mb-4 font-display text-xl font-semibold text-ink">Shop by Category</h2>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/products/${cat.slug}`}
-                  className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-4 text-center hover:border-maroon"
-                >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-tint font-display text-xl font-semibold text-maroon">
-                    {cat.name_en.charAt(0)}
-                  </span>
-                  <span className="text-sm font-medium text-ink">{cat.name_en}</span>
-                  <span className="text-xs text-muted">{cat.productCount} items</span>
-                </Link>
-              ))}
+        <section className="mx-auto max-w-6xl px-4 py-14">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-muted">OUR PRODUCTS</p>
+              <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
+                Explore Our <span className="text-gradient-festival">Crackers</span> Range
+              </h2>
             </div>
-          </section>
-
-          {/* 4. Gift boxes & combos */}
-          {giftBoxRailProducts.length >= 3 && (
-            <section className="mx-auto max-w-6xl px-4 py-6">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-display text-xl font-semibold text-ink">Gift Boxes & Combos</h2>
-                {giftBoxCategory && (
-                  <Link href={`/products/${giftBoxCategory.slug}`} className="text-sm font-medium text-maroon">
-                    See all →
-                  </Link>
-                )}
-              </div>
-              <ProductRail products={giftBoxRailProducts} />
-            </section>
-          )}
-
-          {/* 5. Popular this season */}
-          {bestsellers.length >= 3 && (
-            <section className="mx-auto max-w-6xl px-4 py-6">
-              <h2 className="mb-4 font-display text-xl font-semibold text-ink">Popular This Season</h2>
-              <ProductRail products={bestsellers} />
-            </section>
-          )}
-        </>
+          </div>
+          <ExploreCrackers products={showcaseProducts} categories={categories} />
+        </section>
       )}
 
-      {/* 6. How it works */}
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      {/* Trust section */}
+      <section className="bg-secondary-bg px-4 py-14">
+        <div className="mx-auto max-w-6xl text-center">
+          <p className="text-xs font-semibold tracking-wide text-muted">WHY CHOOSE DAN CRACKERS</p>
+          <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
+            Safe. Reliable. <span className="text-gradient-festival">Always Festive.</span>
+          </h2>
+          <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+            {TRUST_FEATURES.map((f) => (
+              <div key={f.title} className="flex flex-col items-center gap-2">
+                <span className={`flex h-14 w-14 items-center justify-center rounded-full ${f.color}`}>
+                  <f.icon size={24} aria-hidden />
+                </span>
+                <h3 className="font-display text-sm font-semibold text-ink">{f.title}</h3>
+                <p className="text-xs text-ink-soft">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* General enquiry lead form */}
+      <section id="enquiry" className="scroll-mt-20 px-4 py-14">
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-border bg-surface p-6 md:p-10">
+          <p className="text-xs font-semibold tracking-wide text-muted">SEND AN ENQUIRY</p>
+          <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
+            Let&apos;s Make Your <span className="text-gradient-festival">Diwali Special</span>
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-ink-soft">
+            Fill in your details and we&apos;ll get back to you with the best offers.
+          </p>
+          <div className="mt-6">
+            <GeneralEnquiryForm categories={categories} />
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="mx-auto max-w-6xl px-4 py-14">
         <h2 className="mb-6 font-display text-xl font-semibold text-ink">How It Works</h2>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
@@ -127,8 +143,8 @@ export default async function HomePage() {
             "You pay the supplier directly",
             "The supplier despatches to your address",
           ].map((step, i) => (
-            <li key={step} className="rounded-lg border border-border bg-surface p-4">
-              <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-maroon text-sm font-bold text-white">
+            <li key={step} className="rounded-2xl border border-border bg-surface p-4">
+              <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-ink">
                 {i + 1}
               </span>
               <p className="text-sm text-ink-soft">{step}</p>
@@ -140,27 +156,11 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      {/* 7. Why order through us */}
-      <section className="mx-auto max-w-6xl px-4 py-10">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {[
-            { title: "Transparent pricing", body: "Every rate is on the site — no hidden costs, no arithmetic." },
-            { title: "Human confirmation", body: "A real person calls to confirm your order before anything is charged." },
-            { title: "Local to Sivakasi", body: "We visit the mill ourselves — the products and prices are real." },
-          ].map((b) => (
-            <div key={b.title}>
-              <h3 className="mb-1 font-display text-base font-semibold text-ink">{b.title}</h3>
-              <p className="text-sm text-ink-soft">{b.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 8. Safety note */}
-      <section className="mx-auto max-w-6xl px-4 pb-12">
-        <div className="rounded-lg border border-amber/30 bg-gold-tint p-4 text-sm text-ink-soft">
+      {/* Safety note */}
+      <section className="mx-auto max-w-6xl px-4 pb-14">
+        <div className="rounded-2xl border border-amber/30 bg-gold-tint p-4 text-sm text-ink-soft">
           Fireworks are explosives. Always burst them outdoors, under adult supervision.{" "}
-          <Link href="/safety" className="font-semibold text-maroon">
+          <Link href="/safety" className="font-semibold text-gold">
             Read our full safety guidance →
           </Link>
         </div>

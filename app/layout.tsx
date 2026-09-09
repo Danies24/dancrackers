@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { fraunces, inter, notoSansTamil } from "@/lib/fonts";
+import { spaceGrotesk, manrope, notoSansTamil } from "@/lib/fonts";
 import { ToastProvider } from "@/components/ui/toast";
 import { AnalyticsScripts } from "@/components/analytics-scripts";
 import { siteConfig } from "@/lib/site-config";
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${notoSansTamil.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${notoSansTamil.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-cream text-ink">
         <ToastProvider>{children}</ToastProvider>

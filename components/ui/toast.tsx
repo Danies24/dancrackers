@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             role="status"
             className={cn(
-              "flex w-full max-w-sm items-center justify-between gap-3 rounded-md bg-ink px-4 py-3 text-sm text-white shadow-lg",
+              "flex w-full max-w-sm items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-ink shadow-lg",
             )}
           >
             <span>{toast.message}</span>

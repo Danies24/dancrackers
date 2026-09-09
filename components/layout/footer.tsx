@@ -9,7 +9,7 @@ import type { CategoryRow } from "@/lib/data";
  */
 export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }) {
   return (
-    <footer className="mt-16 border-t border-border bg-surface">
+    <footer className="mt-16 border-t border-border bg-cream">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid-cols-4">
         <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon">

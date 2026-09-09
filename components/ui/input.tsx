@@ -9,7 +9,7 @@ interface FieldWrapperProps {
 }
 
 const fieldClasses =
-  "w-full min-h-12 rounded-md border px-3.5 text-[16px] text-ink placeholder:text-muted focus:border-maroon focus:ring-1 focus:ring-maroon";
+  "w-full min-h-12 rounded-2xl border bg-surface px-3.5 text-[16px] text-ink placeholder:text-muted focus:border-maroon focus:ring-1 focus:ring-maroon";
 
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement>,

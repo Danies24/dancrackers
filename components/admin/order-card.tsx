@@ -58,7 +58,7 @@ export function OrderCard({ order, highlight }: { order: Order; highlight?: bool
         </a>
         <Link
           href={`/admin/orders/${order.id}`}
-          className="flex-1 rounded-md bg-ink py-1.5 text-center text-xs font-semibold text-white"
+          className="flex-1 rounded-md bg-secondary-bg py-1.5 text-center text-xs font-semibold text-ink"
         >
           Open
         </Link>

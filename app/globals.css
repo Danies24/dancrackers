@@ -1,32 +1,48 @@
 @import "tailwindcss";
 
-/* Design tokens — PRD §25.2 (colour), §25.3 (type), §25.4 (spacing/radius). */
+/* Design tokens — Dark Diwali 2026 design system. */
 :root {
-  --ink: #1a1523;
-  --ink-soft: #4a4152;
-  --muted: #857c90;
+  /* Base surfaces */
+  --ink: #fff8ec; /* warm white — primary text */
+  --ink-soft: #a9b0c3; /* secondary text */
+  --muted: #727a91; /* tertiary text */
 
-  --maroon: #7a1f2b;
-  --maroon-dark: #5e1721;
-  --maroon-tint: #fdf3f2;
+  --cream: #080b18; /* midnight navy — page background */
+  --secondary-bg: #11162b; /* secondary sections, nav */
+  --surface: #151b34; /* card navy */
+  --border: #2a3152; /* border navy */
 
-  --gold: #c8952b;
-  --gold-tint: #fdf8ec;
+  /* Festival accents */
+  --maroon: #ff6b1a; /* electric orange — primary brand/CTA */
+  --maroon-dark: #e85a0f; /* orange hover */
+  --maroon-tint: rgba(255, 107, 26, 0.12);
 
-  --teal: #0e7c7b;
-  --teal-tint: #eaf6f6;
+  --pink: #ff3d81; /* hot pink — secondary accent / gradient end */
+  --pink-tint: rgba(255, 61, 129, 0.12);
 
-  --amber: #b26b00;
-  --red: #b3261e;
+  --gold: #ffc857; /* diwali gold */
+  --gold-tint: rgba(255, 200, 87, 0.15);
 
-  --cream: #fbf7f1;
-  --surface: #ffffff;
-  --border: #e8e1d8;
+  --blue: #4da3ff; /* electric blue */
+  --blue-tint: rgba(77, 163, 255, 0.15);
+
+  --teal: #20d6a3; /* emerald — success/trust */
+  --teal-tint: rgba(32, 214, 163, 0.15);
+
+  --amber: #ffb020;
+  --red: #ff4d4d;
 
   --whatsapp: #25d366;
 
   --background: var(--cream);
   --foreground: var(--ink);
+
+  /* Gradients & glow */
+  --gradient-primary: linear-gradient(90deg, #ff6b1a 0%, #ff3d81 100%);
+  --gradient-festival: linear-gradient(135deg, #ffc857 0%, #ff6b1a 45%, #ff3d81 100%);
+  --glow-orange: rgba(255, 107, 26, 0.25);
+  --glow-pink: rgba(255, 61, 129, 0.2);
+  --glow-gold: rgba(255, 200, 87, 0.2);
 }
 
 @theme inline {
@@ -38,8 +54,14 @@
   --color-maroon-dark: var(--maroon-dark);
   --color-maroon-tint: var(--maroon-tint);
 
+  --color-pink: var(--pink);
+  --color-pink-tint: var(--pink-tint);
+
   --color-gold: var(--gold);
   --color-gold-tint: var(--gold-tint);
+
+  --color-blue: var(--blue);
+  --color-blue-tint: var(--blue-tint);
 
   --color-teal: var(--teal);
   --color-teal-tint: var(--teal-tint);
@@ -48,6 +70,7 @@
   --color-red: var(--red);
 
   --color-cream: var(--cream);
+  --color-secondary-bg: var(--secondary-bg);
   --color-surface: var(--surface);
   --color-border: var(--border);
   --color-whatsapp: var(--whatsapp);
@@ -59,9 +82,9 @@
   --font-body: var(--font-body);
   --font-tamil: var(--font-tamil);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
 
   --spacing-4-5: 18px; /* half-step, used sparingly */
@@ -85,6 +108,11 @@ h3 {
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--maroon);
 }
 
 /* Visible focus ring everywhere — never outline: none (§27.1). */
@@ -117,4 +145,66 @@ h3 {
 
 .skip-link:focus {
   left: 0;
+}
+
+/* Festival gradients & glow utilities */
+.bg-gradient-primary {
+  background-image: var(--gradient-primary);
+}
+
+.text-gradient-festival {
+  background-image: var(--gradient-festival);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-orange {
+  box-shadow: 0 0 28px var(--glow-orange);
+}
+
+.glow-pink {
+  box-shadow: 0 0 28px var(--glow-pink);
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Page-load fade-in-up, staggered via inline animation-delay */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 500ms ease-out both;
+}
+
+@keyframes spark-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) rotate(20deg);
+  }
+}
+
+.animate-spark {
+  animation: spark-pop 900ms ease-out both;
 }

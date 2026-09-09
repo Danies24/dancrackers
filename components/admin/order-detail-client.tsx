@@ -245,7 +245,7 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
               setNote("");
             }}
             disabled={saving || !note.trim()}
-            className="rounded-md bg-ink px-4 text-sm font-semibold text-white disabled:opacity-40"
+            className="rounded-md bg-secondary-bg px-4 text-sm font-semibold text-ink disabled:opacity-40"
           >
             Add
           </button>

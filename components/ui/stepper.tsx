@@ -19,7 +19,7 @@ export function Stepper({ value, min = 1, onIncrement, onDecrement, label, class
         onClick={onDecrement}
         disabled={value <= min}
         aria-label={`Decrease quantity of ${label}`}
-        className="flex h-10 w-10 items-center justify-center rounded-md border border-border text-ink-soft disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-soft transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Minus size={16} aria-hidden />
       </button>
@@ -33,7 +33,7 @@ export function Stepper({ value, min = 1, onIncrement, onDecrement, label, class
         type="button"
         onClick={onIncrement}
         aria-label={`Increase quantity of ${label}`}
-        className="flex h-10 w-10 items-center justify-center rounded-md border border-border text-ink-soft hover:border-maroon hover:text-maroon"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-soft transition-colors hover:border-maroon hover:text-maroon"
       >
         <Plus size={16} aria-hidden />
       </button>

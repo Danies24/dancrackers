@@ -3,19 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Button variants per PRD §25.5. One primary per screen. WhatsApp green is
- * the only place a non-palette colour is permitted (recognisability beats
- * consistency there).
+ * Button variants — Dark Diwali 2026 design system. Pill-shaped, gradient
+ * primary CTA, subtle lift-on-hover / press-to-shrink. WhatsApp green stays
+ * the one non-palette colour (recognisability beats consistency there).
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-[16px] font-semibold transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-40 min-h-11",
+  "inline-flex items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-40 min-h-11 active:scale-[0.97]",
   {
     variants: {
       variant: {
-        primary: "bg-maroon text-white hover:bg-maroon-dark",
-        secondary: "border-2 border-maroon text-maroon bg-transparent hover:bg-maroon-tint",
+        primary:
+          "bg-gradient-primary text-ink shadow-[0_0_0_rgba(0,0,0,0)] hover:-translate-y-0.5 hover:glow-orange",
+        secondary:
+          "border border-border text-ink bg-transparent hover:-translate-y-0.5 hover:border-maroon hover:glow-orange",
         ghost: "text-maroon bg-transparent hover:bg-maroon-tint",
-        whatsapp: "bg-whatsapp text-white hover:brightness-95",
+        whatsapp: "bg-whatsapp text-white hover:brightness-95 hover:-translate-y-0.5",
       },
       size: {
         default: "h-12 md:h-11 px-6",

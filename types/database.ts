@@ -234,6 +234,39 @@ export type Database = {
         }
         Relationships: []
       }
+      general_enquiries: {
+        Row: {
+          category: string | null
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          name: string
+          phone: string
+          status: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          phone: string
+          status?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string
+          status?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string

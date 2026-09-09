@@ -1,14 +1,14 @@
-import { Fraunces, Inter, Noto_Sans_Tamil } from "next/font/google";
+import { Space_Grotesk, Manrope, Noto_Sans_Tamil } from "next/font/google";
 
-/** Two families max (§25.3). Tamil is a separate subset so Latin-only pages never download it. */
-export const fraunces = Fraunces({
+/** Dark Diwali 2026 design system: Space Grotesk for display, Manrope for body. */
+export const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["600"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
-export const inter = Inter({
+export const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600", "700"],

@@ -23,7 +23,7 @@ export function AdminNav({ userName }: { userName: string }) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-ink text-white">
+    <header className="sticky top-0 z-40 border-b border-border bg-secondary-bg text-ink">
       <div className="flex h-14 items-center justify-between px-4">
         <span className="font-display text-sm font-semibold">Dan Crackers Admin</span>
         <button onClick={signOut} className="text-xs text-white/70 hover:text-white">

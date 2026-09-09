@@ -42,15 +42,15 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-shadow hover:shadow-sm">
-      <Link href={`/product/${product.slug}`} className="relative block aspect-square bg-cream">
+    <div className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-border bg-surface transition-all duration-300 ease-out hover:-translate-y-1 hover:border-maroon/50 hover:glow-orange">
+      <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
         {product.image_url ? (
           <Image
             src={product.image_url}
             alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
         ) : (
           <PlaceholderImage name={product.name_en} />
