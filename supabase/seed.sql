@@ -233,3 +233,14 @@ insert into captains (code, token, name, phone, city, area, status) values
   ('PRI07', 'pri07devtoken0002', 'TEST — Priya (dev)', '9000000002', 'Chennai', 'Velachery', 'active')
 on conflict (code) do nothing;
 
+-- Dev-only overrides of the [BLOCKED] production defaults (migration
+-- 20260909000003_default_settings.sql leaves these at 0/empty in every real
+-- environment). Non-zero test values here so the discount engine, minimum
+-- order gate and WhatsApp links are exercisable locally. NEVER copy these
+-- numbers into production — they are not confirmed supplier figures.
+update settings set value = '10' where key = 'discount_percent';
+update settings set value = '3000' where key = 'min_order_value';
+update settings set value = '"9000000099"' where key = 'whatsapp_business_number';
+update settings set value = '"9000000098"' where key = 'supplier_whatsapp_number';
+update settings set value = '["600001","600002","600096","626204"]' where key = 'served_pincodes';
+
