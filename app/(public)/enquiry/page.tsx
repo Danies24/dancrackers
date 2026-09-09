@@ -22,6 +22,7 @@ import {
   pincodeSchema,
 } from "@/lib/validation";
 import { siteConfig } from "@/lib/site-config";
+import { trackEvent } from "@/lib/analytics";
 
 const SESSION_KEY = "dc_enquiry_draft";
 
@@ -62,7 +63,10 @@ export default function EnquiryPage() {
   const renderedAt = useRef(Date.now());
   const submittedRef = useRef(false);
 
-  useEffect(() => setHydrated(true), []);
+  useEffect(() => {
+    setHydrated(true);
+    trackEvent("enquiry_form_view");
+  }, []);
 
   const draft = useMemo(() => {
     if (typeof window === "undefined") return null;
@@ -180,13 +184,22 @@ export default function EnquiryPage() {
           );
         } catch {}
         submittedRef.current = true;
+        trackEvent("enquiry_submitted", {
+          order_ref: data.orderRef,
+          value: data.totals?.grandTotal,
+          item_count: data.totals?.totalQuantity,
+          captain_code: getReferral() ?? undefined,
+          city: formValues.city,
+        });
         clear();
         router.push(`/enquiry/success?ref=${encodeURIComponent(data.orderRef)}`);
         return;
       }
 
+      trackEvent("enquiry_failed", { reason: data?.error?.code ?? "unknown" });
       setSubmitError(data?.error?.message ?? "We could not save your enquiry. Please send it to us on WhatsApp instead.");
     } catch {
+      trackEvent("enquiry_failed", { reason: "network_error" });
       setSubmitError("We could not save your enquiry. Please send it to us on WhatsApp instead.");
     } finally {
       setSubmitting(false);

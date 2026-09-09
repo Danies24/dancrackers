@@ -100,3 +100,64 @@ async function sendTelegramNotification(order: NotificationOrder): Promise<void>
     console.error(`[notifications] Telegram failed for ${order.orderRef}`, error);
   }
 }
+
+export interface DigestOrder {
+  orderRef: string;
+  name: string;
+  city: string;
+  grandTotal: number;
+  ageHours: number;
+}
+
+export interface DigestInput {
+  newSinceLastDigest: DigestOrder[];
+  slaBreaches: DigestOrder[]; // NEW and older than 2 hours — highlighted (§18.6)
+  confirmedAwaitingPayment: DigestOrder[];
+}
+
+/**
+ * §18.6. The 09:00/18:00 IST safety-net digest — catches a silent
+ * notification outage by summarising state independently of the
+ * per-enquiry alerts.
+ */
+export async function sendDigestEmail(input: DigestInput): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const dan = process.env.NOTIFY_EMAIL_DAN;
+  const arun = process.env.NOTIFY_EMAIL_ARUN;
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!apiKey || !from || (!dan && !arun)) {
+    console.warn("[digest] Resend not configured — skipping digest email");
+    return;
+  }
+
+  const rows = (orders: DigestOrder[]) =>
+    orders.length === 0
+      ? "<p>None.</p>"
+      : `<ul>${orders
+          .map((o) => `<li>${o.orderRef} — ${o.name} — ${o.city} — ${formatRupees(o.grandTotal)} (${o.ageHours.toFixed(1)}h)</li>`)
+          .join("")}</ul>`;
+
+  const subject =
+    input.slaBreaches.length > 0
+      ? `⚠️ Digest: ${input.slaBreaches.length} SLA breach(es), ${input.newSinceLastDigest.length} new`
+      : `Digest: ${input.newSinceLastDigest.length} new enquiries`;
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px;">
+      <h2>Dan Crackers — digest</h2>
+      ${input.slaBreaches.length > 0 ? `<h3 style="color:#B3261E">SLA breach — over 2h, no contact</h3>${rows(input.slaBreaches)}` : ""}
+      <h3>New since last digest</h3>
+      ${rows(input.newSinceLastDigest)}
+      <h3>Confirmed, awaiting payment</h3>
+      ${rows(input.confirmedAwaitingPayment)}
+    </div>
+  `;
+
+  try {
+    const resend = new Resend(apiKey);
+    const to = [dan, arun].filter((v): v is string => Boolean(v));
+    await resend.emails.send({ from, to, subject, html });
+  } catch (error) {
+    console.error("[digest] send failed", error);
+  }
+}

@@ -6,6 +6,7 @@ import { Search, X } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductCardSkeleton } from "@/components/ui/skeleton";
 import { searchProducts, sortProducts, type SortOption } from "@/lib/catalogue-search";
+import { trackEvent } from "@/lib/analytics";
 import type { CategoryRow, ProductWithCategory } from "@/lib/data";
 
 const PAGE_SIZE = 40;
@@ -54,6 +55,21 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
+
+  useEffect(() => {
+    if (debouncedQuery) trackEvent("search_performed", { search_term: debouncedQuery, results_count: filtered.length });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    if (category) trackEvent("filter_applied", { filter_type: "category", filter_value: category });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
+
+  useEffect(() => {
+    if (sort !== "recommended") trackEvent("sort_applied", { value: sort });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort]);
 
   const clearFilters = useCallback(() => {
     setQuery("");

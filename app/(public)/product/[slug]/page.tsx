@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
@@ -41,6 +42,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
+      <ProductViewTracker
+        productId={product.id}
+        sku={product.sku}
+        name={product.name_en}
+        category={product.category?.name_en}
+        price={product.price}
+      />
       <nav className="mb-4 text-xs text-muted">
         <Link href="/">Home</Link> / <Link href="/products">Products</Link>
         {product.category && (

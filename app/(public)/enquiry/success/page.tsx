@@ -7,6 +7,7 @@ import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatRupees } from "@/lib/format";
 import { siteConfig } from "@/lib/site-config";
+import { trackEvent } from "@/lib/analytics";
 
 interface LastOrder {
   orderRef: string;
@@ -33,11 +34,13 @@ function SuccessContent() {
       // No stored detail (e.g. a hard refresh in a new context) — the page still
       // works from the reference alone, per §12.7 "still renders from the reference in the URL".
     }
+    trackEvent("enquiry_success_view", { order_ref: ref });
   }, [ref]);
 
   function copyRef() {
     navigator.clipboard?.writeText(ref).then(() => {
       setCopied(true);
+      trackEvent("order_ref_copied", { order_ref: ref });
       setTimeout(() => setCopied(false), 2000);
     });
   }
@@ -80,13 +83,13 @@ function SuccessContent() {
 
       <div className="mt-6 flex flex-col gap-3">
         {order?.whatsappUrl && (
-          <a href={order.whatsappUrl} target="_blank" rel="noopener">
+          <a href={order.whatsappUrl} target="_blank" rel="noopener" onClick={() => trackEvent("whatsapp_click", { context: "success" })}>
             <Button variant="whatsapp" size="full">
               Send this order on WhatsApp
             </Button>
           </a>
         )}
-        <a href={`tel:+${siteConfig.operator.phoneE164}`}>
+        <a href={`tel:+${siteConfig.operator.phoneE164}`} onClick={() => trackEvent("call_click", { context: "success" })}>
           <Button variant="secondary" size="full">
             Call us now
           </Button>

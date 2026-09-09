@@ -10,6 +10,7 @@ import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { findItem } from "@/lib/cart";
+import { trackEvent } from "@/lib/analytics";
 import type { ProductWithCategory } from "@/lib/data";
 
 /**
@@ -28,6 +29,13 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
     e.preventDefault();
     if (!product.price) return;
     add({ productId: product.id, sku: product.sku, price: product.price }, 1);
+    trackEvent("add_to_cart", {
+      product_id: product.id,
+      name: product.name_en,
+      price: product.price,
+      quantity: 1,
+      source: "grid",
+    });
     setJustAdded(true);
     show(`Added ${product.name_en} to cart`, { label: "View cart", onClick: () => {} });
     setTimeout(() => setJustAdded(false), 1200);

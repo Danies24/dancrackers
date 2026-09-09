@@ -3,6 +3,7 @@
 import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { captureReferral, normalizeCode } from "@/lib/referral";
+import { setCaptainCodeProperty, trackEvent } from "@/lib/analytics";
 
 /**
  * §12.12, §20.4. Not a visible page — captures the code, fires the click
@@ -15,6 +16,8 @@ export default function ReferralLandingPage({ params }: { params: Promise<{ code
   useEffect(() => {
     const code = normalizeCode(rawCode) ?? rawCode.trim().toUpperCase();
     captureReferral(code);
+    setCaptainCodeProperty(code);
+    trackEvent("captain_link_opened", { captain_code: code });
 
     fetch("/api/track", {
       method: "POST",

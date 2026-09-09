@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { fraunces, inter, notoSansTamil } from "@/lib/fonts";
 import { ToastProvider } from "@/components/ui/toast";
+import { AnalyticsScripts } from "@/components/analytics-scripts";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -35,6 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col bg-cream text-ink">
         <ToastProvider>{children}</ToastProvider>
+        <AnalyticsScripts />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

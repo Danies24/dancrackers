@@ -2,16 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect } from "react";
 import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
+import { trackEvent } from "@/lib/analytics";
 
 export default function CartPage() {
   const { items, setQty, remove } = useCart();
   const { loading, activeLines, unavailableLines, totals, settings, belowMinimum, shortfall } =
     useValidatedCart();
+
+  useEffect(() => {
+    if (!loading && items.length > 0) {
+      trackEvent("cart_view", { item_count: items.length, cart_value: totals.grandTotal });
+      if (belowMinimum) trackEvent("min_order_warning_shown", { cart_value: totals.grandTotal, shortfall });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, belowMinimum]);
 
   if (items.length === 0 && !loading) {
     return (
@@ -145,7 +155,14 @@ export default function CartPage() {
             className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4 md:static md:mt-6 md:border-0 md:bg-transparent md:p-0"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
-            <Link href={belowMinimum ? "#" : "/enquiry"} aria-disabled={belowMinimum} tabIndex={belowMinimum ? -1 : undefined}>
+            <Link
+              href={belowMinimum ? "#" : "/enquiry"}
+              aria-disabled={belowMinimum}
+              tabIndex={belowMinimum ? -1 : undefined}
+              onClick={() => {
+                if (!belowMinimum) trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length });
+              }}
+            >
               <Button size="full" disabled={belowMinimum}>
                 Continue to Enquiry →
               </Button>
