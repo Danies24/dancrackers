@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
+import { ReferralCodeField } from "@/components/cart/referral-code-field";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
@@ -150,6 +151,8 @@ export default function CartPage() {
               </Link>
             </div>
           )}
+
+          <ReferralCodeField />
 
           <div
             className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4 md:static md:mt-6 md:border-0 md:bg-transparent md:p-0"

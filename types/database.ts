@@ -107,6 +107,7 @@ export type Database = {
           area: string | null
           city: string | null
           code: string
+          commission_rate: number
           created_at: string
           id: string
           name: string
@@ -121,6 +122,7 @@ export type Database = {
           area?: string | null
           city?: string | null
           code: string
+          commission_rate?: number
           created_at?: string
           id?: string
           name: string
@@ -135,6 +137,7 @@ export type Database = {
           area?: string | null
           city?: string | null
           code?: string
+          commission_rate?: number
           created_at?: string
           id?: string
           name?: string

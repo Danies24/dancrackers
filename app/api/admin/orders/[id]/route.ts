@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
+import { computeCommissionAmount } from "@/lib/commission";
 import type { Database } from "@/types/database";
 
 type OrderUpdate = Database["public"]["Tables"]["orders"]["Update"];
@@ -41,6 +42,7 @@ const patchSchema = z.object({
   lostReason: z.enum(LOST_REASONS).optional(),
   note: z.string().max(2000).optional(),
   captainCode: z.string().trim().toUpperCase().nullable().optional(),
+  commissionPaid: z.boolean().optional(),
 });
 
 /** PATCH /api/admin/orders/[id] (§19.4, §22.2). Status transitions, append-only notes, captain override. */
@@ -54,7 +56,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       { status: 400 },
     );
   }
-  const { status, lostReason, note, captainCode } = parsed.data;
+  const { status, lostReason, note, captainCode, commissionPaid } = parsed.data;
 
   if (status === "LOST" && !lostReason) {
     return NextResponse.json(
@@ -68,7 +70,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { data: existing, error: fetchError } = await supabase
     .from("orders")
-    .select("internal_notes")
+    .select("internal_notes, captain_id, status, grand_total, commission_amount, commission_paid_at, first_contacted_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -77,31 +79,72 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   const update: OrderUpdate = {};
+  const autoNotes: string[] = [];
+
   if (status) {
     update.status = status;
-    if (status === "CONTACTED" || status === "CONFIRMED") {
-      // first_contacted_at is the SLA measurement (§21.7) — set once, on first contact.
-    }
     if (status === "CONFIRMED") update.confirmed_at = new Date().toISOString();
     if (status === "DELIVERED") update.delivered_at = new Date().toISOString();
   }
   if (status === "LOST") update.lost_reason = lostReason;
-  if (captainCode !== undefined) update.captain_code = captainCode;
 
-  if (note) {
-    const notes = Array.isArray(existing.internal_notes) ? existing.internal_notes : [];
-    update.internal_notes = [
-      ...notes,
-      { at: new Date().toISOString(), by: admin?.name ?? "admin", text: note },
-    ];
+  // Manual captain override (§20.6) — resolve to captain_id too, on any status,
+  // since a deliberate admin correction shouldn't be dropped just because the
+  // captain happens to be inactive.
+  if (captainCode !== undefined) {
+    if (captainCode) {
+      const { data: matched } = await supabase.from("captains").select("id").eq("code", captainCode).maybeSingle();
+      update.captain_id = matched?.id ?? null;
+      update.captain_code = captainCode;
+    } else {
+      update.captain_id = null;
+      update.captain_code = null;
+    }
   }
 
   // Set first_contacted_at once, the first time status ever leaves NEW.
-  if (status && status !== "NEW") {
-    const { data: current } = await supabase.from("orders").select("first_contacted_at").eq("id", id).maybeSingle();
-    if (current && !current.first_contacted_at) {
-      update.first_contacted_at = new Date().toISOString();
+  if (status && status !== "NEW" && !existing.first_contacted_at) {
+    update.first_contacted_at = new Date().toISOString();
+  }
+
+  // Freeze commission (PRD §20.5) the moment an order enters DELIVERED.
+  const enteringDelivered = status === "DELIVERED" && existing.status !== "DELIVERED";
+  const leavingDelivered = status !== undefined && status !== "DELIVERED" && existing.status === "DELIVERED";
+
+  if (enteringDelivered) {
+    const effectiveCaptainId = update.captain_id !== undefined ? update.captain_id : existing.captain_id;
+    if (effectiveCaptainId) {
+      const { data: captain } = await supabase
+        .from("captains")
+        .select("commission_rate")
+        .eq("id", effectiveCaptainId)
+        .maybeSingle();
+      const rate = Number(captain?.commission_rate ?? 0);
+      update.commission_rate = rate;
+      update.commission_amount = computeCommissionAmount(Number(existing.grand_total), rate);
     }
+  } else if (leavingDelivered) {
+    if (!existing.commission_paid_at) {
+      update.commission_rate = null;
+      update.commission_amount = null;
+    } else {
+      autoNotes.push(
+        `Reverted from DELIVERED to ${status} — commission (${existing.commission_amount ?? 0}, already paid) left unchanged. Review manually.`,
+      );
+    }
+  }
+
+  if (commissionPaid !== undefined) {
+    update.commission_paid_at = commissionPaid ? new Date().toISOString() : null;
+  }
+
+  if (note) autoNotes.push(note);
+  if (autoNotes.length > 0) {
+    const notes = Array.isArray(existing.internal_notes) ? existing.internal_notes : [];
+    update.internal_notes = [
+      ...notes,
+      ...autoNotes.map((text) => ({ at: new Date().toISOString(), by: admin?.name ?? "admin", text })),
+    ];
   }
 
   const { data: updated, error: updateError } = await supabase

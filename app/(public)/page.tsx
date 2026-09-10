@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ShieldCheck, Tag, Truck, Headphones, ArrowRight, PlayCircle } from "lucide-react";
+import { ShieldCheck, Tag, Truck, Headphones, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { ExploreCrackers } from "@/components/marketing/explore-crackers";
@@ -13,13 +13,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 300;
-
-const TRUST_INDICATORS = [
-  "Wide Range of Products",
-  "Best Wholesale Prices",
-  "Trusted & Reliable",
-  "Pan India Supply",
-];
 
 const TRUST_FEATURES = [
   { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
@@ -36,37 +29,25 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-cream px-4 pb-14 pt-16 text-center md:pb-20 md:pt-24">
+      <section className="relative overflow-hidden bg-cream px-4 pb-8 pt-10 text-center md:pb-12 md:pt-14">
         <SparkField />
         <div className="relative mx-auto max-w-3xl">
           <span className="inline-block rounded-full border border-border bg-gold-tint px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-ink shadow-soft">
             DIWALI 2026
           </span>
-          <h1 className="mx-auto mt-5 max-w-2xl font-display text-4xl font-bold leading-[1.1] text-ink md:text-6xl">
-            Celebrate <br />
-            <span className="text-gradient-festival">Brighter Together</span>
+          <h1 className="mx-auto mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.1] text-ink md:text-5xl">
+            Straight From Sivakasi. <br />
+            <span className="text-gradient-festival">Straight to You.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-lg text-base text-ink-soft md:text-lg">
-            Premium crackers. Safer celebrations. Happier moments. Supplied by {siteConfig.supplier.name}, Sivakasi.
+          <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
+            No middlemen, no markup, just premium crackers at true factory price.
           </p>
-          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href="#enquiry">
-              <Button size="default">
-                Send Enquiry <ArrowRight size={16} aria-hidden />
-              </Button>
-            </a>
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/products">
               <Button variant="secondary">
                 View Products <PlayCircle size={16} aria-hidden />
               </Button>
             </Link>
-          </div>
-          <div className="mx-auto mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {TRUST_INDICATORS.map((t) => (
-              <div key={t} className="rounded-2xl border border-border bg-surface/60 px-3 py-3 text-xs font-medium text-ink-soft">
-                {t}
-              </div>
-            ))}
           </div>
         </div>
       </section>

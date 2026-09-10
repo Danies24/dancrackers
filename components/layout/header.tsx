@@ -144,11 +144,26 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
         >
           <div className="mb-4 flex items-center justify-between pt-10">
             <span className="font-display text-lg font-bold text-ink">Dan Crackers</span>
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setDrawerOpen(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft hover:bg-black/5 hover:text-ink"
+            >
+              <X size={20} aria-hidden />
+            </button>
           </div>
           <nav className="flex flex-1 flex-col gap-1">
             {[{ href: "/", label: "Home" }, { href: "/products", label: "All Products" }, ...NAV_LINKS.filter((l) => l.href !== "/products")].map(
               (link, i) => (
-                <DrawerLink key={link.href} href={link.href} onClick={() => setDrawerOpen(false)} delay={i} open={drawerOpen}>
+                <DrawerLink
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setDrawerOpen(false)}
+                  delay={i}
+                  open={drawerOpen}
+                  active={pathname === link.href}
+                >
                   {link.label}
                 </DrawerLink>
               ),
@@ -162,6 +177,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
                 className="pl-6 text-sm"
                 delay={i + 5}
                 open={drawerOpen}
+                active={pathname === `/products/${cat.slug}`}
               >
                 {cat.name_en}
               </DrawerLink>
@@ -196,6 +212,7 @@ function DrawerLink({
   className,
   delay,
   open,
+  active,
 }: {
   href: string;
   children: React.ReactNode;
@@ -203,14 +220,17 @@ function DrawerLink({
   className?: string;
   delay: number;
   open: boolean;
+  active?: boolean;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       style={{ transitionDelay: open ? `${delay * 35}ms` : "0ms" }}
       className={cn(
-        "min-h-11 rounded-xl px-3 py-2.5 text-ink-soft transition-all duration-200 hover:bg-maroon-tint hover:text-ink",
+        "min-h-11 rounded-xl px-3 py-2.5 transition-all duration-200 hover:bg-maroon-tint hover:text-ink",
+        active ? "bg-maroon-tint font-semibold text-maroon-ink" : "text-ink-soft",
         open ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0",
         className,
       )}
