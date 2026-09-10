@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 type BadgeVariant = "net-rate" | "bestseller" | "unavailable";
 
 const variantClasses: Record<BadgeVariant, string> = {
-  "net-rate": "bg-gold-tint text-gold",
-  bestseller: "bg-maroon-tint text-maroon",
-  unavailable: "bg-white/10 text-ink-soft",
+  "net-rate": "bg-gold-tint text-gold-ink",
+  bestseller: "bg-maroon-tint text-maroon-ink",
+  unavailable: "bg-border text-ink-soft",
 };
 
 const variantLabel: Record<BadgeVariant, string> = {

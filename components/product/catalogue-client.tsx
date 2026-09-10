@@ -141,7 +141,7 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
               <button
                 type="button"
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                className="rounded-md border-2 border-maroon px-6 py-2.5 text-sm font-semibold text-maroon"
+                className="rounded-md border-2 border-maroon-ink px-6 py-2.5 text-sm font-semibold text-maroon-ink"
               >
                 Load more
               </button>
@@ -173,7 +173,7 @@ function EmptyResults({ query, onClear }: { query: string; onClear: () => void }
       <p className="text-ink-soft">
         {query ? `No products match "${query}". Try a shorter word, or browse by category.` : "No products found."}
       </p>
-      <button type="button" onClick={onClear} className="flex items-center gap-1 text-sm font-semibold text-maroon">
+      <button type="button" onClick={onClear} className="flex items-center gap-1 text-sm font-semibold text-maroon-ink">
         <X size={16} aria-hidden /> Clear filters
       </button>
     </div>

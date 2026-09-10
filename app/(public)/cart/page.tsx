@@ -25,7 +25,7 @@ export default function CartPage() {
 
   if (items.length === 0 && !loading) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-20 text-center">
+      <div className="zone-light mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-20 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-maroon-tint text-3xl">🛒</div>
         <h1 className="font-display text-xl font-semibold text-ink">Your cart is empty</h1>
         <Link href="/products">
@@ -36,7 +36,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 pb-40 md:pb-6">
+    <div className="zone-light mx-auto max-w-3xl px-4 py-6 pb-40 md:pb-6">
       <h1 className="font-display text-2xl font-semibold text-ink">
         Your Order <span className="text-base font-normal text-muted">({items.length} items)</span>
       </h1>
@@ -58,7 +58,7 @@ export default function CartPage() {
                   {v.image_url ? (
                     <Image src={v.image_url} alt={v.name_en ?? ""} fill className="object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center font-display font-semibold text-maroon">
+                    <div className="flex h-full w-full items-center justify-center font-display font-semibold text-maroon-ink">
                       {v.name_en?.charAt(0)}
                     </div>
                   )}
@@ -74,7 +74,7 @@ export default function CartPage() {
                     {formatRupees(v.price!)} per {formatUnit(v.unit ?? "")}
                   </p>
                   {priceChanged && (
-                    <p className="mt-1 text-xs text-amber">Price updated since you added this item.</p>
+                    <p className="mt-1 text-xs text-amber-ink">Price updated since you added this item.</p>
                   )}
                   <div className="mt-2 flex items-center justify-between">
                     <Stepper
@@ -92,7 +92,7 @@ export default function CartPage() {
                   type="button"
                   onClick={() => remove(line.productId)}
                   aria-label={`Remove ${v.name_en}`}
-                  className="self-start text-muted hover:text-red"
+                  className="self-start text-muted hover:text-red-ink"
                 >
                   ✕
                 </button>
@@ -106,12 +106,12 @@ export default function CartPage() {
                 <p className="text-sm font-semibold text-ink line-through">
                   {line.validated?.name_en ?? "Product"}
                 </p>
-                <p className="text-xs text-red">No longer available</p>
+                <p className="text-xs text-red-ink">No longer available</p>
               </div>
               <button
                 type="button"
                 onClick={() => remove(line.productId)}
-                className="text-xs font-semibold text-maroon"
+                className="text-xs font-semibold text-maroon-ink"
               >
                 Remove
               </button>
@@ -143,7 +143,7 @@ export default function CartPage() {
           </div>
 
           {belowMinimum && (
-            <div className="mt-4 rounded-md border border-amber/30 bg-gold-tint p-3 text-sm text-amber">
+            <div className="mt-4 rounded-md border border-amber/30 bg-gold-tint p-3 text-sm text-amber-ink">
               Minimum order {formatRupees(settings.minOrderValue)}. Add {formatRupees(shortfall)} more to continue.{" "}
               <Link href="/products" className="font-semibold underline">
                 Browse more
@@ -172,7 +172,7 @@ export default function CartPage() {
             </p>
           </div>
 
-          <Link href="/products" className="mt-4 inline-block text-sm font-semibold text-maroon">
+          <Link href="/products" className="mt-4 inline-block text-sm font-semibold text-maroon-ink">
             ← Add more items
           </Link>
         </>

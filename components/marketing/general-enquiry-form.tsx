@@ -63,7 +63,7 @@ export function GeneralEnquiryForm({ categories }: Props) {
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-teal/30 bg-teal-tint px-6 py-14 text-center">
-        <Sparkles className="text-teal" size={32} aria-hidden />
+        <Sparkles className="text-teal-ink" size={32} aria-hidden />
         <p className="font-display text-xl font-semibold text-ink">Enquiry sent successfully! 🎆</p>
         <p className="text-sm text-ink-soft">We&apos;ll call you back shortly.</p>
       </div>
@@ -119,7 +119,7 @@ export function GeneralEnquiryForm({ categories }: Props) {
       <div className="sm:col-span-2">
         <Textarea label="Your Message (Optional)" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
       </div>
-      {error && <p className="text-sm text-red sm:col-span-2">{error}</p>}
+      {error && <p className="text-sm text-red-ink sm:col-span-2">{error}</p>}
       <div className="sm:col-span-2">
         <Button type="submit" size="full" disabled={submitting}>
           {submitting ? "Sending…" : "Send Enquiry ✨"}

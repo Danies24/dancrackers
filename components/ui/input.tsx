@@ -9,7 +9,7 @@ interface FieldWrapperProps {
 }
 
 const fieldClasses =
-  "w-full min-h-12 rounded-2xl border bg-surface px-3.5 text-[16px] text-ink placeholder:text-muted focus:border-maroon focus:ring-1 focus:ring-maroon";
+  "w-full min-h-12 rounded-2xl border bg-surface px-3.5 text-[16px] text-ink placeholder:text-muted focus:border-maroon-ink focus:ring-1 focus:ring-maroon-ink";
 
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement>,
@@ -26,12 +26,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className="flex flex-col gap-1.5">
         <label htmlFor={inputId} className="text-sm font-medium text-ink-soft">
           {label}
-          {required && <span className="text-red"> *</span>}
+          {required && <span className="text-red-ink"> *</span>}
         </label>
         <input
           ref={ref}
           id={inputId}
-          className={cn(fieldClasses, error && "border-red", !error && "border-border", className)}
+          className={cn(fieldClasses, error && "border-red-ink", !error && "border-border", className)}
           aria-invalid={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}
           {...props}
@@ -42,7 +42,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
         {error && (
-          <p id={errorId} className="flex items-center gap-1 text-xs text-red">
+          <p id={errorId} className="flex items-center gap-1 text-xs text-red-ink">
             {error}
           </p>
         )}
@@ -66,7 +66,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="flex flex-col gap-1.5">
         <label htmlFor={inputId} className="text-sm font-medium text-ink-soft">
           {label}
-          {required && <span className="text-red"> *</span>}
+          {required && <span className="text-red-ink"> *</span>}
         </label>
         <textarea
           ref={ref}
@@ -74,7 +74,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={cn(
             fieldClasses,
             "min-h-24 py-2.5",
-            error && "border-red",
+            error && "border-red-ink",
             !error && "border-border",
             className,
           )}
@@ -88,7 +88,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </p>
         )}
         {error && (
-          <p id={errorId} className="text-xs text-red">
+          <p id={errorId} className="text-xs text-red-ink">
             {error}
           </p>
         )}

@@ -22,10 +22,10 @@ const TRUST_INDICATORS = [
 ];
 
 const TRUST_FEATURES = [
-  { icon: ShieldCheck, color: "text-teal bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
-  { icon: Tag, color: "text-maroon bg-maroon-tint", title: "Competitive Pricing", body: "Best rates for bulk orders." },
-  { icon: Truck, color: "text-blue bg-blue-tint", title: "Pan India Delivery", body: "We deliver across India." },
-  { icon: Headphones, color: "text-pink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
+  { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
+  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Competitive Pricing", body: "Best rates for bulk orders." },
+  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Pan India Delivery", body: "We deliver across India." },
+  { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
 ];
 
 export default async function HomePage() {
@@ -71,11 +71,12 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <div className="zone-light">
       {catalogueEmpty ? (
         <section className="mx-auto max-w-6xl px-4 py-16 text-center">
           <p className="text-ink-soft">
             Our catalogue is being updated. Call us on{" "}
-            <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon">
+            <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon-ink">
               {siteConfig.operator.phoneDisplay}
             </a>
             .
@@ -144,14 +145,14 @@ export default async function HomePage() {
             "The supplier despatches to your address",
           ].map((step, i) => (
             <li key={step} className="rounded-2xl border border-border bg-surface p-4">
-              <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-ink">
+              <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-on-fill">
                 {i + 1}
               </span>
               <p className="text-sm text-ink-soft">{step}</p>
             </li>
           ))}
         </ol>
-        <Link href="/how-it-works" className="mt-4 inline-block text-sm font-semibold text-maroon">
+        <Link href="/how-it-works" className="mt-4 inline-block text-sm font-semibold text-maroon-ink">
           Read the full explainer →
         </Link>
       </section>
@@ -160,11 +161,12 @@ export default async function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-14">
         <div className="rounded-2xl border border-amber/30 bg-gold-tint p-4 text-sm text-ink-soft">
           Fireworks are explosives. Always burst them outdoors, under adult supervision.{" "}
-          <Link href="/safety" className="font-semibold text-gold">
+          <Link href="/safety" className="font-semibold text-gold-ink">
             Read our full safety guidance →
           </Link>
         </div>
       </section>
+      </div>
     </div>
   );
 }

@@ -43,6 +43,47 @@
   --glow-orange: rgba(255, 107, 26, 0.25);
   --glow-pink: rgba(255, 61, 129, 0.2);
   --glow-gold: rgba(255, 200, 87, 0.2);
+
+  /* Half-White (Direction B), 2026-09. On-light text/icon variants — fills
+     (bg-maroon, bg-gradient-primary, *-tint chips) are untouched and stay
+     bright everywhere. Default value = the bright accent itself, so any
+     page NOT wrapped in .zone-light renders pixel-identical to today. */
+  --maroon-ink: var(--maroon);
+  --pink-ink: var(--pink);
+  --gold-ink: var(--gold);
+  --blue-ink: var(--blue);
+  --teal-ink: var(--teal);
+  --amber-ink: var(--amber);
+  --red-ink: var(--red);
+
+  /* Text sitting on a solid/gradient accent fill (primary buttons, filled
+     chips) — always the light cream, regardless of zone. */
+  --on-fill: #fff8ec;
+}
+
+/**
+ * Half-White (Direction B) day zone. Wrap product/cart/checkout body
+ * content in .zone-light to flip it from the dark "festival night" surface
+ * to a warm ivory "shopfront" surface. Hero, nav and footer are never
+ * wrapped, so they keep every existing dark value untouched.
+ */
+.zone-light {
+  --cream: #fbf7f0; /* warm ivory — was midnight navy */
+  --secondary-bg: #f3ece1; /* soft sand */
+  --surface: #ffffff; /* card white */
+  --border: #e6dcc7; /* sand border */
+
+  --ink: #171b2e; /* deep navy ink — was warm white */
+  --ink-soft: #4b5468;
+  --muted: #868fa3;
+
+  --maroon-ink: #c6480e;
+  --pink-ink: #c41e60;
+  --gold-ink: #8a6200;
+  --blue-ink: #1d66b8;
+  --teal-ink: #0a7d62;
+  --amber-ink: #a35608;
+  --red-ink: #cc332c;
 }
 
 @theme inline {
@@ -74,6 +115,15 @@
   --color-surface: var(--surface);
   --color-border: var(--border);
   --color-whatsapp: var(--whatsapp);
+
+  --color-maroon-ink: var(--maroon-ink);
+  --color-pink-ink: var(--pink-ink);
+  --color-gold-ink: var(--gold-ink);
+  --color-blue-ink: var(--blue-ink);
+  --color-teal-ink: var(--teal-ink);
+  --color-amber-ink: var(--amber-ink);
+  --color-red-ink: var(--red-ink);
+  --color-on-fill: var(--on-fill);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

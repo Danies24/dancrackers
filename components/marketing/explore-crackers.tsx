@@ -41,7 +41,7 @@ export function ExploreCrackers({
       </div>
 
       <div className="mt-6 text-center">
-        <Link href={active ? `/products/${active}` : "/products"} className="text-sm font-semibold text-maroon">
+        <Link href={active ? `/products/${active}` : "/products"} className="text-sm font-semibold text-maroon-ink">
           View All Products →
         </Link>
       </div>
@@ -55,7 +55,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
       type="button"
       onClick={onClick}
       className={`h-10 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors ${
-        active ? "border-transparent bg-gradient-primary text-ink" : "border-border bg-surface text-ink-soft hover:border-maroon"
+        active ? "border-transparent bg-gradient-primary text-on-fill" : "border-border bg-surface text-ink-soft hover:border-maroon-ink"
       }`}
     >
       {label}

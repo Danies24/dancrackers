@@ -17,7 +17,7 @@ export function ProductGallery({ images, name, category }: Props) {
   if (images.length === 0) {
     return (
       <div className="flex aspect-square w-full items-center justify-center rounded-lg bg-maroon-tint">
-        <span className="font-display text-6xl font-semibold text-maroon">
+        <span className="font-display text-6xl font-semibold text-maroon-ink">
           {name.trim().charAt(0).toUpperCase() || "?"}
         </span>
       </div>

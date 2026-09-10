@@ -33,7 +33,7 @@ export function Stepper({ value, min = 1, onIncrement, onDecrement, label, class
         type="button"
         onClick={onIncrement}
         aria-label={`Increase quantity of ${label}`}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-soft transition-colors hover:border-maroon hover:text-maroon"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-soft transition-colors hover:border-maroon-ink hover:text-maroon-ink"
       >
         <Plus size={16} aria-hidden />
       </button>

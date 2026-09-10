@@ -42,7 +42,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
   }
 
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-border bg-surface transition-all duration-300 ease-out hover:-translate-y-1 hover:border-maroon/50 hover:glow-orange">
+    <div className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-border bg-surface transition-all duration-300 ease-out hover:-translate-y-1 hover:border-maroon-ink/50 hover:glow-orange">
       <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
         {product.image_url ? (
           <Image
@@ -110,7 +110,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
 function PlaceholderImage({ name }: { name: string }) {
   const letter = name.trim().charAt(0).toUpperCase() || "?";
   return (
-    <div className="flex h-full w-full items-center justify-center bg-maroon-tint text-3xl font-display font-semibold text-maroon">
+    <div className="flex h-full w-full items-center justify-center bg-maroon-tint text-3xl font-display font-semibold text-maroon-ink">
       {letter}
     </div>
   );

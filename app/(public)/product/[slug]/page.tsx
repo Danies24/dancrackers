@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const isCallForRate = !product.price;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
+    <div className="zone-light mx-auto max-w-5xl px-4 py-6">
       <ProductViewTracker
         productId={product.id}
         sku={product.sku}
@@ -77,7 +77,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           {product.category && (
             <Link
               href={`/products/${product.category.slug}`}
-              className="mt-2 inline-block text-xs font-medium text-maroon"
+              className="mt-2 inline-block text-xs font-medium text-maroon-ink"
             >
               {product.category.name_en}
             </Link>
@@ -87,7 +87,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {isCallForRate ? (
               <p className="text-ink-soft">
                 Call us for the rate on this item —{" "}
-                <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon">
+                <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon-ink">
                   {siteConfig.operator.phoneDisplay}
                 </a>
               </p>
@@ -125,7 +125,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           <p className="mt-6 text-xs text-muted">
             Fireworks are explosives — use only under adult supervision and follow the safety instructions.{" "}
-            <Link href="/safety" className="font-medium text-maroon">
+            <Link href="/safety" className="font-medium text-maroon-ink">
               Read safety guidance →
             </Link>
           </p>
