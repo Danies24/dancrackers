@@ -87,7 +87,7 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
         <h2 className="mb-2 text-sm font-bold text-ink">Customer</h2>
         <p className="text-sm font-medium">{order.name}</p>
         <p className="text-sm text-ink-soft">
-          <a href={`tel:+91${order.phone}`} className="font-semibold text-maroon">
+          <a href={`tel:+91${order.phone}`} className="font-semibold text-maroon-ink">
             {order.phone}
           </a>{" "}
           ·{" "}
@@ -198,7 +198,7 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
       <section className="rounded-lg border border-border bg-surface p-4">
         <h2 className="mb-2 text-sm font-bold text-ink">Supplier order</h2>
         <div className="flex gap-2">
-          <button onClick={copySupplierMessage} className="flex-1 rounded-md border border-maroon py-2 text-sm font-semibold text-maroon">
+          <button onClick={copySupplierMessage} className="flex-1 rounded-md border border-maroon py-2 text-sm font-semibold text-maroon-ink">
             Copy supplier message
           </button>
           {supplierMessage?.whatsappUrl && (

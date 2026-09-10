@@ -10,9 +10,11 @@ import type { CategoryRow } from "@/lib/data";
 export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }) {
   return (
     <footer className="mt-16 border-t border-border bg-cream">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid-cols-4">
+      {/* Nav-link grid — hidden on mobile per design brief: the hamburger side
+          menu already covers About/Contact/How it works/Products/Information. */}
+      <div className="mx-auto hidden max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid md:grid-cols-4">
         <div className="min-w-0">
-          <h3 className="mb-3 font-display text-base font-semibold text-maroon">
+          <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">
             {siteConfig.name}
           </h3>
           <ul className="space-y-2 text-sm text-ink-soft">
@@ -28,7 +30,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           </ul>
         </div>
         <div className="min-w-0">
-          <h3 className="mb-3 font-display text-base font-semibold text-maroon">Products</h3>
+          <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">Products</h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             {topCategories.slice(0, 6).map((cat) => (
               <li key={cat.id}>
@@ -43,7 +45,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           </ul>
         </div>
         <div className="min-w-0">
-          <h3 className="mb-3 font-display text-base font-semibold text-maroon">Information</h3>
+          <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">Information</h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             <li>
               <Link href="/safety">Safety</Link>
@@ -63,7 +65,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           </ul>
         </div>
         <div className="min-w-0">
-          <h3 className="mb-3 font-display text-base font-semibold text-maroon">Contact</h3>
+          <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">Contact</h3>
           <ul className="space-y-2 break-words text-sm text-ink-soft">
             <li>
               <a href={`tel:+${siteConfig.operator.phoneE164}`}>{siteConfig.operator.phoneDisplay}</a>

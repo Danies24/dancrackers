@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { diffImport, parseCatalogueCsv } from "@/lib/csv-import";
+import { slugify } from "@/lib/slugify";
 
 const bodySchema = z.object({
   csv: z.string().min(1),
@@ -47,11 +48,7 @@ export async function POST(request: Request) {
   for (const row of rows) {
     let categoryId = categoryByName.get(row.category.toLowerCase());
     if (!categoryId) {
-      const slug = row.category
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+      const slug = slugify(row.category);
       const { data: newCategory, error: catError } = await supabase
         .from("categories")
         .insert({ slug, name_en: row.category, display_order: categoryByName.size + 1 })
@@ -67,11 +64,7 @@ export async function POST(request: Request) {
 
     const existing = (existingProducts ?? []).find((p) => p.sku === row.sku);
 
-    const slug = row.name_en
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+    const slug = slugify(row.name_en);
 
     const { data: upserted, error: upsertError } = await supabase
       .from("products")

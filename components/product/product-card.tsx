@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
@@ -11,6 +12,7 @@ import { useToast } from "@/components/ui/toast";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
 import type { ProductWithCategory } from "@/lib/data";
 
 /**
@@ -41,8 +43,22 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
     setTimeout(() => setJustAdded(false), 1200);
   }
 
+  const inCart = !!cartItem;
+
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-border bg-surface transition-all duration-300 ease-out hover:-translate-y-1 hover:border-maroon-ink/50 hover:glow-orange">
+    <div
+      className={cn(
+        "group relative flex h-full flex-col overflow-hidden rounded-[20px] border transition-all duration-300 ease-out hover:-translate-y-1 hover:glow-orange",
+        inCart
+          ? "border-teal bg-teal-tint shadow-soft"
+          : "border-border bg-surface shadow-soft hover:border-maroon-ink/50",
+      )}
+    >
+      {inCart && (
+        <span className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-full bg-teal px-2 py-0.5 text-[10px] font-semibold text-on-fill shadow-soft">
+          <Check size={11} aria-hidden strokeWidth={3} /> In Cart
+        </span>
+      )}
       <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
         {product.image_url ? (
           <Image

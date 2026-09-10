@@ -60,11 +60,11 @@ export default function ImportPage() {
 
       {result && (
         <div className="mb-4 rounded-lg border border-teal/30 bg-teal-tint p-4 text-sm">
-          <p className="font-semibold text-teal">Import committed.</p>
+          <p className="font-semibold text-teal-ink">Import committed.</p>
           <p>
             {result.created} new · {result.updated} updated · {result.markedUnavailable} marked unavailable
           </p>
-          <Link href="/admin/products" className="mt-2 inline-block font-semibold text-maroon">
+          <Link href="/admin/products" className="mt-2 inline-block font-semibold text-maroon-ink">
             View products →
           </Link>
         </div>

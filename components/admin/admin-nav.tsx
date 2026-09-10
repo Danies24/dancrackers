@@ -26,11 +26,11 @@ export function AdminNav({ userName }: { userName: string }) {
     <header className="sticky top-0 z-40 border-b border-border bg-secondary-bg text-ink">
       <div className="flex h-14 items-center justify-between px-4">
         <span className="font-display text-sm font-semibold">Dan Crackers Admin</span>
-        <button onClick={signOut} className="text-xs text-white/70 hover:text-white">
+        <button onClick={signOut} className="text-xs text-ink-soft hover:text-ink">
           Sign out ({userName})
         </button>
       </div>
-      <nav className="flex border-t border-white/10">
+      <nav className="flex border-t border-border">
         {links.map((link) => {
           const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
           return (
@@ -39,7 +39,7 @@ export function AdminNav({ userName }: { userName: string }) {
               href={link.href}
               className={cn(
                 "flex-1 py-3 text-center text-sm font-medium",
-                active ? "border-b-2 border-gold text-white" : "text-white/60",
+                active ? "border-b-2 border-gold-ink text-ink" : "text-ink-soft",
               )}
             >
               {link.label}

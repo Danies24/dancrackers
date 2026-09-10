@@ -63,7 +63,7 @@ export default function HowItWorksPage() {
           Online sale of firecrackers is not permitted under Indian law (Supreme Court order in{" "}
           <em>Arjun Gopal v. Union of India</em>, 2018). This website collects enquiries only — the sale itself
           happens between you and the supplier, after a phone call. See our{" "}
-          <Link href="/compliance" className="font-semibold text-maroon">
+          <Link href="/compliance" className="font-semibold text-maroon-ink">
             compliance page
           </Link>{" "}
           for details.

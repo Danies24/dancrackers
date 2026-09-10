@@ -37,7 +37,7 @@ export default function ContactPage() {
 function ContactRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
   const content = (
     <div className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4">
-      <span className="text-maroon">{icon}</span>
+      <span className="text-maroon-ink">{icon}</span>
       <div>
         <p className="text-xs text-muted">{label}</p>
         <p className="font-medium text-ink">{value}</p>

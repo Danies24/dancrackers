@@ -28,7 +28,7 @@ export default function AboutPage() {
         </p>
         <p>
           For product quality, warranty or manufacturing questions, the supplier is directly reachable — see
-          our <a href="/contact" className="font-semibold text-maroon">Contact</a> page.
+          our <a href="/contact" className="font-semibold text-maroon-ink">Contact</a> page.
         </p>
       </div>
     </div>

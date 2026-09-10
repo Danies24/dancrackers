@@ -40,7 +40,7 @@ const formSchema = z
     email: emailSchema,
     preferredCallTime: z.enum(["anytime", "morning", "afternoon", "evening"]).optional(),
     notes: z.string().max(500).optional(),
-    company: z.string().optional(), // honeypot
+    hp_check: z.string().optional(), // honeypot — see lib/validation.ts for why it's not named something autofill-prone
   })
   .superRefine((data, ctx) => {
     if (!data.whatsappSame) {
@@ -162,7 +162,7 @@ export default function EnquiryPage() {
           },
           items: activeLines.map((l) => ({ productId: l.productId, quantity: l.qty })),
           captainCode: getReferral() ?? undefined,
-          company: formValues.company || undefined,
+          hp_check: formValues.hp_check || undefined,
           meta: { sourceUrl: window.location.href, formRenderedAt: renderedAt.current },
         }),
       });
@@ -213,7 +213,7 @@ export default function EnquiryPage() {
       {!loading && (
         <div className="mt-3 rounded-md border border-border bg-surface p-3 text-sm text-ink-soft">
           {items.reduce((s, i) => s + i.qty, 0)} items · <strong>{formatRupees(totals.grandTotal)}</strong>{" "}
-          <Link href="/cart" className="font-semibold text-maroon">
+          <Link href="/cart" className="font-semibold text-maroon-ink">
             view
           </Link>
         </div>
@@ -236,7 +236,7 @@ export default function EnquiryPage() {
           autoComplete="off"
           aria-hidden="true"
           className="absolute left-[-9999px]"
-          {...register("company")}
+          {...register("hp_check")}
         />
 
         <Input label="Full name" required autoComplete="name" error={errors.name?.message} {...register("name")} />

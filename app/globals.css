@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
-/* Design tokens — Dark Diwali 2026 design system. */
+/* Design tokens — Premium Gen-Z Modern (white) design system, 2026-09. */
 :root {
-  /* Base surfaces */
-  --ink: #fff8ec; /* warm white — primary text */
-  --ink-soft: #a9b0c3; /* secondary text */
-  --muted: #727a91; /* tertiary text */
+  /* Base surfaces — clean white throughout, warm neutral for separation */
+  --ink: #171b2e; /* deep navy-black — primary text */
+  --ink-soft: #4b5468; /* secondary text */
+  --muted: #868fa3; /* tertiary text */
 
-  --cream: #080b18; /* midnight navy — page background */
-  --secondary-bg: #11162b; /* secondary sections, nav */
-  --surface: #151b34; /* card navy */
-  --border: #2a3152; /* border navy */
+  --cream: #ffffff; /* page background */
+  --secondary-bg: #f7f5f2; /* secondary sections, nav-on-scroll */
+  --surface: #ffffff; /* card surface — separated from page by border/shadow */
+  --border: #e7e2d9; /* card/input borders, dividers */
 
-  /* Festival accents */
+  /* Festival accents — fills stay fully saturated on white */
   --maroon: #ff6b1a; /* electric orange — primary brand/CTA */
   --maroon-dark: #e85a0f; /* orange hover */
-  --maroon-tint: rgba(255, 107, 26, 0.12);
+  --maroon-tint: rgba(255, 107, 26, 0.1);
 
   --pink: #ff3d81; /* hot pink — secondary accent / gradient end */
-  --pink-tint: rgba(255, 61, 129, 0.12);
+  --pink-tint: rgba(255, 61, 129, 0.1);
 
   --gold: #ffc857; /* diwali gold */
-  --gold-tint: rgba(255, 200, 87, 0.15);
+  --gold-tint: rgba(255, 200, 87, 0.16);
 
   --blue: #4da3ff; /* electric blue */
-  --blue-tint: rgba(77, 163, 255, 0.15);
+  --blue-tint: rgba(77, 163, 255, 0.14);
 
   --teal: #20d6a3; /* emerald — success/trust */
-  --teal-tint: rgba(32, 214, 163, 0.15);
+  --teal-tint: rgba(32, 214, 163, 0.14);
 
   --amber: #ffb020;
   --red: #ff4d4d;
@@ -40,43 +40,14 @@
   /* Gradients & glow */
   --gradient-primary: linear-gradient(90deg, #ff6b1a 0%, #ff3d81 100%);
   --gradient-festival: linear-gradient(135deg, #ffc857 0%, #ff6b1a 45%, #ff3d81 100%);
-  --glow-orange: rgba(255, 107, 26, 0.25);
-  --glow-pink: rgba(255, 61, 129, 0.2);
-  --glow-gold: rgba(255, 200, 87, 0.2);
+  --glow-orange: rgba(255, 107, 26, 0.22);
+  --glow-pink: rgba(255, 61, 129, 0.18);
+  --glow-gold: rgba(255, 200, 87, 0.18);
 
-  /* Half-White (Direction B), 2026-09. On-light text/icon variants — fills
-     (bg-maroon, bg-gradient-primary, *-tint chips) are untouched and stay
-     bright everywhere. Default value = the bright accent itself, so any
-     page NOT wrapped in .zone-light renders pixel-identical to today. */
-  --maroon-ink: var(--maroon);
-  --pink-ink: var(--pink);
-  --gold-ink: var(--gold);
-  --blue-ink: var(--blue);
-  --teal-ink: var(--teal);
-  --amber-ink: var(--amber);
-  --red-ink: var(--red);
-
-  /* Text sitting on a solid/gradient accent fill (primary buttons, filled
-     chips) — always the light cream, regardless of zone. */
-  --on-fill: #fff8ec;
-}
-
-/**
- * Half-White (Direction B) day zone. Wrap product/cart/checkout body
- * content in .zone-light to flip it from the dark "festival night" surface
- * to a warm ivory "shopfront" surface. Hero, nav and footer are never
- * wrapped, so they keep every existing dark value untouched.
- */
-.zone-light {
-  --cream: #fbf7f0; /* warm ivory — was midnight navy */
-  --secondary-bg: #f3ece1; /* soft sand */
-  --surface: #ffffff; /* card white */
-  --border: #e6dcc7; /* sand border */
-
-  --ink: #171b2e; /* deep navy ink — was warm white */
-  --ink-soft: #4b5468;
-  --muted: #868fa3;
-
+  /* Text/icon color for each accent — tuned for contrast on white.
+     Fills (bg-maroon, bg-gradient-primary, *-tint chips) are untouched and
+     stay bright everywhere; these "-ink" variants are for text/icons that
+     sit directly on the page or a card, never on a saturated fill. */
   --maroon-ink: #c6480e;
   --pink-ink: #c41e60;
   --gold-ink: #8a6200;
@@ -84,6 +55,10 @@
   --teal-ink: #0a7d62;
   --amber-ink: #a35608;
   --red-ink: #cc332c;
+
+  /* Text sitting on a solid/gradient accent fill (primary buttons, filled
+     chips) — always warm cream, for contrast against the saturated fill. */
+  --on-fill: #fff8ec;
 }
 
 @theme inline {
@@ -215,6 +190,16 @@ input[type="radio"] {
 
 .glow-pink {
   box-shadow: 0 0 28px var(--glow-pink);
+}
+
+/* Soft elevation for white-on-white cards (§Gen-Z Modern — border alone
+   isn't enough separation once every surface is white). */
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(23, 27, 46, 0.04), 0 8px 24px rgba(23, 27, 46, 0.06);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 2px 4px rgba(23, 27, 46, 0.05), 0 16px 40px rgba(23, 27, 46, 0.08);
 }
 
 .scrollbar-none {

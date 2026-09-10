@@ -58,7 +58,7 @@ function SuccessContent() {
         className="mx-auto mt-4 flex items-center gap-2 rounded-md border border-border bg-surface px-4 py-2 font-mono text-sm"
       >
         {ref} <Copy size={14} aria-hidden />
-        {copied && <span className="text-teal">Copied</span>}
+        {copied && <span className="text-teal-ink">Copied</span>}
       </button>
 
       <p className="mt-4 text-ink-soft">
@@ -98,13 +98,13 @@ function SuccessContent() {
 
       <p className="mt-6 text-xs text-muted">
         Fireworks are explosives — please follow our{" "}
-        <Link href="/safety" className="font-semibold text-maroon">
+        <Link href="/safety" className="font-semibold text-maroon-ink">
           safety guidance
         </Link>
         .
       </p>
 
-      <Link href="/products" className="mt-6 inline-block text-sm font-semibold text-maroon">
+      <Link href="/products" className="mt-6 inline-block text-sm font-semibold text-maroon-ink">
         Browse more crackers →
       </Link>
     </div>

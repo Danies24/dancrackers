@@ -85,8 +85,11 @@ export const enquirySchema = z.object({
     .toUpperCase()
     .optional()
     .transform((v) => (v ? v : undefined)),
-  // Honeypot (§30.2): a hidden field named 'company'. Any non-empty value is a bot.
-  company: z.string().max(0).optional(),
+  // Honeypot (§30.2): named to avoid browser/password-manager autofill heuristics
+  // (a field named e.g. "company" gets silently autofilled by real users' saved
+  // contact info, which then looks like a bot to this check). Any non-empty
+  // value is treated as a bot.
+  hp_check: z.string().max(0).optional(),
   meta: z
     .object({
       sourceUrl: z.string().optional(),

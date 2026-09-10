@@ -8,7 +8,7 @@ export default function CompliancePage() {
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="font-display text-2xl font-semibold text-ink">Compliance Notice</h1>
 
-      <div className="mt-6 rounded-lg border border-maroon/20 bg-maroon-tint p-4 text-sm font-medium text-maroon">
+      <div className="mt-6 rounded-lg border border-maroon/20 bg-maroon-tint p-4 text-sm font-medium text-maroon-ink">
         {complianceNotice}
       </div>
 

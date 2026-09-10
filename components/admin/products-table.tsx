@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
 import type { Database } from "@/types/database";
@@ -59,7 +60,11 @@ export function ProductsTable({ initialProducts }: { initialProducts: Product[] 
           <tbody>
             {filtered.map((p) => (
               <tr key={p.id} className="border-b border-border/50">
-                <td className="p-2 font-mono text-xs">{p.sku}</td>
+                <td className="p-2 font-mono text-xs">
+                  <Link href={`/admin/products/${p.id}`} className="text-maroon-ink hover:underline">
+                    {p.sku}
+                  </Link>
+                </td>
                 <td className="max-w-[160px] truncate p-2">
                   {p.name_en}
                   {!p.image_url && <span className="ml-1 text-[10px] text-amber">needs photo</span>}

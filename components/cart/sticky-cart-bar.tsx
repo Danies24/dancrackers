@@ -40,7 +40,7 @@ export function StickyCartBar() {
       </span>
       <Link
         href="/cart"
-        className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-maroon"
+        className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-maroon-ink"
       >
         View Cart →
       </Link>

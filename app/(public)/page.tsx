@@ -39,7 +39,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden bg-cream px-4 pb-14 pt-16 text-center md:pb-20 md:pt-24">
         <SparkField />
         <div className="relative mx-auto max-w-3xl">
-          <span className="inline-block rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-semibold tracking-wide text-gold">
+          <span className="inline-block rounded-full border border-border bg-gold-tint px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-ink shadow-soft">
             DIWALI 2026
           </span>
           <h1 className="mx-auto mt-5 max-w-2xl font-display text-4xl font-bold leading-[1.1] text-ink md:text-6xl">
@@ -71,7 +71,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="zone-light">
+      <>
       {catalogueEmpty ? (
         <section className="mx-auto max-w-6xl px-4 py-16 text-center">
           <p className="text-ink-soft">
@@ -166,7 +166,7 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-      </div>
+      </>
     </div>
   );
 }

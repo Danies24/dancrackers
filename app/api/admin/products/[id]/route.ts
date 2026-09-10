@@ -4,6 +4,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
 
 const patchSchema = z.object({
+  name_en: z.string().min(1).optional(),
+  name_ta: z.string().nullable().optional(),
+  sku: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
+  category_id: z.string().uuid().optional(),
+  unit: z.enum(["pkt", "pcs", "box", "bundle"]).optional(),
+  min_qty: z.number().int().positive().optional(),
+  description: z.string().nullable().optional(),
+  display_order: z.number().int().optional(),
+  video_url: z.string().url().nullable().optional(),
   price: z.number().nonnegative().nullable().optional(),
   status: z.enum(["active", "unavailable", "archived"]).optional(),
   is_bestseller: z.boolean().optional(),

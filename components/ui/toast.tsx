@@ -55,7 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={toast.action.onClick}
-                className="shrink-0 font-semibold text-gold underline underline-offset-2"
+                className="shrink-0 font-semibold text-gold-ink underline underline-offset-2"
               >
                 {toast.action.label}
               </button>

@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-/** Sticky nav — transparent over the hero, blurred navy once scrolled. */
+/** Sticky nav — transparent over the hero, blurred white with a border once scrolled. */
 export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -69,8 +69,8 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "transition-colors hover:text-maroon",
-                  pathname.startsWith(link.href) && link.href !== "/" && "text-maroon",
+                  "transition-colors hover:text-maroon-ink",
+                  pathname.startsWith(link.href) && link.href !== "/" && "text-maroon-ink",
                 )}
               >
                 {link.label}
@@ -82,37 +82,37 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
             <Link
               href="/products"
               aria-label="Search products"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink"
             >
               <Search size={18} aria-hidden />
             </Link>
             <Link
               href="/cart"
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:text-maroon md:hidden"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:text-maroon-ink md:hidden"
             >
               <ShoppingCart size={20} aria-hidden />
               {itemCount > 0 && (
-                <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-primary px-1 text-[10px] font-semibold text-ink">
+                <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-primary px-1 text-[10px] font-semibold text-on-fill">
                   {itemCount}
                 </span>
               )}
             </Link>
             <Link
               href="/cart"
-              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon md:flex"
+              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink md:flex"
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
             >
               <ShoppingCart size={18} aria-hidden />
               {itemCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-primary px-1 text-[10px] font-semibold text-ink">
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-primary px-1 text-[10px] font-semibold text-on-fill">
                   {itemCount}
                 </span>
               )}
             </Link>
             <Link
               href={isHome ? "#enquiry" : "/#enquiry"}
-              className="ml-2 hidden items-center gap-1 rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-ink transition-all hover:-translate-y-0.5 hover:glow-orange md:inline-flex"
+              className="ml-2 hidden items-center gap-1 rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-on-fill transition-all hover:-translate-y-0.5 hover:glow-orange md:inline-flex"
             >
               Enquire Now
             </Link>

@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const isCallForRate = !product.price;
 
   return (
-    <div className="zone-light mx-auto max-w-5xl px-4 py-6">
+    <div className="mx-auto max-w-5xl px-4 py-6">
       <ProductViewTracker
         productId={product.id}
         sku={product.sku}
@@ -60,7 +60,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <ProductGallery images={images} name={product.name_en} category={product.category?.name_en ?? ""} />
+        <div>
+          <ProductGallery images={images} name={product.name_en} category={product.category?.name_en ?? ""} />
+          {product.video_url && (
+            <video controls className="mt-4 w-full rounded-lg" src={product.video_url} />
+          )}
+        </div>
 
         <div className="pb-24 md:pb-0">
           <div className="mb-1 flex flex-wrap gap-1.5">

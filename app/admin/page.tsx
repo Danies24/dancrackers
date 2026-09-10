@@ -64,7 +64,7 @@ export default async function AdminTodayPage() {
       <div className="mt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-ink">New enquiries</h2>
-          <Link href="/admin/orders" className="text-xs font-semibold text-maroon">
+          <Link href="/admin/orders" className="text-xs font-semibold text-maroon-ink">
             View all →
           </Link>
         </div>

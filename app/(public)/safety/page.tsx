@@ -68,7 +68,7 @@ export default function SafetyPage() {
         </p>
         <p className="mt-2">
           See our{" "}
-          <Link href="/compliance" className="font-semibold text-maroon">
+          <Link href="/compliance" className="font-semibold text-maroon-ink">
             compliance page
           </Link>{" "}
           for the legal framework behind this.

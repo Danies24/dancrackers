@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const tooFast =
     typeof input.meta?.formRenderedAt === "number" &&
     Date.now() - input.meta.formRenderedAt < MIN_SUBMIT_SECONDS * 1000;
-  if (input.company || tooFast) {
+  if (input.hp_check || tooFast) {
     console.warn("[enquiry] honeypot/speed check tripped — silently dropped");
     return NextResponse.json(
       { orderRef: "DC-0000-0000", totals: null, whatsappUrl: null },

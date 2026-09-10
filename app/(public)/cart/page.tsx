@@ -25,7 +25,7 @@ export default function CartPage() {
 
   if (items.length === 0 && !loading) {
     return (
-      <div className="zone-light mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-20 text-center">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-20 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-maroon-tint text-3xl">🛒</div>
         <h1 className="font-display text-xl font-semibold text-ink">Your cart is empty</h1>
         <Link href="/products">
@@ -36,7 +36,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="zone-light mx-auto max-w-3xl px-4 py-6 pb-40 md:pb-6">
+    <div className="mx-auto max-w-3xl px-4 py-6 pb-40 md:pb-6">
       <h1 className="font-display text-2xl font-semibold text-ink">
         Your Order <span className="text-base font-normal text-muted">({items.length} items)</span>
       </h1>
