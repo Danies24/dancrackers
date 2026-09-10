@@ -2,8 +2,12 @@
  * Site-wide facts that are legally load-bearing (§32.4, §32.5) or reused
  * across many components. NOT product data — that lives in the database.
  *
- * [BLOCKED / PLACEHOLDER] Supplier name, phone numbers and the address are
- * placeholders until confirmed in writing (PRD §42.1). Replace before launch.
+ * Single source of truth — every page pulls the phone number and supplier
+ * name from here, so updating either happens in exactly one place.
+ *
+ * [PLACEHOLDER] Supplier address is still generic (locality only). The PRD
+ * (§32.3, §42.1 item 7) wants the full registered address confirmed in
+ * writing before this appears on a live page.
  */
 export const siteConfig = {
   name: "Dan Crackers",
@@ -11,14 +15,14 @@ export const siteConfig = {
   operator: {
     name: "Dan Crackers",
     address: "Avudiyapuram, Virudhunagar District, Tamil Nadu 626204",
-    phoneDisplay: "9XXXXXXXXX", // [BLOCKED] replace with the real business number
-    phoneE164: "91XXXXXXXXXX",
+    phoneDisplay: "82483 65737",
+    phoneE164: "918248365737",
     email: "hello@dancrackersorders.com",
   },
   supplier: {
-    // [BLOCKED] Name and address must be confirmed in writing (PRD §32.3, §42.1 item 7)
-    // before this appears on a live page.
-    name: "[Supplier name — pending written confirmation]",
+    // [PLACEHOLDER] Working name for now — confirm the final legal name and
+    // full address with the supplier in writing before launch (§32.3).
+    name: "Dan Fireworks",
     address: "Sivakasi, Tamil Nadu",
   },
   categoriesInFooter: 6,

@@ -62,16 +62,18 @@ export async function POST(request: Request) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (token && chatId) {
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: `📩 Quick enquiry — ${input.name} — ${input.phone}${input.category ? ` — ${input.category}` : ""}${input.message ? `\n"${input.message}"` : ""}`,
-      }),
-    }).catch(() => {});
+  const chatIds = [process.env.TELEGRAM_CHAT_ID_DAN, process.env.TELEGRAM_CHAT_ID_ARUN].filter(
+    (v): v is string => Boolean(v),
+  );
+  if (token && chatIds.length > 0) {
+    const text = `📩 Quick enquiry — ${input.name} — ${input.phone}${input.category ? ` — ${input.category}` : ""}${input.message ? `\n"${input.message}"` : ""}`;
+    for (const chatId of chatIds) {
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+      }).catch(() => {});
+    }
   }
 
   return NextResponse.json({ ok: true }, { status: 201 });

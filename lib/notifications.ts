@@ -66,8 +66,10 @@ function buildEmailHtml(order: NotificationOrder): string {
 
 async function sendTelegramNotification(order: NotificationOrder): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) {
+  const chatIds = [process.env.TELEGRAM_CHAT_ID_DAN, process.env.TELEGRAM_CHAT_ID_ARUN].filter(
+    (v): v is string => Boolean(v),
+  );
+  if (!token || chatIds.length === 0) {
     console.warn(`[notifications] Telegram not configured — skipped for ${order.orderRef}`);
     return;
   }
@@ -87,18 +89,22 @@ async function sendTelegramNotification(order: NotificationOrder): Promise<void>
     .filter(Boolean)
     .join("\n");
 
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
-    if (!res.ok) {
-      console.error(`[notifications] Telegram responded ${res.status} for ${order.orderRef}`);
-    }
-  } catch (error) {
-    console.error(`[notifications] Telegram failed for ${order.orderRef}`, error);
-  }
+  await Promise.allSettled(
+    chatIds.map(async (chatId) => {
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: chatId, text }),
+        });
+        if (!res.ok) {
+          console.error(`[notifications] Telegram responded ${res.status} for ${order.orderRef} (chat ${chatId})`);
+        }
+      } catch (error) {
+        console.error(`[notifications] Telegram failed for ${order.orderRef} (chat ${chatId})`, error);
+      }
+    }),
+  );
 }
 
 export interface DigestOrder {

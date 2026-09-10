@@ -29,6 +29,9 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
   const [saving, setSaving] = useState(false);
   const [supplierMessage, setSupplierMessage] = useState<{ message: string; whatsappUrl: string | null } | null>(null);
   const [pendingLostReason, setPendingLostReason] = useState(false);
+  const [captainEditing, setCaptainEditing] = useState(false);
+  const [captainInput, setCaptainInput] = useState("");
+  const [captainNote, setCaptainNote] = useState("");
 
   async function patch(body: Record<string, unknown>) {
     setSaving(true);
@@ -103,7 +106,61 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
         </p>
         {order.preferred_call_time && <p className="mt-1 text-xs text-muted">Preferred call time: {order.preferred_call_time}</p>}
         {order.needs_review && <p className="mt-1 text-xs font-semibold text-amber">⚠ Needs review (out-of-area pincode)</p>}
-        {order.captain_code && <p className="mt-1 text-xs text-ink-soft">Captain: <strong>{order.captain_code}</strong></p>}
+      </section>
+
+      {/* Captain */}
+      <section className="rounded-lg border border-border bg-surface p-4">
+        <h2 className="mb-2 text-sm font-bold text-ink">Captain</h2>
+        {order.captain_code ? (
+          <p className="text-sm text-ink-soft">
+            via <strong className="font-mono text-ink">{order.captain_code}</strong>
+          </p>
+        ) : (
+          <p className="text-sm text-muted">Direct — no captain referral</p>
+        )}
+
+        {captainEditing ? (
+          <div className="mt-2 flex flex-col gap-2">
+            <input
+              value={captainInput}
+              onChange={(e) => setCaptainInput(e.target.value.toUpperCase())}
+              placeholder="e.g. RAJ12 (blank to clear)"
+              className="h-10 w-full rounded-md border border-border px-2 font-mono text-sm"
+            />
+            <input
+              value={captainNote}
+              onChange={(e) => setCaptainNote(e.target.value)}
+              placeholder="Reason (optional) — e.g. customer confirmed they used Rajesh's link"
+              className="h-10 w-full rounded-md border border-border px-2 text-sm"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  patch({ captainCode: captainInput.trim() || null, note: captainNote.trim() || undefined });
+                  setCaptainEditing(false);
+                  setCaptainNote("");
+                }}
+                disabled={saving}
+                className="rounded-md bg-maroon px-3 py-1.5 text-xs font-semibold text-white"
+              >
+                Save
+              </button>
+              <button onClick={() => setCaptainEditing(false)} className="text-xs text-muted underline">
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => {
+              setCaptainInput(order.captain_code ?? "");
+              setCaptainEditing(true);
+            }}
+            className="mt-2 text-xs font-semibold text-maroon-ink underline"
+          >
+            {order.captain_code ? "Correct attribution" : "Set a captain"}
+          </button>
+        )}
       </section>
 
       {/* Items */}
