@@ -1,16 +1,15 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { ShieldCheck, Tag, Truck, Headphones, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { ExploreCrackers } from "@/components/marketing/explore-crackers";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
 import { getCatalogue, getCategoryWithCounts } from "@/lib/data";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
-export const metadata: Metadata = {
-  title: "Dan Crackers — Sivakasi Crackers for Chennai | Order Online",
-};
+// No title metadata here — the layout's `default` title (brandConfig.seo.defaultTitle)
+// is used as-is for the homepage. An explicit title here would instead fill the
+// layout's `%s | ${brand}` template, duplicating the brand name.
 
 export const revalidate = 300;
 
@@ -57,8 +56,8 @@ export default async function HomePage() {
         <section className="mx-auto max-w-6xl px-4 py-16 text-center">
           <p className="text-ink-soft">
             Our catalogue is being updated. Call us on{" "}
-            <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon-ink">
-              {siteConfig.operator.phoneDisplay}
+            <a href={`tel:+${getPhoneE164()}`} className="font-semibold text-maroon-ink">
+              {getPhoneDisplay()}
             </a>
             .
           </p>
@@ -80,7 +79,7 @@ export default async function HomePage() {
       {/* Trust section */}
       <section className="bg-secondary-bg px-4 py-14">
         <div className="mx-auto max-w-6xl text-center">
-          <p className="text-xs font-semibold tracking-wide text-muted">WHY CHOOSE DAN CRACKERS</p>
+          <p className="text-xs font-semibold tracking-wide text-muted">WHY CHOOSE {brandConfig.brand.name.toUpperCase()}</p>
           <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
             Safe. Reliable. <span className="text-gradient-festival">Always Festive.</span>
           </h2>

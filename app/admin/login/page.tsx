@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig } from "@/config/brandConfig";
 
 function LoginForm() {
   const router = useRouter();
@@ -33,7 +33,7 @@ function LoginForm() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4">
-      <h1 className="mb-1 font-display text-xl font-semibold text-ink">{siteConfig.name} — Admin</h1>
+      <h1 className="mb-1 font-display text-xl font-semibold text-ink">{brandConfig.brand.name} — Admin</h1>
       <p className="mb-6 text-sm text-muted">Order desk sign in</p>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <Input

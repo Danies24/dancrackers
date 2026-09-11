@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
-  title: "How to Order Crackers from Dan Crackers",
+  title: `How to Order Crackers from ${brandConfig.brand.name}`,
 };
+
+const supplier = getPrimarySupplier();
 
 const steps = [
   { title: "Browse and add to cart", body: "Search or browse by category. Every price is on the site." },
   { title: "Submit your enquiry (no payment)", body: "Tell us your name, phone and address. No payment field exists anywhere on this site." },
-  { title: "We call you within 2 hours to confirm", body: "Dan or Arun calls to confirm your items, address and the final amount." },
+  { title: "We call you within 2 hours to confirm", body: "Our team calls to confirm your items, address and the final amount." },
   { title: "You pay the supplier directly", body: "By UPI or bank transfer, straight to the supplier — never to us." },
-  { title: "The supplier despatches to your address", body: `${siteConfig.supplier.name} packs and sends your order.` },
+  { title: "The supplier despatches to your address", body: `${supplier.name || "The supplier"} packs and sends your order.` },
 ];
 
 const faqs = [

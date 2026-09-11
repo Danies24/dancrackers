@@ -4,29 +4,27 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { spaceGrotesk, manrope, notoSansTamil } from "@/lib/fonts";
 import { ToastProvider } from "@/components/ui/toast";
 import { AnalyticsScripts } from "@/components/analytics-scripts";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig, getSiteUrl } from "@/config/brandConfig";
 import "./globals.css";
 
-const description =
-  "Browse the full Sivakasi crackers price list with photos. Build your order, we call you to confirm. Supplied by licensed Sivakasi manufacturers.";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${siteConfig.name} — Sivakasi Crackers for Chennai | Order Online`,
-    template: `%s | ${siteConfig.name}`,
+    default: brandConfig.seo.defaultTitle,
+    template: brandConfig.seo.titleTemplate,
   },
-  description,
+  description: brandConfig.seo.defaultDescription,
+  keywords: [...brandConfig.seo.keywords],
   openGraph: {
     type: "website",
-    siteName: siteConfig.name,
-    title: `${siteConfig.name} — Sivakasi Crackers for Chennai`,
-    description,
+    siteName: brandConfig.brand.name,
+    title: brandConfig.seo.defaultTitle,
+    description: brandConfig.seo.defaultDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} — Sivakasi Crackers for Chennai`,
-    description,
+    title: brandConfig.seo.defaultTitle,
+    description: brandConfig.seo.defaultDescription,
   },
 };
 

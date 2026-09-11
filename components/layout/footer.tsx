@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { complianceNotice, manufacturerFacilitatorNotice, siteConfig } from "@/lib/site-config";
+import { brandConfig, getFormattedAddress, getManufacturerFacilitatorNotice, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
 import type { CategoryRow } from "@/lib/data";
 
 /**
@@ -8,6 +8,9 @@ import type { CategoryRow } from "@/lib/data";
  * the legal footing the whole business model depends on (§32.4).
  */
 export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }) {
+  const email = getPrimaryEmail();
+  const notice = getManufacturerFacilitatorNotice();
+
   return (
     <footer className="mt-16 border-t border-border bg-cream">
       {/* Nav-link grid — hidden on mobile per design brief: the hamburger side
@@ -15,7 +18,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
       <div className="mx-auto hidden max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid md:grid-cols-4">
         <div className="min-w-0">
           <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">
-            {siteConfig.name}
+            {brandConfig.brand.name}
           </h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             <li>
@@ -68,22 +71,22 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">Contact</h3>
           <ul className="space-y-2 break-words text-sm text-ink-soft">
             <li>
-              <a href={`tel:+${siteConfig.operator.phoneE164}`}>{siteConfig.operator.phoneDisplay}</a>
+              <a href={`tel:+${getPhoneE164()}`}>{getPhoneDisplay()}</a>
             </li>
             <li>
-              <a href={`mailto:${siteConfig.operator.email}`} className="break-all">
-                {siteConfig.operator.email}
+              <a href={`mailto:${email.address}`} className="break-all">
+                {email.address}
               </a>
             </li>
-            <li>{siteConfig.operator.address}</li>
+            <li>{getFormattedAddress()}</li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-border bg-maroon-tint px-4 py-4 text-center text-xs leading-relaxed text-ink-soft">
-        <p>{manufacturerFacilitatorNotice.manufacturedBy}</p>
-        <p>{manufacturerFacilitatorNotice.facilitatedBy}</p>
-        <p className="mx-auto mt-2 max-w-2xl">{complianceNotice}</p>
+        <p>{notice.manufacturedBy}</p>
+        <p>{notice.facilitatedBy}</p>
+        <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>
       </div>
     </footer>
   );

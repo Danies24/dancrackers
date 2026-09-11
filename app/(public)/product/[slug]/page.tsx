@@ -8,7 +8,7 @@ import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
-import { siteConfig } from "@/lib/site-config";
+import { getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 export const revalidate = 300;
 
@@ -92,8 +92,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {isCallForRate ? (
               <p className="text-ink-soft">
                 Call us for the rate on this item —{" "}
-                <a href={`tel:+${siteConfig.operator.phoneE164}`} className="font-semibold text-maroon-ink">
-                  {siteConfig.operator.phoneDisplay}
+                <a href={`tel:+${getPhoneE164()}`} className="font-semibold text-maroon-ink">
+                  {getPhoneDisplay()}
                 </a>
               </p>
             ) : (
@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="mt-6">
               <p className="mb-3 text-sm text-ink-soft">This item is currently unavailable.</p>
               <a
-                href={`https://wa.me/${siteConfig.operator.phoneE164}?text=${encodeURIComponent(
+                href={`https://wa.me/${getPhoneE164()}?text=${encodeURIComponent(
                   `Hi, I'd like to know when ${product.name_en} will be back in stock.`,
                 )}`}
                 target="_blank"

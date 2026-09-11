@@ -1,4 +1,5 @@
 import { formatNumberIndian, formatRupees } from "./format";
+import { brandConfig } from "@/config/brandConfig";
 
 /**
  * The three wa.me messages (PRD §17). wa.me deep links only — no Business
@@ -50,7 +51,7 @@ export interface CustomerMessageInput {
 /** Message 1 — customer to us (§17.3). Secondary action; the enquiry is already saved. */
 export function buildCustomerMessage(input: CustomerMessageInput): string {
   return [
-    "Hi Dan Crackers, I have submitted an order enquiry.",
+    brandConfig.messages.whatsappGreeting,
     "",
     `Ref: ${input.orderRef}`,
     `Name: ${input.name}`,
@@ -72,7 +73,6 @@ export interface SupplierMessageInput {
   supplierName: string;
   orderRef: string;
   dateDisplay: string; // DD-MM-YYYY
-  bookedByName: string;
   bookedByPhone: string;
   customerName: string;
   customerPhone: string;
@@ -106,7 +106,7 @@ export function buildSupplierMessage(input: SupplierMessageInput): string {
     "",
     `Our ref: ${input.orderRef}`,
     `Date: ${input.dateDisplay}`,
-    `Booked by: Dan Crackers (${input.bookedByName}, ${input.bookedByPhone})`,
+    `${brandConfig.messages.supplierOrderHeader} (${input.bookedByPhone})`,
     "",
     "DELIVER TO",
     `${input.customerName} — ${input.customerPhone}`,
@@ -138,5 +138,5 @@ export function buildSupplierMessage(input: SupplierMessageInput): string {
 /** Message 3 — captain kit (§17.5, §20.7). Tamil/English mixed, ready to forward as-is. */
 export function buildCaptainKitMessage(captainCode: string, siteUrl: string): string {
   const link = `${siteUrl.replace(/\/$/, "")}/c/${captainCode}`;
-  return `Naan indha Deepavali crackers Sivakasi-la irundhu direct-a order panren. Rate ellame website-la clear-a irukku, delivery gate varaikkum vandhudum. Idho link — ${link}`;
+  return brandConfig.messages.captainShareMessage.replace("{link}", link);
 }

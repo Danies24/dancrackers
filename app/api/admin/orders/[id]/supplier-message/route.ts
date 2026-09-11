@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildSupplierMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { getSettings } from "@/lib/data";
-import { siteConfig } from "@/lib/site-config";
+import { getPhoneDisplay, getPrimarySupplier } from "@/config/brandConfig";
 
 /** GET /api/admin/orders/[id]/supplier-message (§17.4, §22.2). The formatted order-to-supplier text. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -22,11 +22,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const supplierNumber = String(settings.supplier_whatsapp_number ?? "");
 
   const message = buildSupplierMessage({
-    supplierName: siteConfig.supplier.name,
+    supplierName: getPrimarySupplier().name,
     orderRef: order.order_ref,
     dateDisplay: new Date(order.created_at).toLocaleDateString("en-GB").replace(/\//g, "-"),
-    bookedByName: "Dan",
-    bookedByPhone: siteConfig.operator.phoneDisplay,
+    bookedByPhone: getPhoneDisplay(),
     customerName: order.name,
     customerPhone: order.phone,
     address: order.address,

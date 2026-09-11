@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { siteConfig } from "@/lib/site-config";
+import { getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
+  const email = getPrimaryEmail();
+  const supplier = getPrimarySupplier();
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="font-display text-2xl font-semibold text-ink">Privacy Policy</h1>
@@ -23,7 +26,7 @@ export default function PrivacyPage() {
         </Section>
         <Section title="Who we share it with">
           <p>
-            Your name, phone number and delivery address are shared with {siteConfig.supplier.name} solely to
+            Your name, phone number and delivery address are shared with {supplier.name || "our supplier"} solely to
             fulfil your order. We do not sell your data to anyone. Captains never see your phone number or
             full address — only your first name, order status and amount.
           </p>
@@ -43,7 +46,7 @@ export default function PrivacyPage() {
         </Section>
         <Section title="Deletion requests">
           <p>
-            Email {siteConfig.operator.email} or call {siteConfig.operator.phoneDisplay} to request deletion.
+            Email {email.address} or call {getPhoneDisplay()} to request deletion.
             We will remove your personal details and anonymise any past orders within 30 days.
           </p>
         </Section>

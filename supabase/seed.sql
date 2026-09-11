@@ -1,10 +1,10 @@
--- SAMPLE CATALOGUE — NOT the real Dan Crackers / Gurusamy supplier data.
+-- SAMPLE CATALOGUE — NOT the real supplier data.
 --
 -- Transcribed from 'Selva Fancy Crackers — Diwali Price List 2026', the
 -- representative sample catalogue the PRD names for data-model derivation
 -- (PRD §3.6, §13). It is real, published pricing from an actual Sivakasi
--- seller — not fabricated — but it is NOT the Dan Crackers supplier's
--- catalogue. Used here only to seed a realistic local/dev/preview database
+-- seller — not fabricated — but it is NOT our real supplier's catalogue.
+-- Used here only to seed a realistic local/dev/preview database
 -- (17 categories, ~188 items, ₹24-3,750 range, matching PRD §3.6).
 --
 -- This file is only ever run by `supabase db reset` / local dev seeding.

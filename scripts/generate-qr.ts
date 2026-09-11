@@ -4,7 +4,7 @@
  * a future admin UI).
  *
  * Usage: npx tsx scripts/generate-qr.ts <CODE> [siteUrl]
- * Example: npx tsx scripts/generate-qr.ts RAJ12 https://dancrackersorders.com
+ * Example: npx tsx scripts/generate-qr.ts RAJ12 https://kolagalam.example.com
  */
 import { config } from "dotenv";
 import { writeFile, mkdir } from "node:fs/promises";

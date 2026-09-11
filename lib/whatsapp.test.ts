@@ -83,7 +83,6 @@ describe("buildSupplierMessage — includes SKU on every line (§17.4)", () => {
       supplierName: "Gurusamy Fireworks",
       orderRef: "DC-2609-0147",
       dateDisplay: "12-10-2026",
-      bookedByName: "Dan",
       bookedByPhone: "9XXXXXXXXX",
       customerName: "Priya R",
       customerPhone: "9876543210",

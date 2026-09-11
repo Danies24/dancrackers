@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import { complianceNotice, manufacturerFacilitatorNotice, siteConfig } from "@/lib/site-config";
+import { brandConfig, getManufacturerFacilitatorNotice, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = { title: "Compliance Notice" };
 
 export default function CompliancePage() {
+  const notice = getManufacturerFacilitatorNotice();
+  const supplier = getPrimarySupplier();
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="font-display text-2xl font-semibold text-ink">Compliance Notice</h1>
 
       <div className="mt-6 rounded-lg border border-maroon/20 bg-maroon-tint p-4 text-sm font-medium text-maroon-ink">
-        {complianceNotice}
+        {brandConfig.legal.complianceNotice}
       </div>
 
       <div className="mt-6 flex flex-col gap-4 text-sm leading-relaxed text-ink-soft">
@@ -27,12 +30,12 @@ export default function CompliancePage() {
           </p>
         </Section>
         <Section title="Who does what">
-          <p>{manufacturerFacilitatorNotice.manufacturedBy}</p>
-          <p>{manufacturerFacilitatorNotice.facilitatedBy}</p>
+          <p>{notice.manufacturedBy}</p>
+          <p>{notice.facilitatedBy}</p>
           <p className="mt-2">
-            {siteConfig.supplier.name} holds the licences required to manufacture and sell fireworks, invoices
-            the customer directly, and is the seller of record. {siteConfig.operator.name} never possesses,
-            stores, transports or sells fireworks, and never receives payment for them.
+            {supplier.name || "The supplier"} holds the licences required to manufacture and sell fireworks,
+            invoices the customer directly, and is the seller of record. {brandConfig.legal.facilitator.name}{" "}
+            never possesses, stores, transports or sells fireworks, and never receives payment for them.
           </p>
         </Section>
         <Section title="What happens on this site">

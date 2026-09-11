@@ -1,6 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import { formatRupees } from "./format";
+import { brandConfig } from "@/config/brandConfig";
 
 /**
  * §18. Three independent channels after the DB write commits. Every
@@ -27,17 +28,17 @@ export async function sendEnquiryNotifications(order: NotificationOrder): Promis
 
 async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const dan = process.env.NOTIFY_EMAIL_DAN;
-  const arun = process.env.NOTIFY_EMAIL_ARUN;
+  const primary = process.env.NOTIFY_EMAIL_PRIMARY;
+  const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
   const from = process.env.RESEND_FROM_EMAIL;
-  if (!apiKey || !from || (!dan && !arun)) {
+  if (!apiKey || !from || (!primary && !secondary)) {
     console.warn(`[notifications] Resend not configured — skipped email for ${order.orderRef}`);
     return;
   }
 
   try {
     const resend = new Resend(apiKey);
-    const to = [dan, arun].filter((v): v is string => Boolean(v));
+    const to = [primary, secondary].filter((v): v is string => Boolean(v));
     await resend.emails.send({
       from,
       to,
@@ -66,7 +67,7 @@ function buildEmailHtml(order: NotificationOrder): string {
 
 async function sendTelegramNotification(order: NotificationOrder): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatIds = [process.env.TELEGRAM_CHAT_ID_DAN, process.env.TELEGRAM_CHAT_ID_ARUN].filter(
+  const chatIds = [process.env.TELEGRAM_CHAT_ID_PRIMARY, process.env.TELEGRAM_CHAT_ID_SECONDARY].filter(
     (v): v is string => Boolean(v),
   );
   if (!token || chatIds.length === 0) {
@@ -128,10 +129,10 @@ export interface DigestInput {
  */
 export async function sendDigestEmail(input: DigestInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const dan = process.env.NOTIFY_EMAIL_DAN;
-  const arun = process.env.NOTIFY_EMAIL_ARUN;
+  const primary = process.env.NOTIFY_EMAIL_PRIMARY;
+  const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
   const from = process.env.RESEND_FROM_EMAIL;
-  if (!apiKey || !from || (!dan && !arun)) {
+  if (!apiKey || !from || (!primary && !secondary)) {
     console.warn("[digest] Resend not configured — skipping digest email");
     return;
   }
@@ -150,7 +151,7 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
 
   const html = `
     <div style="font-family: sans-serif; max-width: 480px;">
-      <h2>Dan Crackers — digest</h2>
+      <h2>${brandConfig.brand.name} — digest</h2>
       ${input.slaBreaches.length > 0 ? `<h3 style="color:#B3261E">SLA breach — over 2h, no contact</h3>${rows(input.slaBreaches)}` : ""}
       <h3>New since last digest</h3>
       ${rows(input.newSinceLastDigest)}
@@ -161,7 +162,7 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
 
   try {
     const resend = new Resend(apiKey);
-    const to = [dan, arun].filter((v): v is string => Boolean(v));
+    const to = [primary, secondary].filter((v): v is string => Boolean(v));
     await resend.emails.send({ from, to, subject, html });
   } catch (error) {
     console.error("[digest] send failed", error);

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import type { CategoryRow } from "@/lib/data";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -59,7 +59,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
               <X size={22} aria-hidden className={cn("absolute transition-all duration-200", drawerOpen ? "scale-100 opacity-100" : "scale-0 opacity-0")} />
             </button>
             <Link href="/" className="font-display text-lg font-bold text-ink">
-              Dan <span className="text-gradient-festival">Crackers</span>
+              <span className="text-gradient-festival">{brandConfig.brand.name}</span>
             </Link>
           </div>
 
@@ -143,7 +143,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
           )}
         >
           <div className="mb-4 flex items-center justify-between pt-10">
-            <span className="font-display text-lg font-bold text-ink">Dan Crackers</span>
+            <span className="font-display text-lg font-bold text-ink">{brandConfig.brand.name}</span>
             <button
               type="button"
               aria-label="Close menu"
@@ -185,13 +185,13 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
           </nav>
           <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
             <a
-              href={`tel:+${siteConfig.operator.phoneE164}`}
+              href={`tel:+${getPhoneE164()}`}
               className="rounded-full border border-border py-2.5 text-center text-sm font-semibold text-ink"
             >
               Call us
             </a>
             <a
-              href={`https://wa.me/${siteConfig.operator.phoneE164}`}
+              href={`https://wa.me/${getPhoneE164()}`}
               target="_blank"
               rel="noopener"
               className="rounded-full bg-whatsapp py-2.5 text-center text-sm font-semibold text-white"

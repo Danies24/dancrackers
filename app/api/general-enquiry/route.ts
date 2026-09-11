@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatIds = [process.env.TELEGRAM_CHAT_ID_DAN, process.env.TELEGRAM_CHAT_ID_ARUN].filter(
+  const chatIds = [process.env.TELEGRAM_CHAT_ID_PRIMARY, process.env.TELEGRAM_CHAT_ID_SECONDARY].filter(
     (v): v is string => Boolean(v),
   );
   if (token && chatIds.length > 0) {

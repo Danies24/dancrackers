@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatRupees } from "@/lib/format";
-import { siteConfig } from "@/lib/site-config";
+import { getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 import { trackEvent } from "@/lib/analytics";
 
 interface LastOrder {
@@ -62,7 +62,7 @@ function SuccessContent() {
       </button>
 
       <p className="mt-4 text-ink-soft">
-        We have your order. <strong>Dan or Arun will call you on {siteConfig.operator.phoneDisplay} within 2 hours.</strong>
+        We have your order. <strong>Our team will call you on {getPhoneDisplay()} within 2 hours.</strong>
       </p>
 
       {order?.grandTotal !== undefined && (
@@ -89,7 +89,7 @@ function SuccessContent() {
             </Button>
           </a>
         )}
-        <a href={`tel:+${siteConfig.operator.phoneE164}`} onClick={() => trackEvent("call_click", { context: "success" })}>
+        <a href={`tel:+${getPhoneE164()}`} onClick={() => trackEvent("call_click", { context: "success" })}>
           <Button variant="secondary" size="full">
             Call us now
           </Button>

@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import { siteConfig } from "@/lib/site-config";
+import { brandConfig, getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = { title: "Terms of Service" };
 
 export default function TermsPage() {
+  const email = getPrimaryEmail();
+  const supplier = getPrimarySupplier();
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="font-display text-2xl font-semibold text-ink">Terms of Service</h1>
       <div className="prose-sm mt-6 flex flex-col gap-4 text-sm leading-relaxed text-ink-soft">
         <Section title="1. What this site is">
           <p>
-            {siteConfig.name} operates a catalogue and order-enquiry service for fireworks manufactured and
-            sold by {siteConfig.supplier.name}. We are not the seller or manufacturer of any product listed
-            here.
+            {brandConfig.brand.name} operates a catalogue and order-enquiry service for fireworks manufactured
+            and sold by {supplier.name || "our supplier"}. We are not the seller or manufacturer of any
+            product listed here.
           </p>
         </Section>
         <Section title="2. An enquiry is not a confirmed order">
@@ -50,7 +53,7 @@ export default function TermsPage() {
         </Section>
         <Section title="7. Contact">
           <p>
-            Questions about these terms can be sent to {siteConfig.operator.email} or {siteConfig.operator.phoneDisplay}.
+            Questions about these terms can be sent to {email.address} or {getPhoneDisplay()}.
           </p>
         </Section>
       </div>

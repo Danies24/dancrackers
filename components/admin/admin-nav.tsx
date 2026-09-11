@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { brandConfig } from "@/config/brandConfig";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -26,7 +27,7 @@ export function AdminNav({ userName }: { userName: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-secondary-bg text-ink">
       <div className="flex h-14 items-center justify-between px-4">
-        <span className="font-display text-sm font-semibold">Dan Crackers Admin</span>
+        <span className="font-display text-sm font-semibold">{brandConfig.brand.name} Admin</span>
         <button onClick={signOut} className="text-xs text-ink-soft hover:text-ink">
           Sign out ({userName})
         </button>

@@ -21,7 +21,7 @@ import {
   phoneSchema,
   pincodeSchema,
 } from "@/lib/validation";
-import { siteConfig } from "@/lib/site-config";
+import { getPhoneE164 } from "@/config/brandConfig";
 import { trackEvent } from "@/lib/analytics";
 
 const SESSION_KEY = "dc_enquiry_draft";
@@ -136,7 +136,7 @@ export default function EnquiryPage() {
       grandTotal: totals.grandTotal,
       address: formValues.address,
     });
-    return buildWhatsAppUrl(siteConfig.operator.phoneE164.replace(/^91/, ""), message);
+    return buildWhatsAppUrl(getPhoneE164().replace(/^91/, ""), message);
   }
 
   async function onSubmit(formValues: FormValues) {

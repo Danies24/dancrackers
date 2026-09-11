@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 // [BLOCKED — PRD §12.9, §42.1 item 9] This is a SAMPLE safety text, sourced
 // from the representative sample catalogue (Selva Fancy Crackers 2026), not
-// yet confirmed by the real Dan Crackers supplier. The English column is an
+// yet confirmed by the real supplier. The English column is an
 // unverified rendering for layout purposes only. Per the PRD's hard rule
 // (§14.3/§12.9): "do not paraphrase or invent safety guidance" — this MUST
 // be replaced with the real supplier's own text, in both languages, before
