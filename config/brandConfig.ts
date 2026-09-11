@@ -90,7 +90,7 @@ export const brandConfig = {
 
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam — Sivakasi Crackers for Chennai | Order Online",
+    defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Order Online",
     defaultDescription:
       "Browse the full Sivakasi crackers price list with photos. Build your order, we call you to confirm. Supplied by licensed Sivakasi manufacturers.",
     keywords: ["Sivakasi crackers", "Diwali crackers online", "firecrackers Chennai", "Kolagalam"],
