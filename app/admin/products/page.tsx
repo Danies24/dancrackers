@@ -28,6 +28,12 @@ export default async function AdminProductsPage() {
           >
             Import CSV
           </Link>
+          <Link
+            href="/admin/products/photos"
+            className="rounded-md border border-border px-3 py-2 text-sm font-semibold text-ink"
+          >
+            Bulk Photos
+          </Link>
         </div>
       </div>
       <ProductsTable initialProducts={products ?? []} />
