@@ -10,6 +10,24 @@ import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
+import { Skeleton } from "@/components/ui/skeleton";
+
+/** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
+function CartLineSkeleton() {
+  return (
+    <div className="flex gap-3 p-3">
+      <Skeleton className="h-14 w-14 shrink-0 rounded-md" />
+      <div className="flex-1">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="mt-2 h-3 w-1/3" />
+        <div className="mt-3 flex items-center justify-between">
+          <Skeleton className="h-8 w-24 rounded-md" />
+          <Skeleton className="h-4 w-14" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CartPage() {
   const { items, setQty, remove } = useCart();
@@ -43,9 +61,9 @@ export default function CartPage() {
       </h1>
 
       {loading ? (
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 divide-y divide-border rounded-lg border border-border bg-surface">
           {items.map((i) => (
-            <div key={i.productId} className="h-20 animate-pulse rounded-lg bg-black/[0.05]" />
+            <CartLineSkeleton key={i.productId} />
           ))}
         </div>
       ) : (

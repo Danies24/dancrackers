@@ -85,7 +85,15 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
         </div>
       </div>
 
-      <div className="border-t border-border bg-maroon-tint px-4 py-4 text-center text-xs leading-relaxed text-ink-soft">
+      {/* Extra bottom clearance: the site-wide StickyCartBar (h-16, fixed to the
+          viewport bottom on every page except /cart, /enquiry, /admin) would
+          otherwise cover this compliance notice — the one thing on the page
+          that must never be hidden. Applied unconditionally since this is a
+          server component with no visibility into the client cart state. */}
+      <div
+        className="border-t border-border bg-maroon-tint px-4 py-4 text-center text-xs leading-relaxed text-ink-soft"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
+      >
         <p>{notice.manufacturedBy}</p>
         <p>{notice.facilitatedBy}</p>
         <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>

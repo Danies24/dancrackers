@@ -38,21 +38,33 @@ export function useValidatedCart(): ValidatedCart {
       setLoading(false);
       return;
     }
+
+    // Only ever fetch validation for product IDs we don't already have —
+    // removing/reordering/changing qty on items already in the cart never
+    // needs a network round trip, so it never needs to show loading again.
+    const knownIds = new Set((validated ?? []).map((v) => v.productId));
+    const missingIds = items.map((i) => i.productId).filter((id) => !knownIds.has(id));
+
+    if (missingIds.length === 0) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     fetch("/api/products/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productIds: items.map((i) => i.productId) }),
+      body: JSON.stringify({ productIds: missingIds }),
     })
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
-        setValidated(data.items ?? []);
+        setValidated((prev) => [...(prev ?? []), ...(data.items ?? [])]);
         if (data.settings) setSettings(data.settings);
       })
       .catch(() => {
-        if (!cancelled) setValidated([]);
+        if (!cancelled) setValidated((prev) => prev ?? []);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

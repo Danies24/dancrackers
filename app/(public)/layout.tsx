@@ -10,7 +10,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <CartProvider>
       <Header categories={categories} />
-      <main id="main-content" className="flex-1 pb-16 md:pb-0">
+      <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer topCategories={categories} />
