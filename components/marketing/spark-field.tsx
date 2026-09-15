@@ -1,4 +1,6 @@
 import { DiyaIcon } from "@/components/marketing/diya-icon";
+import { SparklerIcon } from "@/components/marketing/sparkler-icon";
+import { SkyShotIcon } from "@/components/marketing/sky-shot-icon";
 
 /**
  * Minimal decorative "distant fireworks" — a handful of soft radial-gradient
@@ -59,6 +61,12 @@ export function SparkField() {
       ))}
       <div className="absolute bottom-4 right-6">
         <DiyaIcon size={46} />
+      </div>
+      <div className="absolute left-6 top-10">
+        <SkyShotIcon size={34} />
+      </div>
+      <div className="absolute right-[15%] top-1/2">
+        <SparklerIcon size={30} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CatalogueClient, CatalogueLoadingSkeleton } from "@/components/product/catalogue-client";
-import { DiyaIcon } from "@/components/marketing/diya-icon";
+import { SkyShotIcon } from "@/components/marketing/sky-shot-icon";
 import { getActiveCategories, getCatalogue } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function ProductsPage() {
     <div className="mx-auto max-w-6xl px-4 py-6">
       <h1 className="flex items-center gap-2 font-display text-2xl font-semibold text-ink">
         All Products
-        <DiyaIcon size={22} />
+        <SkyShotIcon size={22} />
       </h1>
       <Suspense fallback={<CatalogueLoadingSkeleton />}>
         <CatalogueClient products={products} categories={categories} />
