@@ -124,8 +124,8 @@ export default async function HomePage() {
             "You pay the supplier directly",
             "The supplier despatches to your address",
           ].map((step, i) => (
-            <li key={step} className="rounded-2xl border border-border bg-surface p-4">
-              <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-on-fill">
+            <li key={step} className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-on-fill">
                 {i + 1}
               </span>
               <p className="text-sm text-ink-soft">{step}</p>
