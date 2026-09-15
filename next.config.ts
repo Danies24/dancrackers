@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   images: {
+    // Product photos rarely change once uploaded (each upload gets a new
+    // timestamped path) — cache Vercel's optimized copies for a long time
+    // instead of the framework default.
+    minimumCacheTTL: 31536000,
     // Local Supabase Storage serves from 127.0.0.1, a private IP — Next.js
     // blocks image optimization from private IPs by default (SSRF
     // protection). Production Storage is at https://*.supabase.co (a public

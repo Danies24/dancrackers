@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
+import { ImageWithSkeleton } from "@/components/product/image-with-skeleton";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
       )}
       <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
         {product.image_url ? (
-          <Image
+          <ImageWithSkeleton
             src={product.image_url}
             alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
             fill

@@ -45,7 +45,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const { error } = await supabase.storage
     .from("product-media")
-    .upload(path, file, { contentType: file.type, upsert: true });
+    .upload(path, file, { contentType: file.type, upsert: true, cacheControl: "31536000" });
 
   if (error) {
     return NextResponse.json({ error: { code: "internal_error", message: error.message } }, { status: 500 });

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/toast";
+import { compressImage } from "@/lib/image-compress";
 
 export function MediaUploadField({
   productId,
@@ -24,8 +25,9 @@ export function MediaUploadField({
 
     setUploading(true);
     try {
+      const toUpload = kind === "image" ? await compressImage(file) : file;
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", toUpload);
       formData.append("kind", kind);
 
       const res = await fetch(`/api/admin/products/${productId}/media`, {

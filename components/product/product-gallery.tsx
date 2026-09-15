@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
+import { ImageWithSkeleton } from "@/components/product/image-with-skeleton";
 
 interface Props {
   images: string[];
@@ -42,7 +42,7 @@ export function ProductGallery({ images, name, category }: Props) {
       >
         {images.map((src, i) => (
           <div key={src} className="relative aspect-square w-full shrink-0 snap-center bg-cream">
-            <Image
+            <ImageWithSkeleton
               src={src}
               alt={`${name} — ${category}`}
               fill

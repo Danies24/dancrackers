@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { compressImage } from "@/lib/image-compress";
 
 interface Product {
   id: string;
@@ -122,8 +123,9 @@ export default function BulkPhotosPage() {
 
   async function uploadOne(item: Classified): Promise<{ ok: true } | { ok: false; error: string }> {
     try {
+      const compressed = await compressImage(item.file);
       const formData = new FormData();
-      formData.append("file", item.file);
+      formData.append("file", compressed);
       formData.append("kind", "image");
       const res = await fetch(`/api/admin/products/${item.product.id}/media`, { method: "POST", body: formData });
       const data = await res.json();
