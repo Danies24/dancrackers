@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatRupees } from "@/lib/format";
-import { getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { getPhoneE164 } from "@/config/brandConfig";
 import { trackEvent } from "@/lib/analytics";
 
 interface LastOrder {
@@ -85,7 +85,10 @@ function SuccessContent() {
       </button>
 
       <p className="mt-4 text-ink-soft">
-        We have your order. <strong>Our team will call you on {getPhoneDisplay()} within 2 hours.</strong>
+        We have your order.{" "}
+        <strong>
+          Our team will call you {order?.phone ? `on ${order.phone} ` : ""}within 2 hours.
+        </strong>
       </p>
 
       {order?.grandTotal !== undefined && (
