@@ -117,7 +117,7 @@ export function buildSupplierMessage(input: SupplierMessageInput): string {
   lines.push(
     "",
     "ITEMS",
-    "S.No | Item               | Unit |  Qty | Rate | Amount",
+    "SKU  | Item               | Unit |  Qty | Rate | Amount",
     ...itemLines,
     "",
     `Subtotal          ${formatNumberIndian(input.subtotal)}`,
