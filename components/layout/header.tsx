@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
+import { DiyaIcon } from "@/components/marketing/diya-icon";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import type { CategoryRow } from "@/lib/data";
 import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
 import { cn } from "@/lib/utils";
@@ -61,6 +63,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
             <Link href="/" className="font-display text-lg font-bold text-ink">
               <span className="text-gradient-festival">{brandConfig.brand.name}</span>
             </Link>
+            <DiyaIcon size={26} />
           </div>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex">
@@ -79,6 +82,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
           </nav>
 
           <div className="flex items-center gap-1">
+            <ThemeToggle />
             <Link
               href="/products"
               aria-label="Search products"

@@ -17,6 +17,15 @@ interface LastOrder {
   phone?: string;
 }
 
+// One-shot celebratory sparks around the success checkmark — plays once on
+// mount via .animate-celebrate, never loops (this is a moment, not ambience).
+const CELEBRATION_SPARKS = [
+  { top: "-8px", left: "-8px", color: "var(--gold)", delay: "0.1s" },
+  { top: "-10px", left: "70%", color: "var(--pink)", delay: "0.25s" },
+  { top: "70%", left: "-10px", color: "var(--maroon)", delay: "0.4s" },
+  { top: "80%", left: "80%", color: "var(--gold)", delay: "0.15s" },
+];
+
 function SuccessContent() {
   const searchParams = useSearchParams();
   const ref = searchParams.get("ref") ?? "";
@@ -47,8 +56,22 @@ function SuccessContent() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10 text-center">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-teal-tint text-teal">
+      <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-teal-tint text-teal">
         <Check size={32} />
+        {CELEBRATION_SPARKS.map((s, i) => (
+          <span
+            key={i}
+            aria-hidden="true"
+            className="animate-celebrate absolute h-2 w-2"
+            style={{
+              top: s.top,
+              left: s.left,
+              background: s.color,
+              clipPath: "polygon(50% 0%,63% 38%,100% 50%,63% 62%,50% 100%,37% 62%,0% 50%,37% 38%)",
+              animationDelay: s.delay,
+            }}
+          />
+        ))}
       </div>
       <h1 className="font-display text-2xl font-semibold text-ink">Enquiry received</h1>
 

@@ -5,6 +5,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductViewTracker } from "@/components/product/product-view-tracker";
+import { DiyaIcon } from "@/components/marketing/diya-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
@@ -97,9 +98,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </a>
               </p>
             ) : (
-              <p className="tabular-nums">
+              <p className="flex items-center gap-2 tabular-nums">
                 <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
                 <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
+                <DiyaIcon size={18} />
               </p>
             )}
           </div>

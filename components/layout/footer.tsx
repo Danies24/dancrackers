@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DiyaIcon } from "@/components/marketing/diya-icon";
 import { brandConfig, getFormattedAddress, getManufacturerFacilitatorNotice, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
 import type { CategoryRow } from "@/lib/data";
 
@@ -17,8 +18,9 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           menu already covers About/Contact/How it works/Products/Information. */}
       <div className="mx-auto hidden max-w-6xl grid-cols-2 gap-8 px-4 py-10 md:grid md:grid-cols-4">
         <div className="min-w-0">
-          <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">
+          <h3 className="mb-3 flex items-center gap-2 font-display text-base font-semibold text-maroon-ink">
             {brandConfig.brand.name}
+            <DiyaIcon size={18} />
           </h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             <li>
