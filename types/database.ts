@@ -713,13 +713,18 @@ export type Database = {
     Views: {
       public_products: {
         Row: {
+          category: Json
           category_id: string
+          description: string | null
           discount_percent: number | null
           display_order: number
           id: string
           image_url: string | null
+          image_urls: string[]
           is_bestseller: boolean
           is_discountable: boolean
+          is_featured: boolean
+          min_qty: number
           mrp: number | null
           name_en: string
           name_ta: string | null
@@ -728,6 +733,7 @@ export type Database = {
           slug: string
           status: string
           unit: string
+          video_url: string | null
         }
         Relationships: []
       }

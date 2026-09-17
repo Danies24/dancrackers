@@ -173,7 +173,7 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
               ),
             )}
             {categories.length > 0 && <div className="my-2 border-t border-border" />}
-            {categories.slice(0, 6).map((cat, i) => (
+            {categories.map((cat, i) => (
               <DrawerLink
                 key={cat.id}
                 href={`/products/${cat.slug}`}

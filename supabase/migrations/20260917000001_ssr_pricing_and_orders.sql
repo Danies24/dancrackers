@@ -65,29 +65,46 @@ alter table pricing_settings enable row level security;
 -- No anon/authenticated policies at all — service role only, by design.
 
 -- ── public_products: the only thing the storefront reads ────────────
+-- The category is embedded directly as jsonb rather than left as a plain
+-- category_id for PostgREST to resolve — a view has no real foreign key for
+-- PostgREST's embedding/relationship detection to key off, so `.select("*,
+-- category:categories(...)")` against this view cannot be relied on. This
+-- way the view is self-contained and the client-side shape never depends on
+-- how PostgREST happens to introspect a view's lineage.
 create view public_products as
 select
-  id,
-  sku,
-  slug,
-  name_en,
-  name_ta,
-  category_id,
-  unit,
-  status,
-  is_bestseller,
-  image_url,
-  display_order,
-  price,
+  p.id,
+  p.sku,
+  p.slug,
+  p.name_en,
+  p.name_ta,
+  p.category_id,
+  p.unit,
+  p.status,
+  p.is_bestseller,
+  p.is_featured,
+  p.min_qty,
+  p.image_url,
+  p.image_urls,
+  p.video_url,
+  p.description,
+  p.display_order,
+  p.price,
   -- Whether an item is discountable vs net-rate is fine to expose (it's a
   -- category-level fact, not a number) — only the MRP/discount-% themselves
   -- are withheld for net-rate items, since is_discountable=false means mrp
   -- IS the supplier's real net rate.
-  is_discountable,
-  case when is_discountable then mrp end as mrp,
-  case when is_discountable then discount_percent end as discount_percent
-from products
-where status = 'active';
+  p.is_discountable,
+  case when p.is_discountable then p.mrp end as mrp,
+  case when p.is_discountable then p.discount_percent end as discount_percent,
+  jsonb_build_object('id', c.id, 'slug', c.slug, 'name_en', c.name_en, 'name_ta', c.name_ta) as category
+from products p
+join categories c on c.id = p.category_id
+-- Row-existence filtering (active-only for listings) stays the caller's job,
+-- same as it is against the base table today — this view's job is column
+-- redaction. Archived (retired-catalogue) products are the one row-level
+-- exclusion made here, since nothing customer-facing should ever see them.
+where p.status <> 'archived';
 
 grant select on public_products to anon, authenticated;
 

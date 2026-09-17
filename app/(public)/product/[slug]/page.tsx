@@ -70,7 +70,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         <div className="pb-24 md:pb-0">
           <div className="mb-1 flex flex-wrap gap-1.5">
-            {!product.is_discountable && <Badge variant="net-rate" />}
+            {product.is_discountable && product.discount_percent != null && (
+              <span className="rounded-full bg-maroon px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-on-fill">
+                {Math.round(product.discount_percent)}% OFF
+              </span>
+            )}
             {product.is_bestseller && <Badge variant="bestseller" />}
             {isUnavailable && <Badge variant="unavailable" />}
           </div>
@@ -92,17 +96,24 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="mt-4">
             {isCallForRate ? (
               <p className="text-ink-soft">
-                Call us for the rate on this item —{" "}
+                Ask us for the price on this item —{" "}
                 <a href={`tel:+${getPhoneE164()}`} className="font-semibold text-maroon-ink">
                   {getPhoneDisplay()}
                 </a>
               </p>
             ) : (
-              <p className="flex items-center gap-2 tabular-nums">
-                <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
-                <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
-                <SparklerIcon size={18} />
-              </p>
+              <div>
+                {product.is_discountable && product.mrp != null ? (
+                  <p className="tabular-nums text-sm text-muted line-through">{formatRupees(product.mrp)}</p>
+                ) : !product.is_discountable ? (
+                  <p className="text-sm text-muted">Special price</p>
+                ) : null}
+                <p className="flex items-center gap-2 tabular-nums">
+                  <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
+                  <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
+                  <SparklerIcon size={18} />
+                </p>
+              </div>
             )}
           </div>
 
