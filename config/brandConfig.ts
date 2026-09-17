@@ -147,17 +147,32 @@ export function getPrimarySupplier(): Supplier {
   return brandConfig.legal.suppliers.find((s) => s.isPrimary) ?? brandConfig.legal.suppliers[0];
 }
 
-/** The one number every "contact supplier" WhatsApp button on the site should use — digits only, no "+91". */
+/**
+ * ADMIN-ONLY. Sree Sai Ram's own WhatsApp number — used exclusively by the
+ * login-gated "Send order to supplier" button in /admin/orders, so staff can
+ * actually message the supplier to place an order. Never call this from
+ * anything under app/(public)/* or a public API route: a customer must
+ * never see this number. For every public-facing tel:/wa.me link, use
+ * getPhoneE164()/getPhoneDisplay() below instead — digits only, no "+91".
+ */
 export function getPrimarySupplierWhatsApp(): string {
   return getPrimarySupplier().whatsapp.replace(/\D/g, "");
 }
 
-/** E.164-ish digits with no "+" — e.g. "918248365737". Matches wa.me / tel: link conventions used across the site. */
+/**
+ * THE single phone/WhatsApp number shown anywhere on the public website —
+ * every tel:/wa.me link on the storefront (header, footer, home, product
+ * pages, contact, enquiry) reads this one function, sourced from the one
+ * `isPrimary` entry in brandConfig.contact.phones. Never hardcode a number
+ * on a public page, and never use getPrimarySupplierWhatsApp() here — that
+ * one is the supplier's own number, for the admin panel only.
+ * E.164-ish digits with no "+" — e.g. "918248365737".
+ */
 export function getPhoneE164(phone: Phone = getPrimaryPhone()): string {
   return `${phone.countryCode.replace("+", "")}${phone.number}`;
 }
 
-/** Human-readable display grouping — e.g. "82483 65737". */
+/** Human-readable display grouping of the same public number — e.g. "82483 65737". */
 export function getPhoneDisplay(phone: Phone = getPrimaryPhone()): string {
   return `${phone.number.slice(0, 5)} ${phone.number.slice(5)}`;
 }
