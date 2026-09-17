@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildSupplierMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
-import { getSettings } from "@/lib/data";
-import { getPhoneDisplay, getPrimarySupplier } from "@/config/brandConfig";
+import { getPhoneDisplay, getPrimarySupplier, getPrimarySupplierWhatsApp } from "@/config/brandConfig";
 
 /**
  * GET /api/admin/orders/[id]/supplier-message. The formatted order-to-
@@ -22,9 +21,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (!order) {
     return NextResponse.json({ error: { code: "not_found", message: "Order not found." } }, { status: 404 });
   }
-
-  const settings = await getSettings();
-  const supplierNumber = String(settings.supplier_whatsapp_number ?? "");
 
   const orderItems = items ?? [];
   const supplierTotal = Number(order.supplier_total ?? order.grand_total);
@@ -54,7 +50,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     grandTotal: supplierTotal,
   });
 
-  const whatsappUrl = supplierNumber ? buildWhatsAppUrl(supplierNumber, message) : null;
+  const whatsappUrl = buildWhatsAppUrl(getPrimarySupplierWhatsApp(), message);
 
   return NextResponse.json({
     message,

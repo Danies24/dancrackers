@@ -59,6 +59,14 @@ export const brandConfig = {
         city: "Sivakasi",
         address: "3/268 D Sivakasi–Sattur Road, Opp. Sri Sankari Mahal, Chinnakamanpatti, Sivakasi 626 189",
         phone: "99946 37193 / 96297 24212",
+        // The single number every "contact supplier" WhatsApp button on the
+        // site uses (order-detail's "Send on WhatsApp" for the supplier
+        // order today; anywhere else later) — kept separate from the
+        // display-only `phone` string above since a wa.me link needs one
+        // canonical 10-digit number, not a "/"-joined pair. This is their
+        // primary published contact number (kidscrackerspark.com, "CALL US
+        // ANYTIME") — swap here, once, if that ever changes.
+        whatsapp: "9629724212",
         // TODO(confirm): licence number — get in writing from the supplier before this appears on a live page.
         licenceNo: "TODO(confirm)",
         isPrimary: true,
@@ -137,6 +145,11 @@ export function getPrimaryEmail(): Email {
 
 export function getPrimarySupplier(): Supplier {
   return brandConfig.legal.suppliers.find((s) => s.isPrimary) ?? brandConfig.legal.suppliers[0];
+}
+
+/** The one number every "contact supplier" WhatsApp button on the site should use — digits only, no "+91". */
+export function getPrimarySupplierWhatsApp(): string {
+  return getPrimarySupplier().whatsapp.replace(/\D/g, "");
 }
 
 /** E.164-ish digits with no "+" — e.g. "918248365737". Matches wa.me / tel: link conventions used across the site. */
