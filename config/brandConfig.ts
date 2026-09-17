@@ -16,9 +16,10 @@ export const brandConfig = {
     descriptor: "Sivakasi Crackers",
     // TODO: write a real tagline for Kolagalam (shown in the OG image and site metadata).
     tagline: "TODO: Kolagalam tagline",
-    // TODO: replace once a real domain is registered — NEXT_PUBLIC_SITE_URL
-    // takes priority at runtime (see getSiteUrl()), this is only the fallback.
-    siteUrl: "TODO: https://kolagalam.example.com",
+    // Replace once a real custom domain (e.g. kolagalam.com) is registered —
+    // NEXT_PUBLIC_SITE_URL takes priority at runtime (see getSiteUrl()),
+    // this is only the fallback if that env var isn't set.
+    siteUrl: "https://kolagalam.vercel.app",
     logo: {
       primary: "/brand/logo-primary.svg",
       dark: "/brand/logo-dark.svg",
