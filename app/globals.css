@@ -401,3 +401,41 @@ input[type="radio"] {
   transform-origin: center;
   animation: sky-burst 2.4s ease-out infinite;
 }
+
+/* One-shot cracker-blast burst — fired only when the cart crosses a
+   packaging/delivery milestone on the progress bar (cart-progress-banner,
+   cart-progress-bar), never looping. Each particle radiates outward to its
+   own --burst-x/--burst-y offset, set inline per-particle. */
+@keyframes firecracker-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--burst-x, 20px), var(--burst-y, -20px)) scale(1.1) rotate(35deg);
+  }
+}
+
+.animate-firecracker-burst {
+  animation: firecracker-burst 750ms ease-out both;
+}
+
+/* Expanding ring pulse behind the progress bar at the same crossing moment. */
+@keyframes blast-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--glow-gold);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 0 16px rgba(255, 200, 87, 0);
+    opacity: 0;
+  }
+}
+
+.animate-blast-ring {
+  animation: blast-ring 700ms ease-out both;
+}

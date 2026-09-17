@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/components/cart/cart-provider";
 import {
   computeTotals,
-  isBelowMinimumOrderForState,
-  shortfallToMinimumForState,
+  isBelowMinimumOrderValue,
+  shortfallToMinimumValue,
   type PricingResult,
 } from "@/lib/pricing";
 import type { ValidateResultItem } from "@/app/api/products/validate/route";
@@ -23,7 +23,6 @@ export interface ValidatedCart {
   activeLines: ResolvedCartLine[];
   unavailableLines: ResolvedCartLine[];
   totals: PricingResult;
-  /** Only meaningful once a delivery state is known — false/0 until then. */
   belowMinimum: boolean;
   shortfall: number;
 }
@@ -31,14 +30,10 @@ export interface ValidatedCart {
 /**
  * Shared by /cart and /enquiry — one revalidation call, one totals
  * computation. Each product's discount is already baked into its `price`
- * by the DB, so this hook no longer needs a global discount setting.
- *
- * `state` is the customer's delivery state, only known once they reach the
- * enquiry form — pass it there to get a real minimum-order check; omit it
- * (as the cart page does) to skip that check entirely rather than show a
- * wrong number.
+ * by the DB, so this hook no longer needs a global discount setting. The
+ * minimum-order check is flat (§ cartCharges) — no delivery state needed.
  */
-export function useValidatedCart(state?: string | null): ValidatedCart {
+export function useValidatedCart(): ValidatedCart {
   const { items } = useCart();
   const [validated, setValidated] = useState<ValidateResultItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -116,7 +111,7 @@ export function useValidatedCart(state?: string | null): ValidatedCart {
     activeLines,
     unavailableLines,
     totals,
-    belowMinimum: state ? isBelowMinimumOrderForState(totals.grandTotal, state) : false,
-    shortfall: state ? shortfallToMinimumForState(totals.grandTotal, state) : 0,
+    belowMinimum: isBelowMinimumOrderValue(totals.subtotal),
+    shortfall: shortfallToMinimumValue(totals.subtotal),
   };
 }

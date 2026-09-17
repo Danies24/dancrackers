@@ -44,12 +44,25 @@ export interface CustomerMessageInput {
   name: string;
   phone: string;
   items: WhatsAppOrderItem[];
+  /** Item subtotal, before packaging/delivery — omit charge lines entirely when not given. */
+  subtotal?: number;
+  packagingCharge?: number;
+  deliveryCharge?: number;
   grandTotal: number;
   address: string;
 }
 
 /** Message 1 — customer to us (§17.3). Secondary action; the enquiry is already saved. */
 export function buildCustomerMessage(input: CustomerMessageInput): string {
+  const chargeLines: string[] = [];
+  if (input.subtotal != null && (input.packagingCharge || input.deliveryCharge)) {
+    chargeLines.push("", `Item subtotal: ${formatRupees(input.subtotal)}`);
+    chargeLines.push(
+      `Packaging charge: ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
+    );
+    chargeLines.push(`Delivery charge: ${input.deliveryCharge ? formatRupees(input.deliveryCharge) : "Free"}`);
+  }
+
   return [
     brandConfig.messages.whatsappGreeting,
     "",
@@ -59,6 +72,7 @@ export function buildCustomerMessage(input: CustomerMessageInput): string {
     "",
     "Items:",
     formatItemLines(input.items),
+    ...chargeLines,
     "",
     `Estimated total: ${formatRupees(input.grandTotal)}`,
     "",

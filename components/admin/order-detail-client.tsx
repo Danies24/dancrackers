@@ -244,6 +244,13 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
               {formatRupees(Number(order.commission_total ?? 0))}
             </strong>
           </p>
+          {(Number(order.packaging_charge ?? 0) > 0 || Number(order.delivery_charge ?? 0) > 0) && (
+            <p className="mt-1 text-xs text-muted">
+              Items {formatRupees(Number(order.subtotal))}
+              {Number(order.packaging_charge ?? 0) > 0 && ` + Packaging ${formatRupees(Number(order.packaging_charge))}`}
+              {Number(order.delivery_charge ?? 0) > 0 && ` + Delivery ${formatRupees(Number(order.delivery_charge))}`}
+            </p>
+          )}
         </div>
       </section>
 

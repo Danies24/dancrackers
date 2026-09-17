@@ -54,6 +54,8 @@ export async function GET(request: NextRequest) {
     discount_amount: o.discount_amount,
     mrp_total: o.mrp_total ?? "",
     you_save: o.you_save ?? "",
+    packaging_charge: o.packaging_charge ?? 0,
+    delivery_charge: o.delivery_charge ?? 0,
     customer_pays: o.grand_total,
     pay_supplier: o.supplier_total ?? "",
     my_commission: o.commission_total ?? "",

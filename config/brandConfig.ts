@@ -97,12 +97,18 @@ export const brandConfig = {
     ],
   },
 
-  // Order minimums by delivery state — orders below the applicable minimum
-  // are blocked at enquiry submission (server-side authoritative, client
-  // shows the message as soon as a state is picked).
-  orderMinimums: {
-    tamilNadu: 3000,
-    otherStates: 5000,
+  // Cart-level minimum and charges — flat across all delivery states.
+  // Enforced server-side at enquiry submission (lib/pricing.ts) and mirrored
+  // client-side on the cart/enquiry pages so the message shows instantly.
+  // Packaging and delivery charges are computed off the item subtotal
+  // (before either charge is added) and waived once that subtotal reaches
+  // the matching threshold — see computeTotals in lib/pricing.ts.
+  cartCharges: {
+    minimumOrderValue: 2999,
+    packagingChargePercent: 3,
+    packagingChargeWaiverThreshold: 3499,
+    deliveryCharge: 400,
+    deliveryChargeWaiverThreshold: 3999,
   },
 
   // Deliberately not derived from any product's real discount_percent — a
@@ -214,10 +220,9 @@ export function getManufacturerFacilitatorNotice(): {
   };
 }
 
-/** The minimum order value for a delivery state — Tamil Nadu vs everywhere else (§ orderMinimums). */
-export function getMinimumOrderValue(state?: string | null): number {
-  const isTamilNadu = (state ?? "").trim().toLowerCase() === "tamil nadu";
-  return isTamilNadu ? brandConfig.orderMinimums.tamilNadu : brandConfig.orderMinimums.otherStates;
+/** The flat minimum cart (item subtotal, before packaging/delivery charges) required to check out (§ cartCharges). */
+export function getMinimumOrderValue(): number {
+  return brandConfig.cartCharges.minimumOrderValue;
 }
 
 /**

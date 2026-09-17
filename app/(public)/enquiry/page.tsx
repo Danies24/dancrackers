@@ -22,7 +22,7 @@ import {
   pincodeSchema,
   stateSchema,
 } from "@/lib/validation";
-import { getMinimumOrderValue, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getMinimumOrderValue, getPhoneE164 } from "@/config/brandConfig";
 import { INDIAN_STATES } from "@/lib/indian-states";
 import { trackEvent } from "@/lib/analytics";
 
@@ -106,7 +106,7 @@ export default function EnquiryPage() {
   });
 
   const values = watch();
-  const { loading, activeLines, totals, belowMinimum, shortfall } = useValidatedCart(values.state);
+  const { loading, activeLines, totals, belowMinimum, shortfall } = useValidatedCart();
 
   useEffect(() => {
     try {
@@ -138,6 +138,9 @@ export default function EnquiryPage() {
         unit: l.validated?.unit ?? "pcs",
         lineTotal: (l.validated?.price ?? 0) * l.qty,
       })),
+      subtotal: totals.subtotal,
+      packagingCharge: totals.packagingCharge,
+      deliveryCharge: totals.deliveryCharge,
       grandTotal: totals.grandTotal,
       address: formValues.address,
     });
@@ -227,8 +230,7 @@ export default function EnquiryPage() {
 
       {belowMinimum && !loading && (
         <p className="mt-3 text-sm text-amber">
-          Minimum order for {values.state || "this state"} is {formatRupees(getMinimumOrderValue(values.state))}.
-          Add {formatRupees(shortfall)} more, or{" "}
+          Minimum order is {formatRupees(getMinimumOrderValue())}. Add {formatRupees(shortfall)} more, or{" "}
           <Link href="/cart" className="font-semibold underline">
             go back to cart
           </Link>
@@ -307,8 +309,9 @@ export default function EnquiryPage() {
           </select>
           {errors.state?.message && <p className="text-xs text-red-ink">{errors.state.message}</p>}
           <p className="text-xs text-muted">
-            Minimum order: ₹3,000 for Tamil Nadu, ₹5,000 for other states. Orders under ₹5,000 are collected from
-            the nearest parcel office.
+            Minimum order {formatRupees(getMinimumOrderValue())}. Packaging is free above{" "}
+            {formatRupees(brandConfig.cartCharges.packagingChargeWaiverThreshold)} and delivery is free above{" "}
+            {formatRupees(brandConfig.cartCharges.deliveryChargeWaiverThreshold)}.
           </p>
         </div>
 

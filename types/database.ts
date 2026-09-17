@@ -570,6 +570,8 @@ export type Database = {
           net_rate_subtotal: number
           notes: string | null
           order_ref: string
+          packaging_charge: number
+          delivery_charge: number
           phone: string
           pincode: string
           preferred_call_time: string | null
@@ -623,6 +625,8 @@ export type Database = {
           net_rate_subtotal: number
           notes?: string | null
           order_ref?: string
+          packaging_charge?: number
+          delivery_charge?: number
           phone: string
           pincode: string
           preferred_call_time?: string | null
@@ -676,6 +680,8 @@ export type Database = {
           net_rate_subtotal?: number
           notes?: string | null
           order_ref?: string
+          packaging_charge?: number
+          delivery_charge?: number
           phone?: string
           pincode?: string
           preferred_call_time?: string | null

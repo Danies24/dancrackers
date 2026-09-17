@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  computeDeliveryCharge,
+  computePackagingCharge,
   computeProductPricing,
   computeTotals,
   isBelowMinimumOrder,
-  isBelowMinimumOrderForState,
+  isBelowMinimumOrderValue,
   round2,
   roundToRupee,
   shortfallToMinimum,
@@ -95,11 +97,13 @@ describe("computeTotals — per-product prices already carry the discount", () =
     { price: 3750, quantity: 1, isDiscountable: false }, // net-rate, no MRP
   ];
 
-  it("sums line totals with no separate global discount step", () => {
+  it("sums line totals with no separate global discount step, above both charge waiver thresholds", () => {
     const result = computeTotals(lines);
     expect(result.subtotal).toBe(6090);
     expect(result.discountableSubtotal).toBe(2340);
     expect(result.netRateSubtotal).toBe(3750);
+    expect(result.packagingCharge).toBe(0);
+    expect(result.deliveryCharge).toBe(0);
     expect(result.grandTotal).toBe(6090);
     expect(result.totalQuantity).toBe(16);
   });
@@ -130,10 +134,12 @@ describe("computeTotals — edge cases", () => {
     expect(result.totalQuantity).toBe(0);
   });
 
-  it("handles a single item", () => {
+  it("handles a single item, with packaging + delivery charges below both waiver thresholds", () => {
     const result = computeTotals([{ price: 99.5, quantity: 3, isDiscountable: true }]);
     expect(result.subtotal).toBe(298.5);
-    expect(result.grandTotal).toBe(298.5);
+    expect(result.packagingCharge).toBe(8.96); // 3% of 298.5
+    expect(result.deliveryCharge).toBe(400);
+    expect(result.grandTotal).toBe(707.46);
   });
 
   it("treats a missing mrp as no saving, never a negative youSave", () => {
@@ -155,7 +161,7 @@ describe("computeTotals — edge cases", () => {
     const result = computeTotals([{ price: 1000, quantity: 1, isDiscountable: false }]);
     expect(result.mrpTotal).toBe(0);
     expect(result.youSave).toBe(0);
-    expect(result.grandTotal).toBe(1000);
+    expect(result.grandTotal).toBe(1430); // 1000 + 3% packaging (30) + 400 delivery
   });
 
   it("handles 50 items without drift", () => {
@@ -167,6 +173,28 @@ describe("computeTotals — edge cases", () => {
     const result = computeTotals(lines);
     const expectedSubtotal = round2(lines.reduce((sum, l) => sum + round2(l.price * l.quantity), 0));
     expect(result.subtotal).toBe(expectedSubtotal);
+  });
+});
+
+describe("computePackagingCharge / computeDeliveryCharge — § cartCharges (2999 / 3499 / 3999)", () => {
+  it("charges 3% packaging and a flat ₹400 delivery below both waiver thresholds", () => {
+    expect(computePackagingCharge(3000)).toBe(90);
+    expect(computeDeliveryCharge(3000)).toBe(400);
+  });
+
+  it("waives packaging at/above ₹3,499 but still charges delivery below ₹3,999", () => {
+    expect(computePackagingCharge(3499)).toBe(0);
+    expect(computeDeliveryCharge(3499)).toBe(400);
+  });
+
+  it("waives delivery at/above ₹3,999", () => {
+    expect(computeDeliveryCharge(3999)).toBe(0);
+    expect(computePackagingCharge(3999)).toBe(0);
+  });
+
+  it("charges nothing for an empty or negative subtotal", () => {
+    expect(computePackagingCharge(0)).toBe(0);
+    expect(computeDeliveryCharge(0)).toBe(0);
   });
 });
 
@@ -191,16 +219,9 @@ describe("minimum order helpers", () => {
     expect(shortfallToMinimum(2150, 3000)).toBe(850);
   });
 
-  it("applies the Tamil Nadu minimum (₹3,000) for a Tamil Nadu delivery state", () => {
-    expect(isBelowMinimumOrderForState(2999, "Tamil Nadu")).toBe(true);
-    expect(isBelowMinimumOrderForState(3000, "Tamil Nadu")).toBe(false);
-    expect(isBelowMinimumOrderForState(3000, "tamil nadu")).toBe(false);
-  });
-
-  it("applies the other-states minimum (₹5,000) for any non-Tamil-Nadu state", () => {
-    expect(isBelowMinimumOrderForState(4999, "Kerala")).toBe(true);
-    expect(isBelowMinimumOrderForState(5000, "Kerala")).toBe(false);
-    expect(isBelowMinimumOrderForState(5000, null)).toBe(false);
-    expect(isBelowMinimumOrderForState(4999, undefined)).toBe(true);
+  it("applies the flat ₹2,999 minimum from brandConfig, regardless of state", () => {
+    expect(isBelowMinimumOrderValue(2998)).toBe(true);
+    expect(isBelowMinimumOrderValue(2999)).toBe(false);
+    expect(isBelowMinimumOrderValue(5000)).toBe(false);
   });
 });

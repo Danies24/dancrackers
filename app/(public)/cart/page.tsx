@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
 import { ReferralCodeField } from "@/components/cart/referral-code-field";
+import { CartProgressBar } from "@/components/cart/cart-progress-bar";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
-import { brandConfig } from "@/config/brandConfig";
 
 /** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
 function CartLineSkeleton() {
@@ -32,14 +32,7 @@ function CartLineSkeleton() {
 
 export default function CartPage() {
   const { items, setQty, remove } = useCart();
-  // The delivery state (and so the exact ₹3,000/₹5,000 threshold) isn't known
-  // until the enquiry form, where the real gate is enforced client- and
-  // server-side. Here we only gate on the lower of the two — ₹3,000 — so a
-  // cart that can't possibly clear the minimum for ANY state never lets the
-  // customer proceed; a Tamil Nadu order can still be blocked on the next
-  // step once their state confirms the ₹5,000 floor doesn't apply to them.
-  const { loading, activeLines, unavailableLines, totals } = useValidatedCart();
-  const belowFloor = totals.grandTotal < brandConfig.orderMinimums.tamilNadu;
+  const { loading, activeLines, unavailableLines, totals, belowMinimum } = useValidatedCart();
 
   useEffect(() => {
     if (!loading && items.length > 0) {
@@ -61,7 +54,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 pb-40 md:pb-6">
+    <div className="mx-auto max-w-3xl px-4 py-6 pb-52 md:pb-6">
       <h1 className="font-display text-2xl font-semibold text-ink">
         Your Order <span className="text-base font-normal text-muted">({items.length} items)</span>
       </h1>
@@ -154,25 +147,24 @@ export default function CartPage() {
                 <Row label="Net-rate items (no discount)" value={totals.netRateSubtotal} muted />
               </>
             )}
+            <Row label="Item subtotal" value={totals.subtotal} muted />
+            <Row
+              label="Packaging charge"
+              value={totals.packagingCharge}
+              muted={totals.packagingCharge === 0}
+              free={totals.packagingCharge === 0}
+            />
+            <Row
+              label="Delivery charge"
+              value={totals.deliveryCharge}
+              muted={totals.deliveryCharge === 0}
+              free={totals.deliveryCharge === 0}
+            />
             <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
               <span className="font-semibold text-ink">Total</span>
               <span className="tabular-nums text-2xl font-bold text-ink">{formatRupees(totals.grandTotal)}</span>
             </div>
           </div>
-
-          <p className="mt-3 text-xs text-muted">
-            {belowFloor ? (
-              <span className="font-semibold text-maroon-ink">
-                Add {formatRupees(brandConfig.orderMinimums.tamilNadu - totals.grandTotal)} more to reach the ₹
-                {brandConfig.orderMinimums.tamilNadu.toLocaleString("en-IN")} minimum order.
-              </span>
-            ) : (
-              <>
-                Minimum order ₹3,000 (Tamil Nadu) / ₹5,000 (other states) — confirmed on the next step. Orders under
-                ₹5,000 are collected from the nearest parcel office.
-              </>
-            )}
-          </p>
 
           <ReferralCodeField />
 
@@ -180,7 +172,10 @@ export default function CartPage() {
             className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4 md:static md:mt-6 md:border-0 md:bg-transparent md:p-0"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
-            {belowFloor ? (
+            <div className="mb-3">
+              <CartProgressBar subtotal={totals.subtotal} />
+            </div>
+            {belowMinimum ? (
               <Button size="full" disabled>
                 Continue to Enquiry →
               </Button>
@@ -211,20 +206,27 @@ function Row({
   value,
   muted,
   strike,
+  free,
   className,
 }: {
   label: string;
   value: number;
   muted?: boolean;
   strike?: boolean;
+  /** Renders "Free" in teal instead of ₹0 — for a waived packaging/delivery charge. */
+  free?: boolean;
   className?: string;
 }) {
   return (
     <div className={`flex justify-between py-0.5 text-sm ${muted ? "text-muted" : "text-ink-soft"} ${className ?? ""}`}>
       <span>{label}</span>
-      <span className={`tabular-nums ${strike ? "line-through" : ""}`}>
-        {value < 0 ? `-${formatRupees(-value)}` : formatRupees(value)}
-      </span>
+      {free ? (
+        <span className="tabular-nums font-semibold text-teal-ink">Free</span>
+      ) : (
+        <span className={`tabular-nums ${strike ? "line-through" : ""}`}>
+          {value < 0 ? `-${formatRupees(-value)}` : formatRupees(value)}
+        </span>
+      )}
     </div>
   );
 }

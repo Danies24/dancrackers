@@ -6,7 +6,7 @@
  * totals on one order.
  */
 
-import { getMinimumOrderValue } from "@/config/brandConfig";
+import { brandConfig, getMinimumOrderValue } from "@/config/brandConfig";
 
 export interface PricingLine {
   price: number;
@@ -17,6 +17,7 @@ export interface PricingLine {
 }
 
 export interface PricingResult {
+  /** Items only — before packaging/delivery charges. */
   subtotal: number;
   discountableSubtotal: number;
   netRateSubtotal: number;
@@ -24,6 +25,11 @@ export interface PricingResult {
   mrpTotal: number;
   /** mrpTotal - discountableSubtotal, floored at 0. */
   youSave: number;
+  /** 3% of subtotal, waived once subtotal reaches the packaging waiver threshold (§ cartCharges). */
+  packagingCharge: number;
+  /** Flat fee, waived once subtotal reaches the delivery waiver threshold (§ cartCharges). */
+  deliveryCharge: number;
+  /** subtotal + packagingCharge + deliveryCharge — what the customer actually pays. */
   grandTotal: number;
   totalQuantity: number;
   lines: Array<PricingLine & { lineTotal: number }>;
@@ -108,7 +114,9 @@ export function computeTotals(lines: PricingLine[]): PricingResult {
       .reduce((sum, l) => sum + (l.mrp as number) * l.quantity, 0),
   );
   const youSave = Math.max(0, round2(mrpTotal - discountableSubtotal));
-  const grandTotal = subtotal;
+  const packagingCharge = computePackagingCharge(subtotal);
+  const deliveryCharge = computeDeliveryCharge(subtotal);
+  const grandTotal = round2(subtotal + packagingCharge + deliveryCharge);
   const totalQuantity = lines.reduce((sum, l) => sum + l.quantity, 0);
 
   return {
@@ -117,6 +125,8 @@ export function computeTotals(lines: PricingLine[]): PricingResult {
     netRateSubtotal,
     mrpTotal,
     youSave,
+    packagingCharge,
+    deliveryCharge,
     grandTotal,
     totalQuantity,
     lines: linesWithTotals,
@@ -128,20 +138,34 @@ export function roundToRupee(value: number): number {
   return Math.round(value);
 }
 
-export function isBelowMinimumOrder(grandTotal: number, minOrderValue: number): boolean {
+export function isBelowMinimumOrder(subtotal: number, minOrderValue: number): boolean {
   if (minOrderValue <= 0) return false;
-  return grandTotal < minOrderValue;
+  return subtotal < minOrderValue;
 }
 
-export function shortfallToMinimum(grandTotal: number, minOrderValue: number): number {
-  return Math.max(0, round2(minOrderValue - grandTotal));
+export function shortfallToMinimum(subtotal: number, minOrderValue: number): number {
+  return Math.max(0, round2(minOrderValue - subtotal));
 }
 
-/** Convenience: the minimum-order check against the state-based rule (re-exported for call sites that only need pricing.ts). */
-export function isBelowMinimumOrderForState(grandTotal: number, state: string | null | undefined): boolean {
-  return isBelowMinimumOrder(grandTotal, getMinimumOrderValue(state));
+/** Convenience: the minimum-order check against the flat configured rule (re-exported for call sites that only need pricing.ts). */
+export function isBelowMinimumOrderValue(subtotal: number): boolean {
+  return isBelowMinimumOrder(subtotal, getMinimumOrderValue());
 }
 
-export function shortfallToMinimumForState(grandTotal: number, state: string | null | undefined): number {
-  return shortfallToMinimum(grandTotal, getMinimumOrderValue(state));
+export function shortfallToMinimumValue(subtotal: number): number {
+  return shortfallToMinimum(subtotal, getMinimumOrderValue());
+}
+
+/** 3% of the item subtotal, waived once the subtotal reaches the packaging waiver threshold (§ cartCharges). */
+export function computePackagingCharge(subtotal: number): number {
+  const { packagingChargeWaiverThreshold, packagingChargePercent } = brandConfig.cartCharges;
+  if (subtotal <= 0 || subtotal >= packagingChargeWaiverThreshold) return 0;
+  return round2((subtotal * packagingChargePercent) / 100);
+}
+
+/** Flat delivery fee, waived once the subtotal reaches the delivery waiver threshold (§ cartCharges). */
+export function computeDeliveryCharge(subtotal: number): number {
+  const { deliveryChargeWaiverThreshold, deliveryCharge } = brandConfig.cartCharges;
+  if (subtotal <= 0 || subtotal >= deliveryChargeWaiverThreshold) return 0;
+  return deliveryCharge;
 }

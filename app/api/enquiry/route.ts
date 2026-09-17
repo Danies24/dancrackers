@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enquirySchema, normalizePhone } from "@/lib/validation";
-import { computeProductPricing, computeTotals, isBelowMinimumOrderForState, round2 } from "@/lib/pricing";
+import { computeProductPricing, computeTotals, isBelowMinimumOrder, round2 } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/pricing-settings";
 import { getMinimumOrderValue } from "@/config/brandConfig";
 import { getSettings } from "@/lib/data";
@@ -203,13 +203,13 @@ export async function POST(request: Request) {
   );
   const commissionTotal = round2(totals.grandTotal - supplierTotal);
 
-  const minOrderValue = getMinimumOrderValue(input.customer.state);
-  if (isBelowMinimumOrderForState(totals.grandTotal, input.customer.state)) {
+  const minOrderValue = getMinimumOrderValue();
+  if (isBelowMinimumOrder(totals.subtotal, minOrderValue)) {
     return NextResponse.json(
       {
         error: {
           code: "below_minimum_order",
-          message: `Minimum order value for ${input.customer.state} is ₹${minOrderValue}.`,
+          message: `Minimum order value is ₹${minOrderValue}.`,
         },
       },
       { status: 400 },
@@ -317,6 +317,8 @@ export async function POST(request: Request) {
       net_rate_subtotal: totals.netRateSubtotal,
       discount_percent: effectiveDiscountPercent,
       discount_amount: totals.youSave,
+      packaging_charge: totals.packagingCharge,
+      delivery_charge: totals.deliveryCharge,
       grand_total: totals.grandTotal,
       total_quantity: totals.totalQuantity,
       mrp_total: totals.mrpTotal,
@@ -391,6 +393,9 @@ export async function POST(request: Request) {
             unit: i.unit,
             lineTotal: i.line_total,
           })),
+          subtotal: totals.subtotal,
+          packagingCharge: totals.packagingCharge,
+          deliveryCharge: totals.deliveryCharge,
           grandTotal: totals.grandTotal,
           address: input.customer.address,
         }),
@@ -422,6 +427,8 @@ export async function POST(request: Request) {
         netRateSubtotal: totals.netRateSubtotal,
         mrpTotal: totals.mrpTotal,
         youSave: totals.youSave,
+        packagingCharge: totals.packagingCharge,
+        deliveryCharge: totals.deliveryCharge,
         grandTotal: totals.grandTotal,
         totalQuantity: totals.totalQuantity,
       },
