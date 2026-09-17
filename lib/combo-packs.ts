@@ -47,6 +47,10 @@ export interface ComboVarietyOption {
   tierLabel: string;
   sellingPrice: number;
   totalItems: number;
+  /** Every sibling's own items, pre-fetched so the Small/Medium/Large switcher
+   * can swap instantly client-side with zero extra requests (see
+   * components/product/combo-variety-switcher.tsx). */
+  itemGroups: ComboItemGroup[];
 }
 
 export interface ComboItemGroup {
@@ -122,30 +126,39 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
   if (!rawVariety) return null;
   const variety = rawVariety as unknown as PublicComboVarietyRow;
 
-  const [{ data: pack }, { data: rawSiblingVarieties }, { data: rawItems }] = await Promise.all([
+  const [{ data: pack }, { data: rawSiblingVarieties }] = await Promise.all([
     supabase.from("combo_packs").select("*").eq("id", variety.combo_pack_id).maybeSingle(),
     supabase
       .from("public_combo_pack_varieties")
       .select("id, slug, tier_label, selling_price, total_items")
       .eq("combo_pack_id", variety.combo_pack_id)
       .order("display_order", { ascending: true }),
-    supabase
-      .from("public_combo_pack_items")
-      .select("*")
-      .eq("variety_id", variety.id)
-      .order("display_order", { ascending: true }),
   ]);
 
   if (!pack) return null;
   const siblingVarieties = (rawSiblingVarieties ?? []) as unknown as PublicComboVarietyRow[];
+
+  // Every sibling's items fetched together in one query — this is what lets
+  // the Small/Medium/Large switcher swap tiers instantly client-side (no
+  // per-click Supabase round-trip / full page navigation).
+  const { data: rawItems } = await supabase
+    .from("public_combo_pack_items")
+    .select("*")
+    .in(
+      "variety_id",
+      siblingVarieties.map((v) => v.id),
+    )
+    .order("display_order", { ascending: true });
   const items = (rawItems ?? []) as unknown as PublicComboItemRow[];
 
-  const groups = new Map<string, ComboItemGroup>();
+  const groupsByVariety = new Map<string, Map<string, ComboItemGroup>>();
   for (const item of items) {
+    const varietyGroups = groupsByVariety.get(item.variety_id) ?? new Map<string, ComboItemGroup>();
     const categoryName = item.category?.name_en ?? "Other";
-    const group = groups.get(categoryName) ?? { categoryName, items: [] };
+    const group = varietyGroups.get(categoryName) ?? { categoryName, items: [] };
     group.items.push({ name_en: item.name_en, name_ta: item.name_ta, unit: item.unit, quantity: item.quantity });
-    groups.set(categoryName, group);
+    varietyGroups.set(categoryName, group);
+    groupsByVariety.set(item.variety_id, varietyGroups);
   }
 
   return {
@@ -166,7 +179,8 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
       tierLabel: v.tier_label,
       sellingPrice: v.selling_price,
       totalItems: v.total_items,
+      itemGroups: [...(groupsByVariety.get(v.id) ?? new Map()).values()],
     })),
-    itemGroups: [...groups.values()],
+    itemGroups: [...(groupsByVariety.get(variety.id) ?? new Map()).values()],
   };
 }
