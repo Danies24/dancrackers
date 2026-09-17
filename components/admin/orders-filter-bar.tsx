@@ -12,6 +12,9 @@ export function OrdersFilterBar({
   activeCity,
   allCaptains,
   activeCaptain,
+  supplierPaymentStatus,
+  dateFrom,
+  dateTo,
 }: {
   allStatuses: string[];
   activeStatuses: string[];
@@ -21,6 +24,9 @@ export function OrdersFilterBar({
   activeCity: string;
   allCaptains: string[];
   activeCaptain: string;
+  supplierPaymentStatus: string;
+  dateFrom: string;
+  dateTo: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -106,6 +112,29 @@ export function OrdersFilterBar({
           <option value="oldest">Oldest first</option>
           <option value="value">Highest value</option>
         </select>
+        <select
+          value={supplierPaymentStatus}
+          onChange={(e) =>
+            updateParams((p) => (e.target.value ? p.set("supplier_payment", e.target.value) : p.delete("supplier_payment")))
+          }
+          className="h-9 w-fit rounded-md border border-border bg-surface px-2 text-sm"
+        >
+          <option value="">Any supplier payment status</option>
+          <option value="pending">Supplier pending</option>
+          <option value="paid">Supplier paid</option>
+        </select>
+        <input
+          type="date"
+          value={dateFrom}
+          onChange={(e) => updateParams((p) => (e.target.value ? p.set("from", e.target.value) : p.delete("from")))}
+          className="h-9 w-fit rounded-md border border-border bg-surface px-2 text-sm"
+        />
+        <input
+          type="date"
+          value={dateTo}
+          onChange={(e) => updateParams((p) => (e.target.value ? p.set("to", e.target.value) : p.delete("to")))}
+          className="h-9 w-fit rounded-md border border-border bg-surface px-2 text-sm"
+        />
       </div>
     </div>
   );

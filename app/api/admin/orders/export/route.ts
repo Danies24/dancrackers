@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
   const captainCode = searchParams.get("captain");
   const search = searchParams.get("search")?.trim();
   const sort = searchParams.get("sort") ?? "newest";
+  const supplierPaymentStatus = searchParams.get("supplier_payment");
+  const dateFrom = searchParams.get("from");
+  const dateTo = searchParams.get("to");
 
   const supabase = createAdminClient();
   let query = supabase.from("orders").select("*");
@@ -18,6 +21,9 @@ export async function GET(request: NextRequest) {
   if (statuses.length > 0) query = query.in("status", statuses);
   if (city) query = query.eq("city", city);
   if (captainCode) query = query.eq("captain_code", captainCode.toUpperCase());
+  if (supplierPaymentStatus) query = query.eq("supplier_payment_status", supplierPaymentStatus);
+  if (dateFrom) query = query.gte("created_at", `${dateFrom}T00:00:00`);
+  if (dateTo) query = query.lte("created_at", `${dateTo}T23:59:59`);
   if (search) {
     query = query.or(`order_ref.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%`);
   }
@@ -38,6 +44,7 @@ export async function GET(request: NextRequest) {
     name: o.name,
     phone: o.phone,
     city: o.city,
+    state: o.state ?? "",
     pincode: o.pincode,
     address: o.address,
     landmark: o.landmark ?? "",
@@ -45,7 +52,19 @@ export async function GET(request: NextRequest) {
     subtotal: o.subtotal,
     discount_percent: o.discount_percent,
     discount_amount: o.discount_amount,
-    grand_total: o.grand_total,
+    mrp_total: o.mrp_total ?? "",
+    you_save: o.you_save ?? "",
+    customer_pays: o.grand_total,
+    pay_supplier: o.supplier_total ?? "",
+    my_commission: o.commission_total ?? "",
+    supplier_payment_status: o.supplier_payment_status ?? "pending",
+    supplier_paid_amount: o.supplier_paid_amount ?? "",
+    supplier_paid_at: o.supplier_paid_at ? formatIST(o.supplier_paid_at) : "",
+    lr_number: o.lr_number ?? "",
+    transport_name: o.transport_name ?? "",
+    tracking_url: o.tracking_url ?? "",
+    dispatched_at: o.dispatched_at ? formatIST(o.dispatched_at) : "",
+    pricing_estimated: o.pricing_estimated ? "yes" : "no",
     total_quantity: o.total_quantity,
     commission_rate: o.commission_rate ?? "",
     commission_amount: o.commission_amount ?? "",

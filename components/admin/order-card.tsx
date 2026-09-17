@@ -41,6 +41,25 @@ export function OrderCard({ order, highlight }: { order: Order; highlight?: bool
           </span>
         </div>
       </div>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-soft">
+        <span>
+          Pay supplier <strong className="tabular-nums text-ink">{formatRupees(Number(order.supplier_total ?? 0))}</strong>
+        </span>
+        <span>
+          Commission{" "}
+          <strong className={`tabular-nums ${Number(order.commission_total ?? 0) > 0 ? "text-teal-ink" : "text-red-ink"}`}>
+            {formatRupees(Number(order.commission_total ?? 0))}
+          </strong>
+        </span>
+        <span
+          className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+            order.supplier_payment_status === "paid" ? "bg-teal-tint text-teal-ink" : "bg-gold-tint text-gold-ink"
+          }`}
+        >
+          {order.supplier_payment_status === "paid" ? "Supplier paid" : "Supplier pending"}
+        </span>
+        {order.lr_number && <span className="font-mono">LR {order.lr_number}</span>}
+      </div>
       <div className="mt-2 flex gap-2">
         <a
           href={`tel:+91${order.phone}`}

@@ -4,7 +4,12 @@ import { buildSupplierMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { getSettings } from "@/lib/data";
 import { getPhoneDisplay, getPrimarySupplier } from "@/config/brandConfig";
 
-/** GET /api/admin/orders/[id]/supplier-message (§17.4, §22.2). The formatted order-to-supplier text. */
+/**
+ * GET /api/admin/orders/[id]/supplier-message. The formatted order-to-
+ * supplier text — what Kolagalam actually pays Sree Sai Ram, never the
+ * customer's price. Uses each line's unit_supplier_price/line_supplier_total
+ * and the order's supplier_total, not unit_price/line_total/grand_total.
+ */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = createAdminClient();
@@ -21,6 +26,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const settings = await getSettings();
   const supplierNumber = String(settings.supplier_whatsapp_number ?? "");
 
+  const orderItems = items ?? [];
+  const supplierTotal = Number(order.supplier_total ?? order.grand_total);
+
   const message = buildSupplierMessage({
     supplierName: getPrimarySupplier().name,
     orderRef: order.order_ref,
@@ -32,21 +40,25 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     landmark: order.landmark ?? undefined,
     city: order.city,
     pincode: order.pincode,
-    items: (items ?? []).map((i) => ({
+    items: orderItems.map((i) => ({
       sku: i.sku,
       nameEn: i.name_en,
       unit: i.unit,
       quantity: i.quantity,
-      rate: Number(i.unit_price),
-      amount: Number(i.line_total),
+      rate: Number(i.unit_supplier_price ?? i.unit_price),
+      amount: Number(i.line_supplier_total ?? i.line_total),
     })),
-    subtotal: Number(order.subtotal),
-    discountPercent: Number(order.discount_percent),
-    discountAmount: Number(order.discount_amount),
-    grandTotal: Number(order.grand_total),
+    subtotal: supplierTotal,
+    discountPercent: 0,
+    discountAmount: 0,
+    grandTotal: supplierTotal,
   });
 
   const whatsappUrl = supplierNumber ? buildWhatsAppUrl(supplierNumber, message) : null;
 
-  return NextResponse.json({ message, whatsappUrl });
+  return NextResponse.json({
+    message,
+    whatsappUrl,
+    pricingEstimated: order.pricing_estimated ?? false,
+  });
 }

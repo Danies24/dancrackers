@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { OrderCard } from "@/components/admin/order-card";
 import { OrdersFilterBar } from "@/components/admin/orders-filter-bar";
+import { formatRupees } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +29,18 @@ export default async function AdminOrdersPage({
   const sort = typeof params.sort === "string" ? params.sort : "newest";
   const city = typeof params.city === "string" ? params.city : "";
   const captain = typeof params.captain === "string" ? params.captain : "";
+  const supplierPaymentStatus = typeof params.supplier_payment === "string" ? params.supplier_payment : "";
+  const dateFrom = typeof params.from === "string" ? params.from : "";
+  const dateTo = typeof params.to === "string" ? params.to : "";
 
   const supabase = createAdminClient();
   let query = supabase.from("orders").select("*", { count: "exact" });
   if (statuses.length > 0) query = query.in("status", statuses);
   if (city) query = query.eq("city", city);
   if (captain) query = query.eq("captain_code", captain.toUpperCase());
+  if (supplierPaymentStatus) query = query.eq("supplier_payment_status", supplierPaymentStatus);
+  if (dateFrom) query = query.gte("created_at", `${dateFrom}T00:00:00`);
+  if (dateTo) query = query.lte("created_at", `${dateTo}T23:59:59`);
   if (search) query = query.or(`order_ref.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%`);
   if (sort === "oldest") query = query.order("created_at", { ascending: true });
   else if (sort === "value") query = query.order("grand_total", { ascending: false });
@@ -48,12 +55,26 @@ export default async function AdminOrdersPage({
   const cities = [...new Set((cityRows ?? []).map((r) => r.city))].sort();
   const captains = [...new Set((captainRows ?? []).map((r) => r.captain_code as string))].sort();
 
+  const summary = (orders ?? []).reduce(
+    (acc, o) => {
+      const supplierTotal = Number(o.supplier_total ?? 0);
+      if (o.supplier_payment_status !== "paid") acc.payablePending += supplierTotal;
+      else acc.paidToSupplier += Number(o.supplier_paid_amount ?? supplierTotal);
+      acc.commissionEarned += Number(o.commission_total ?? 0);
+      return acc;
+    },
+    { payablePending: 0, paidToSupplier: 0, commissionEarned: 0 },
+  );
+
   const exportParams = new URLSearchParams();
   statuses.forEach((s) => exportParams.append("status", s));
   if (city) exportParams.set("city", city);
   if (captain) exportParams.set("captain", captain);
   if (search) exportParams.set("search", search);
   if (sort) exportParams.set("sort", sort);
+  if (supplierPaymentStatus) exportParams.set("supplier_payment", supplierPaymentStatus);
+  if (dateFrom) exportParams.set("from", dateFrom);
+  if (dateTo) exportParams.set("to", dateTo);
 
   return (
     <div>
@@ -69,6 +90,13 @@ export default async function AdminOrdersPage({
         </a>
       </div>
 
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <SummaryCard label="Payable to Sree Sai Ram (pending)" value={formatRupees(summary.payablePending)} tone="amber" />
+        <SummaryCard label="Paid to Sree Sai Ram" value={formatRupees(summary.paidToSupplier)} tone="ink" />
+        <SummaryCard label="Commission earned" value={formatRupees(summary.commissionEarned)} tone="teal" />
+        <SummaryCard label="Orders (this view)" value={String(orders?.length ?? 0)} tone="ink" />
+      </div>
+
       <OrdersFilterBar
         allStatuses={ALL_STATUSES}
         activeStatuses={statuses}
@@ -78,6 +106,9 @@ export default async function AdminOrdersPage({
         activeCity={city}
         allCaptains={captains}
         activeCaptain={captain}
+        supplierPaymentStatus={supplierPaymentStatus}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
       />
 
       <div className="mt-4 flex flex-col gap-2">
@@ -86,6 +117,16 @@ export default async function AdminOrdersPage({
           <OrderCard key={o.id} order={o} />
         ))}
       </div>
+    </div>
+  );
+}
+
+function SummaryCard({ label, value, tone }: { label: string; value: string; tone: "amber" | "teal" | "ink" }) {
+  const toneClass = tone === "amber" ? "text-amber-ink" : tone === "teal" ? "text-teal-ink" : "text-ink";
+  return (
+    <div className="rounded-lg border border-border bg-surface p-3">
+      <p className="text-xs text-muted">{label}</p>
+      <p className={`tabular-nums text-lg font-bold ${toneClass}`}>{value}</p>
     </div>
   );
 }
