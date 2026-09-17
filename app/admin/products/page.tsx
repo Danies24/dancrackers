@@ -1,16 +1,20 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProductsTable } from "@/components/admin/products-table";
+import { getPricingSettings } from "@/lib/pricing-settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const supabase = createAdminClient();
-  const { data: products } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en)")
-    .order("display_order")
-    .limit(500);
+  const [{ data: products }, pricingSettings] = await Promise.all([
+    supabase
+      .from("products")
+      .select("*, category:categories(id, slug, name_en)")
+      .order("display_order")
+      .limit(500),
+    getPricingSettings(),
+  ]);
 
   return (
     <div>
@@ -36,7 +40,7 @@ export default async function AdminProductsPage() {
           </Link>
         </div>
       </div>
-      <ProductsTable initialProducts={products ?? []} />
+      <ProductsTable initialProducts={products ?? []} initialPricingSettings={pricingSettings} />
     </div>
   );
 }

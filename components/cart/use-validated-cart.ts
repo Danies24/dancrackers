@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/components/cart/cart-provider";
-import { computeTotals, isBelowMinimumOrder, shortfallToMinimum, type PricingResult } from "@/lib/pricing";
+import {
+  computeTotals,
+  isBelowMinimumOrderForState,
+  shortfallToMinimumForState,
+  type PricingResult,
+} from "@/lib/pricing";
 import type { ValidateResultItem } from "@/app/api/products/validate/route";
 
 export interface ResolvedCartLine {
@@ -18,16 +23,24 @@ export interface ValidatedCart {
   activeLines: ResolvedCartLine[];
   unavailableLines: ResolvedCartLine[];
   totals: PricingResult;
-  settings: { discountPercent: number; minOrderValue: number };
+  /** Only meaningful once a delivery state is known — false/0 until then. */
   belowMinimum: boolean;
   shortfall: number;
 }
 
-/** Shared by /cart and /enquiry — one revalidation call, one totals computation (§15.3). */
-export function useValidatedCart(): ValidatedCart {
+/**
+ * Shared by /cart and /enquiry — one revalidation call, one totals
+ * computation. Each product's discount is already baked into its `price`
+ * by the DB, so this hook no longer needs a global discount setting.
+ *
+ * `state` is the customer's delivery state, only known once they reach the
+ * enquiry form — pass it there to get a real minimum-order check; omit it
+ * (as the cart page does) to skip that check entirely rather than show a
+ * wrong number.
+ */
+export function useValidatedCart(state?: string | null): ValidatedCart {
   const { items } = useCart();
   const [validated, setValidated] = useState<ValidateResultItem[] | null>(null);
-  const [settings, setSettings] = useState({ discountPercent: 0, minOrderValue: 0 });
   const [loading, setLoading] = useState(true);
 
   const idsKey = items.map((i) => i.productId).join(",");
@@ -61,7 +74,6 @@ export function useValidatedCart(): ValidatedCart {
       .then((data) => {
         if (cancelled) return;
         setValidated((prev) => [...(prev ?? []), ...(data.items ?? [])]);
-        if (data.settings) setSettings(data.settings);
       })
       .catch(() => {
         if (!cancelled) setValidated((prev) => prev ?? []);
@@ -94,8 +106,8 @@ export function useValidatedCart(): ValidatedCart {
       price: l.validated!.price!,
       quantity: l.qty,
       isDiscountable: l.validated!.isDiscountable ?? true,
+      mrp: l.validated!.mrp,
     })),
-    settings.discountPercent,
   );
 
   return {
@@ -104,8 +116,7 @@ export function useValidatedCart(): ValidatedCart {
     activeLines,
     unavailableLines,
     totals,
-    settings,
-    belowMinimum: isBelowMinimumOrder(totals.grandTotal, settings.minOrderValue),
-    shortfall: shortfallToMinimum(totals.grandTotal, settings.minOrderValue),
+    belowMinimum: state ? isBelowMinimumOrderForState(totals.grandTotal, state) : false,
+    shortfall: state ? shortfallToMinimumForState(totals.grandTotal, state) : 0,
   };
 }

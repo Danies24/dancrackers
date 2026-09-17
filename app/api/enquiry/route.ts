@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enquirySchema, normalizePhone } from "@/lib/validation";
-import { computeTotals, isBelowMinimumOrder } from "@/lib/pricing";
+import { computeProductPricing, computeTotals, isBelowMinimumOrderForState, round2 } from "@/lib/pricing";
+import { getPricingSettings } from "@/lib/pricing-settings";
+import { getMinimumOrderValue } from "@/config/brandConfig";
 import { getSettings } from "@/lib/data";
 import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashIp } from "@/lib/hash";
@@ -94,7 +96,7 @@ export async function POST(request: Request) {
   const productIds = input.items.map((i) => i.productId);
   const { data: products, error: productsError } = await supabase
     .from("products")
-    .select("id, sku, name_en, name_ta, unit, price, is_discountable, status")
+    .select("id, sku, name_en, name_ta, unit, price, mrp, is_discountable, discount_percent, net_markup_percent, status")
     .in("id", productIds);
 
   if (productsError) {
@@ -104,12 +106,21 @@ export async function POST(request: Request) {
     );
   }
 
+  const pricingSettings = await getPricingSettings();
+
   const byId = new Map(products.map((p) => [p.id, p]));
   const validLines = input.items
     .map((item) => {
       const product = byId.get(item.productId);
       if (!product || product.status !== "active" || product.price == null) return null;
-      return { item, product: { ...product, price: product.price } };
+      const pricing = computeProductPricing({
+        mrp: product.mrp,
+        isDiscountable: product.is_discountable,
+        discountPercent: Number(product.discount_percent),
+        netMarkupPercent: Number(product.net_markup_percent),
+        supplierDiscountPercent: pricingSettings.supplierDiscountPercent,
+      });
+      return { item, product, pricing };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
 
@@ -121,25 +132,29 @@ export async function POST(request: Request) {
   }
 
   const settings = await getSettings();
-  const discountPercent = Number(settings.discount_percent ?? 0);
-  const minOrderValue = Number(settings.min_order_value ?? 0);
   const servedPincodes = Array.isArray(settings.served_pincodes) ? (settings.served_pincodes as string[]) : [];
 
   const totals = computeTotals(
     validLines.map((l) => ({
-      price: l.product.price!,
+      price: l.pricing.customerPrice!,
       quantity: l.item.quantity,
       isDiscountable: l.product.is_discountable,
+      mrp: l.product.mrp,
     })),
-    discountPercent,
   );
 
-  if (isBelowMinimumOrder(totals.grandTotal, minOrderValue)) {
+  const supplierTotal = round2(
+    validLines.reduce((sum, l) => sum + (l.pricing.supplierPrice ?? 0) * l.item.quantity, 0),
+  );
+  const commissionTotal = round2(totals.grandTotal - supplierTotal);
+
+  const minOrderValue = getMinimumOrderValue(input.customer.state);
+  if (isBelowMinimumOrderForState(totals.grandTotal, input.customer.state)) {
     return NextResponse.json(
       {
         error: {
           code: "below_minimum_order",
-          message: `Minimum order value is ₹${minOrderValue}.`,
+          message: `Minimum order value for ${input.customer.state} is ₹${minOrderValue}.`,
         },
       },
       { status: 400 },
@@ -217,6 +232,13 @@ export async function POST(request: Request) {
     customerId = newCustomer.id;
   }
 
+  // The legacy discount_percent/discount_amount columns predate per-product
+  // discounts — now they hold the blended, informational effective rate
+  // across this order's discountable lines (mrp_total/you_save are the
+  // real per-order figures everything else should read).
+  const effectiveDiscountPercent =
+    totals.mrpTotal > 0 ? round2((totals.youSave / totals.mrpTotal) * 100) : 0;
+
   // ── Insert order (§16.5 step 6) ──
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -230,6 +252,7 @@ export async function POST(request: Request) {
       email: input.customer.email || null,
       address: input.customer.address,
       city: input.customer.city,
+      state: input.customer.state,
       pincode: input.customer.pincode,
       landmark: input.customer.landmark ?? null,
       preferred_call_time: input.customer.preferredCallTime ?? null,
@@ -237,10 +260,15 @@ export async function POST(request: Request) {
       subtotal: totals.subtotal,
       discountable_subtotal: totals.discountableSubtotal,
       net_rate_subtotal: totals.netRateSubtotal,
-      discount_percent: discountPercent,
-      discount_amount: totals.discountAmount,
+      discount_percent: effectiveDiscountPercent,
+      discount_amount: totals.youSave,
       grand_total: totals.grandTotal,
       total_quantity: totals.totalQuantity,
+      mrp_total: totals.mrpTotal,
+      you_save: totals.youSave,
+      supplier_total: supplierTotal,
+      commission_total: commissionTotal,
+      pricing_estimated: false,
       status: "NEW",
       needs_review: needsReview,
       source_url: input.meta?.sourceUrl ?? null,
@@ -258,7 +286,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // ── Insert order_items snapshot (§16.5 step 7, §21.8) ──
+  // ── Insert order_items snapshot (§16.5 step 7, §21.8) — full supplier/
+  // commission pricing snapshot, computed once, never re-derived later. ──
   const orderItemsPayload = validLines.map((l) => ({
     order_id: order.id,
     product_id: l.product.id,
@@ -266,10 +295,16 @@ export async function POST(request: Request) {
     name_en: l.product.name_en,
     name_ta: l.product.name_ta,
     unit: l.product.unit,
-    unit_price: l.product.price,
+    unit_price: l.pricing.customerPrice!,
     quantity: l.item.quantity,
-    line_total: Math.round(l.product.price! * l.item.quantity * 100) / 100,
+    line_total: round2(l.pricing.customerPrice! * l.item.quantity),
     is_discountable: l.product.is_discountable,
+    unit_mrp: l.product.mrp,
+    discount_percent: l.product.is_discountable ? Number(l.product.discount_percent) : null,
+    net_markup_percent: l.product.is_discountable ? null : Number(l.product.net_markup_percent),
+    unit_supplier_price: l.pricing.supplierPrice,
+    line_supplier_total: round2(l.pricing.supplierPrice! * l.item.quantity),
+    line_commission: round2(l.pricing.commission! * l.item.quantity),
   }));
 
   const { error: itemsError } = await supabase.from("order_items").insert(orderItemsPayload);
@@ -326,7 +361,8 @@ export async function POST(request: Request) {
         subtotal: totals.subtotal,
         discountableSubtotal: totals.discountableSubtotal,
         netRateSubtotal: totals.netRateSubtotal,
-        discountAmount: totals.discountAmount,
+        mrpTotal: totals.mrpTotal,
+        youSave: totals.youSave,
         grandTotal: totals.grandTotal,
         totalQuantity: totals.totalQuantity,
       },

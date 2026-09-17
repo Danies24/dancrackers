@@ -31,16 +31,16 @@ function CartLineSkeleton() {
 
 export default function CartPage() {
   const { items, setQty, remove } = useCart();
-  const { loading, activeLines, unavailableLines, totals, settings, belowMinimum, shortfall } =
-    useValidatedCart();
+  // The delivery state isn't known until the enquiry form, so the minimum-order
+  // gate is enforced there (both client- and server-side) — not here.
+  const { loading, activeLines, unavailableLines, totals } = useValidatedCart();
 
   useEffect(() => {
     if (!loading && items.length > 0) {
       trackEvent("cart_view", { item_count: items.length, cart_value: totals.grandTotal });
-      if (belowMinimum) trackEvent("min_order_warning_shown", { cart_value: totals.grandTotal, shortfall });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, belowMinimum]);
+  }, [loading]);
 
   if (items.length === 0 && !loading) {
     return (
@@ -142,18 +142,15 @@ export default function CartPage() {
       {!loading && activeLines.length > 0 && (
         <>
           <div className="mt-6 rounded-lg border border-border bg-surface p-4">
-            <Row label="Subtotal" value={totals.subtotal} />
-            {totals.netRateSubtotal > 0 && (
+            {totals.mrpTotal > 0 && <Row label="MRP total" value={totals.mrpTotal} muted strike />}
+            {totals.netRateSubtotal > 0 && totals.discountableSubtotal > 0 && (
               <>
-                <Row label="Items eligible for discount" value={totals.discountableSubtotal} muted />
+                <Row label="Discountable items" value={totals.discountableSubtotal} muted />
                 <Row label="Net-rate items (no discount)" value={totals.netRateSubtotal} muted />
               </>
             )}
-            {totals.discountAmount > 0 && (
-              <Row
-                label={`Discount (${settings.discountPercent}% on eligible items)`}
-                value={-totals.discountAmount}
-              />
+            {totals.youSave > 0 && (
+              <Row label="You save" value={-totals.youSave} className="text-teal-ink" />
             )}
             <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
               <span className="font-semibold text-ink">Total</span>
@@ -161,14 +158,10 @@ export default function CartPage() {
             </div>
           </div>
 
-          {belowMinimum && (
-            <div className="mt-4 rounded-md border border-amber/30 bg-gold-tint p-3 text-sm text-amber-ink">
-              Minimum order {formatRupees(settings.minOrderValue)}. Add {formatRupees(shortfall)} more to continue.{" "}
-              <Link href="/products" className="font-semibold underline">
-                Browse more
-              </Link>
-            </div>
-          )}
+          <p className="mt-3 text-xs text-muted">
+            Minimum order ₹3,000 (Tamil Nadu) / ₹5,000 (other states) — confirmed on the next step. Orders under
+            ₹5,000 are collected from the nearest parcel office.
+          </p>
 
           <ReferralCodeField />
 
@@ -177,16 +170,10 @@ export default function CartPage() {
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
             <Link
-              href={belowMinimum ? "#" : "/enquiry"}
-              aria-disabled={belowMinimum}
-              tabIndex={belowMinimum ? -1 : undefined}
-              onClick={() => {
-                if (!belowMinimum) trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length });
-              }}
+              href="/enquiry"
+              onClick={() => trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length })}
             >
-              <Button size="full" disabled={belowMinimum}>
-                Continue to Enquiry →
-              </Button>
+              <Button size="full">Continue to Enquiry →</Button>
             </Link>
             <p className="mt-2 text-center text-xs text-ink-soft">
               No payment on this site. We will call you to confirm before anything is charged.
@@ -202,11 +189,25 @@ export default function CartPage() {
   );
 }
 
-function Row({ label, value, muted }: { label: string; value: number; muted?: boolean }) {
+function Row({
+  label,
+  value,
+  muted,
+  strike,
+  className,
+}: {
+  label: string;
+  value: number;
+  muted?: boolean;
+  strike?: boolean;
+  className?: string;
+}) {
   return (
-    <div className={`flex justify-between py-0.5 text-sm ${muted ? "text-muted" : "text-ink-soft"}`}>
+    <div className={`flex justify-between py-0.5 text-sm ${muted ? "text-muted" : "text-ink-soft"} ${className ?? ""}`}>
       <span>{label}</span>
-      <span className="tabular-nums">{value < 0 ? `-${formatRupees(-value)}` : formatRupees(value)}</span>
+      <span className={`tabular-nums ${strike ? "line-through" : ""}`}>
+        {value < 0 ? `-${formatRupees(-value)}` : formatRupees(value)}
+      </span>
     </div>
   );
 }

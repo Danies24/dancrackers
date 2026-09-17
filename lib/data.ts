@@ -2,23 +2,60 @@ import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/database";
 
-export type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 export type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
 
+/**
+ * The generated type for the `public_products` VIEW marks every column
+ * nullable — Postgres can't prove a view's output is NOT NULL the way it
+ * can a table's, even though these columns are exactly as non-null in
+ * practice as they are on the base `products` table (the view's WHERE and
+ * its inner join to categories preserve that). Hand-corrected here rather
+ * than trusting the overly-conservative generated shape.
+ */
+export interface ProductRow {
+  id: string;
+  sku: string;
+  slug: string;
+  name_en: string;
+  name_ta: string | null;
+  category_id: string;
+  unit: string;
+  status: string;
+  is_bestseller: boolean;
+  is_featured: boolean;
+  min_qty: number;
+  image_url: string | null;
+  image_urls: string[];
+  video_url: string | null;
+  description: string | null;
+  display_order: number;
+  price: number | null;
+  is_discountable: boolean;
+  mrp: number | null;
+  discount_percent: number | null;
+}
+
 export interface ProductWithCategory extends ProductRow {
-  category: Pick<CategoryRow, "id" | "slug" | "name_en" | "name_ta"> | null;
+  // The view builds this as a jsonb object directly (see the migration) —
+  // never a PostgREST embed, since a plain view has no FK for PostgREST's
+  // relationship detection to key off. Never null: every product has a
+  // category (NOT NULL + inner join).
+  category: Pick<CategoryRow, "id" | "slug" | "name_en" | "name_ta">;
 }
 
 /**
- * All catalogue reads apply the same two rules as the DB CHECK/RLS layer,
- * explicitly, so the intent is legible here too: active status, and a
- * non-null price (FR-1.3 — price IS NULL is excluded from every listing).
+ * Every storefront read goes through `public_products` — never the base
+ * `products` table — so a net-rate item's real supplier rate, or the
+ * supplier-discount percentage, can never reach a customer-facing query
+ * even by accident. The view still exposes every non-archived row; active-
+ * only filtering (FR-1.3 — price IS NULL is excluded from listings) is
+ * applied explicitly here, same as it always was against the base table.
  */
 export async function getCatalogue(): Promise<ProductWithCategory[]> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en, name_ta)")
+    .from("public_products")
+    .select("*")
     .eq("status", "active")
     .not("price", "is", null)
     .order("display_order", { ascending: true });
@@ -51,18 +88,18 @@ export async function getCategoryWithCounts() {
 
 /**
  * Product detail may be opened directly even when the product would not
- * appear in a listing (§12.4: "such items are excluded from listings by
- * FR-1.3, but the URL may still be shared"). So this fetch does NOT filter
- * on price — the page itself renders the "unavailable" / "call for rate"
- * states.
+ * appear in a listing (e.g. temporarily unavailable) — such items are
+ * excluded from listings above, but the URL may still be shared, so this
+ * fetch does NOT filter on status/price; the page itself renders the
+ * "unavailable" / "ask for price" states. The view already excludes
+ * archived (retired-catalogue) products entirely.
  */
 export async function getProductBySlug(slug: string): Promise<ProductWithCategory | null> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en, name_ta)")
+    .from("public_products")
+    .select("*")
     .eq("slug", slug)
-    .neq("status", "archived")
     .maybeSingle();
 
   if (error) throw error;
@@ -76,8 +113,8 @@ export async function getRelatedProducts(
 ): Promise<ProductWithCategory[]> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en, name_ta)")
+    .from("public_products")
+    .select("*")
     .eq("category_id", categoryId)
     .eq("status", "active")
     .not("price", "is", null)
@@ -92,8 +129,8 @@ export async function getRelatedProducts(
 export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en, name_ta)")
+    .from("public_products")
+    .select("*")
     .eq("status", "active")
     .eq("is_bestseller", true)
     .not("price", "is", null)
@@ -107,8 +144,8 @@ export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]>
 export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("*, category:categories(id, slug, name_en, name_ta)")
+    .from("public_products")
+    .select("*")
     .eq("status", "active")
     .eq("is_featured", true)
     .not("price", "is", null)
@@ -117,6 +154,26 @@ export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
 
   if (error) throw error;
   return (data ?? []) as ProductWithCategory[];
+}
+
+/**
+ * The real, currently-active highest discount — feeds the honest headline
+ * claim (brandConfig.getHeadlineOffer) so it can never overstate what's
+ * actually on offer. 0 when nothing discountable is active.
+ */
+export async function getMaxActiveDiscountPercent(): Promise<number> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("public_products")
+    .select("discount_percent")
+    .eq("status", "active")
+    .not("discount_percent", "is", null)
+    .order("discount_percent", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return 0;
+  return Number(data.discount_percent ?? 0);
 }
 
 export interface Setting {

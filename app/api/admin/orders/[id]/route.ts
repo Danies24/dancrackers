@@ -43,6 +43,14 @@ const patchSchema = z.object({
   note: z.string().max(2000).optional(),
   captainCode: z.string().trim().toUpperCase().nullable().optional(),
   commissionPaid: z.boolean().optional(),
+  // Supplier payment — what Kolagalam actually paid Sree Sai Ram for this order.
+  supplierPaymentStatus: z.enum(["pending", "paid"]).optional(),
+  supplierPaidAmount: z.number().nonnegative().optional(),
+  supplierPaymentRef: z.string().max(200).optional(),
+  // Dispatch / tracking, as reported back by the supplier.
+  lrNumber: z.string().max(100).optional(),
+  transportName: z.string().max(100).optional(),
+  trackingUrl: z.string().url().or(z.literal("")).optional(),
 });
 
 /** PATCH /api/admin/orders/[id] (§19.4, §22.2). Status transitions, append-only notes, captain override. */
@@ -56,7 +64,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       { status: 400 },
     );
   }
-  const { status, lostReason, note, captainCode, commissionPaid } = parsed.data;
+  const {
+    status,
+    lostReason,
+    note,
+    captainCode,
+    commissionPaid,
+    supplierPaymentStatus,
+    supplierPaidAmount,
+    supplierPaymentRef,
+    lrNumber,
+    transportName,
+    trackingUrl,
+  } = parsed.data;
 
   if (status === "LOST" && !lostReason) {
     return NextResponse.json(
@@ -70,7 +90,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { data: existing, error: fetchError } = await supabase
     .from("orders")
-    .select("internal_notes, captain_id, status, grand_total, commission_amount, commission_paid_at, first_contacted_at")
+    .select(
+      "internal_notes, captain_id, status, grand_total, commission_amount, commission_paid_at, first_contacted_at, dispatched_at",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -136,6 +158,28 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (commissionPaid !== undefined) {
     update.commission_paid_at = commissionPaid ? new Date().toISOString() : null;
+  }
+
+  if (supplierPaymentStatus !== undefined) {
+    update.supplier_payment_status = supplierPaymentStatus;
+    if (supplierPaymentStatus === "paid") {
+      update.supplier_paid_at = new Date().toISOString();
+      if (supplierPaidAmount !== undefined) update.supplier_paid_amount = supplierPaidAmount;
+      if (supplierPaymentRef !== undefined) update.supplier_payment_ref = supplierPaymentRef || null;
+    } else {
+      update.supplier_paid_amount = null;
+      update.supplier_paid_at = null;
+      update.supplier_payment_ref = null;
+    }
+  }
+
+  if (lrNumber !== undefined) update.lr_number = lrNumber || null;
+  if (transportName !== undefined) update.transport_name = transportName || null;
+  if (trackingUrl !== undefined) update.tracking_url = trackingUrl || null;
+  // First time an LR number is recorded, stamp dispatched_at automatically —
+  // mirrors the confirmed_at/delivered_at auto-timestamp pattern above.
+  if (lrNumber && !existing.dispatched_at) {
+    update.dispatched_at = new Date().toISOString();
   }
 
   if (note) autoNotes.push(note);

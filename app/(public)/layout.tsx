@@ -2,10 +2,13 @@ import { CartProvider } from "@/components/cart/cart-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { StickyCartBar } from "@/components/cart/sticky-cart-bar";
-import { getActiveCategories } from "@/lib/data";
+import { getCategoryWithCounts } from "@/lib/data";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const categories = await getActiveCategories().catch(() => []);
+  // Every active category with at least one product — never a hardcoded
+  // subset, and never a dead-end link to an empty category.
+  const categoriesWithCounts = await getCategoryWithCounts().catch(() => []);
+  const categories = categoriesWithCounts.filter((c) => c.productCount > 0);
 
   return (
     <CartProvider>

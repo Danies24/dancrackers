@@ -69,6 +69,38 @@ export function buildCustomerMessage(input: CustomerMessageInput): string {
   ].join("\n");
 }
 
+export interface CustomerUpdateMessageInput {
+  orderRef: string;
+  items: WhatsAppOrderItem[];
+  grandTotal: number;
+  lrNumber?: string | null;
+  transportName?: string | null;
+  trackingUrl?: string | null;
+}
+
+/**
+ * Post-order status update to the customer — order no., items, customer
+ * total, and dispatch tracking once available. Deliberately carries no
+ * supplier figures (rate, supplier total, commission) — this is the
+ * customer-facing counterpart to buildSupplierMessage, not a variant of it.
+ */
+export function buildCustomerUpdateMessage(input: CustomerUpdateMessageInput): string {
+  const lines = [
+    `Update on your order ${input.orderRef}`,
+    "",
+    "Items:",
+    formatItemLines(input.items),
+    "",
+    `Total: ${formatRupees(input.grandTotal)}`,
+  ];
+  if (input.lrNumber) {
+    lines.push("", "Dispatched.", `LR number: ${input.lrNumber}`);
+    if (input.transportName) lines.push(`Transport: ${input.transportName}`);
+    if (input.trackingUrl) lines.push(`Track: ${input.trackingUrl}`);
+  }
+  return lines.join("\n");
+}
+
 export interface SupplierMessageInput {
   supplierName: string;
   orderRef: string;

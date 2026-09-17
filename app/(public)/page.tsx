@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { ExploreCrackers } from "@/components/marketing/explore-crackers";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
-import { getCatalogue, getCategoryWithCounts } from "@/lib/data";
-import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
+import { brandConfig, getHeadlineOffer, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 // No title metadata here — the layout's `default` title (brandConfig.seo.defaultTitle)
 // is used as-is for the homepage. An explicit title here would instead fill the
@@ -13,15 +13,20 @@ import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig
 
 export const revalidate = 300;
 
+// TODO(confirm): delivery-area claim — Tamil Nadu is confirmed, other states are enquiry-only until served-area data is finalized.
 const TRUST_FEATURES = [
   { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
   { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Competitive Pricing", body: "Best rates for bulk orders." },
-  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Pan India Delivery", body: "We deliver across India." },
+  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Tamil Nadu Delivery", body: "Other states on enquiry." },
   { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
 ];
 
 export default async function HomePage() {
-  const [categories, products] = await Promise.all([getCategoryWithCounts(), getCatalogue()]);
+  const [categories, products, maxDiscountPercent] = await Promise.all([
+    getCategoryWithCounts(),
+    getCatalogue(),
+    getMaxActiveDiscountPercent(),
+  ]);
   const catalogueEmpty = categories.every((c) => c.productCount === 0);
   const showcaseProducts = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller));
 
@@ -39,7 +44,7 @@ export default async function HomePage() {
             <span className="text-gradient-festival">Straight to You.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            No middlemen, no markup, just premium crackers at true factory price.
+            {maxDiscountPercent > 0 ? getHeadlineOffer(maxDiscountPercent) : "Direct from Sivakasi."}
           </p>
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/products">

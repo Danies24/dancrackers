@@ -43,6 +43,8 @@ export const addressSchema = z
 
 export const citySchema = z.string().trim().min(2, "Please enter your city").max(40);
 
+export const stateSchema = z.string().trim().min(2, "Please select your state").max(60);
+
 export const emailSchema = z
   .string()
   .trim()
@@ -65,6 +67,7 @@ export const enquiryCustomerSchema = z.object({
   address: addressSchema,
   apartment: z.string().trim().max(100).optional(),
   city: citySchema,
+  state: stateSchema,
   pincode: pincodeSchema,
   landmark: z.string().trim().max(100).optional(),
   preferredCallTime: preferredCallTimeSchema,
