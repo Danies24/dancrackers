@@ -64,26 +64,33 @@ export async function getCatalogue(): Promise<ProductWithCategory[]> {
   return (data ?? []) as ProductWithCategory[];
 }
 
-export async function getActiveCategories(): Promise<CategoryRow[]> {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("is_active", true)
-    .order("display_order", { ascending: true });
-
-  if (error) throw error;
-  return data ?? [];
-}
-
 export async function getCategoryWithCounts() {
-  const [categories, products] = await Promise.all([getActiveCategories(), getCatalogue()]);
+  const supabase = createPublicClient();
+  const [{ data: categories, error }, products] = await Promise.all([
+    supabase.from("categories").select("*").eq("is_active", true).order("display_order", { ascending: true }),
+    getCatalogue(),
+  ]);
+  if (error) throw error;
+
   const counts = new Map<string, number>();
   for (const p of products) {
     if (!p.category_id) continue;
     counts.set(p.category_id, (counts.get(p.category_id) ?? 0) + 1);
   }
-  return categories.map((c) => ({ ...c, productCount: counts.get(c.id) ?? 0 }));
+  return (categories ?? []).map((c) => ({ ...c, productCount: counts.get(c.id) ?? 0 }));
+}
+
+/**
+ * A category marked active in the DB but with no orderable products in it
+ * right now (catalogue turnover, a supplier gap) is worse than useless in a
+ * customer-facing nav or filter — it's a dead end. Filtered out here, once,
+ * so every caller (product filter pills, category nav, sitemap) gets it for
+ * free instead of separately re-deriving product counts to hide the same
+ * empty categories.
+ */
+export async function getActiveCategories(): Promise<CategoryRow[]> {
+  const categories = await getCategoryWithCounts();
+  return categories.filter((c) => c.productCount > 0);
 }
 
 /**
