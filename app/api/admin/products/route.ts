@@ -31,7 +31,10 @@ const createSchema = z.object({
   name_en: z.string().min(1),
   name_ta: z.string().optional(),
   category_id: z.string().uuid(),
-  price: z.number().nonnegative().nullable().optional(),
+  // The customer price is always trigger-derived from these — never set directly.
+  mrp: z.number().nonnegative().nullable().optional(),
+  discount_percent: z.number().min(0).max(100).optional(),
+  net_markup_percent: z.number().min(0).max(100).optional(),
   unit: z.enum(["pkt", "pcs", "box", "bundle"]).optional(),
   is_discountable: z.boolean().optional(),
   min_qty: z.number().int().positive().optional(),

@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 import { MediaUploadField } from "@/components/admin/media-upload-field";
+import { computeProductPricing } from "@/lib/pricing";
+import { formatRupees } from "@/lib/format";
 import type { Database } from "@/types/database";
 
 type Product = Database["public"]["Tables"]["products"]["Row"] & {
@@ -90,12 +92,12 @@ export function ProductDetailClient({
 
           <div className="grid grid-cols-2 gap-3">
             <LabeledInput
-              label="Price (₹)"
+              label="MRP / PDF rate (₹)"
               type="number"
-              defaultValue={product.price ?? ""}
+              defaultValue={product.mrp ?? ""}
               onBlurCommit={(v) => {
                 const n = v === "" ? null : Number(v);
-                if (n !== product.price) patch({ price: n });
+                if (n !== product.mrp) patch({ mrp: n });
               }}
             />
             <div className="flex flex-col gap-1.5">
@@ -110,6 +112,37 @@ export function ProductDetailClient({
                 <option value="box">box</option>
                 <option value="bundle">bundle</option>
               </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <LabeledInput
+              label={product.is_discountable ? "Discount %" : "Markup %"}
+              type="number"
+              defaultValue={product.is_discountable ? product.discount_percent : product.net_markup_percent}
+              onBlurCommit={(v) => {
+                const n = Number(v);
+                if (product.is_discountable) {
+                  if (n !== product.discount_percent) patch({ discount_percent: n });
+                } else if (n !== product.net_markup_percent) {
+                  patch({ net_markup_percent: n });
+                }
+              }}
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-ink-soft">Customer price</label>
+              <p className="flex h-10 items-center px-1 text-lg font-bold text-ink">
+                {(() => {
+                  const { customerPrice } = computeProductPricing({
+                    mrp: product.mrp,
+                    isDiscountable: product.is_discountable,
+                    discountPercent: Number(product.discount_percent),
+                    netMarkupPercent: Number(product.net_markup_percent),
+                    supplierDiscountPercent: 90,
+                  });
+                  return customerPrice != null ? formatRupees(customerPrice) : "Ask for price";
+                })()}
+              </p>
             </div>
           </div>
 
