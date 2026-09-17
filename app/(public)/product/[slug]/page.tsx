@@ -38,7 +38,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = product.category_id ? await getRelatedProducts(product.category_id, product.id) : [];
+  const related = !product.combo && product.category_id ? await getRelatedProducts(product.category_id, product.id) : [];
   const images = product.image_url ? [product.image_url, ...(product.image_urls ?? [])] : [];
   const isUnavailable = product.status === "unavailable";
   const isCallForRate = !product.price;
@@ -72,6 +72,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         <div className="pb-24 md:pb-0">
           <div className="mb-1 flex flex-wrap gap-1.5">
+            {product.combo && (
+              <span className="rounded-full bg-combo-badge-bg px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-combo-badge-text">
+                {product.combo.badgeText}
+              </span>
+            )}
             {product.is_discountable && product.discount_percent != null && (
               <span className="rounded-full bg-maroon px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-on-fill">
                 {DISPLAY_DISCOUNT_LABEL}
@@ -86,13 +91,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               {product.name_ta}
             </p>
           )}
-          {product.category && (
+          {product.combo?.tagline && <p className="mt-1 text-sm text-ink-soft">{product.combo.tagline}</p>}
+          {!product.combo && product.category && (
             <Link
               href={`/products/${product.category.slug}`}
               className="mt-2 inline-block text-xs font-medium text-maroon-ink"
             >
               {product.category.name_en}
             </Link>
+          )}
+
+          {product.combo && product.combo.varieties.length > 1 && (
+            <div className="mt-3 flex gap-2">
+              {product.combo.varieties.map((v) => (
+                <Link
+                  key={v.id}
+                  href={`/product/${v.slug}`}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                    v.id === product.combo!.varietyId
+                      ? "border-maroon bg-maroon text-on-fill"
+                      : "border-border text-ink-soft hover:border-maroon-ink"
+                  }`}
+                >
+                  {v.tierLabel}
+                </Link>
+              ))}
+            </div>
           )}
 
           <div className="mt-4">
@@ -137,7 +161,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             )
           )}
 
-          {product.description && <p className="mt-6 text-sm leading-relaxed text-ink-soft">{product.description}</p>}
+          {product.combo ? (
+            <div className="mt-6">
+              <h2 className="mb-3 font-display text-base font-semibold text-ink">What&apos;s inside this pack</h2>
+              <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-4">
+                {product.combo.itemGroups.map((group) => (
+                  <div key={group.categoryName}>
+                    <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
+                      {group.categoryName}
+                    </h3>
+                    <ul className="flex flex-col gap-1">
+                      {group.items.map((item, i) => (
+                        <li key={i} className="flex justify-between text-sm text-ink-soft">
+                          <span>
+                            {item.name_en}
+                            {item.name_ta && <span lang="ta"> ({item.name_ta})</span>}
+                          </span>
+                          <span className="tabular-nums font-medium text-ink">× {item.quantity}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-right text-xs text-muted">{product.combo.totalItems} items total</p>
+            </div>
+          ) : (
+            product.description && <p className="mt-6 text-sm leading-relaxed text-ink-soft">{product.description}</p>
+          )}
 
           <p className="mt-6 text-xs text-muted">
             Fireworks are explosives — use only under adult supervision and follow the safety instructions.{" "}

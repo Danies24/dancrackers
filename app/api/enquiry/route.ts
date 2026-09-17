@@ -108,19 +108,74 @@ export async function POST(request: Request) {
 
   const pricingSettings = await getPricingSettings();
 
-  const byId = new Map(products.map((p) => [p.id, p]));
+  interface LineProduct {
+    id: string;
+    sku: string;
+    name_en: string;
+    name_ta: string | null;
+    unit: string;
+    price: number | null;
+    mrp: number | null;
+    is_discountable: boolean;
+    discount_percent: number;
+    net_markup_percent: number;
+    status: string;
+  }
+
+  const byId = new Map<string, LineProduct>(products.map((p) => [p.id, p]));
+  // A cart line's productId may instead be a combo pack variety's id (see
+  // supabase/migrations/20260918000001_combo_packs.sql) — resolve anything
+  // the products lookup missed against that table before giving up on it.
+  // Its selling_price/supplier_cost/commission are already the authoritative,
+  // trigger-computed numbers, kept here so the pricing step below can use
+  // them directly instead of calling computeProductPricing().
+  const comboPricingById = new Map<string, { supplierPrice: number; commission: number }>();
+  const missingIds = productIds.filter((id) => !byId.has(id));
+  if (missingIds.length > 0) {
+    const { data: combos } = await supabase
+      .from("combo_pack_varieties")
+      .select("id, slug, tier_label, selling_price, supplier_cost, commission, combo_pack_id")
+      .in("id", missingIds);
+    if (combos && combos.length > 0) {
+      const packIds = [...new Set(combos.map((c) => c.combo_pack_id))];
+      const { data: packs } = await supabase.from("combo_packs").select("id, name, is_active").in("id", packIds);
+      const packById = new Map((packs ?? []).map((p) => [p.id, p]));
+      for (const c of combos) {
+        const pack = packById.get(c.combo_pack_id);
+        if (!pack?.is_active) continue;
+        byId.set(c.id, {
+          id: c.id,
+          sku: `COMBO-${c.slug.toUpperCase()}`,
+          name_en: `${pack.name} — ${c.tier_label}`,
+          name_ta: null,
+          unit: "pack",
+          price: c.selling_price,
+          mrp: null,
+          is_discountable: false,
+          discount_percent: 0,
+          net_markup_percent: 0,
+          status: "active",
+        });
+        comboPricingById.set(c.id, { supplierPrice: c.supplier_cost, commission: c.commission });
+      }
+    }
+  }
+
   const validLines = input.items
     .map((item) => {
       const product = byId.get(item.productId);
       if (!product || product.status !== "active" || product.price == null) return null;
-      const pricing = computeProductPricing({
-        mrp: product.mrp,
-        isDiscountable: product.is_discountable,
-        discountPercent: Number(product.discount_percent),
-        netMarkupPercent: Number(product.net_markup_percent),
-        supplierDiscountPercent: pricingSettings.supplierDiscountPercent,
-      });
-      return { item, product, pricing };
+      const comboPricing = comboPricingById.get(item.productId);
+      const pricing = comboPricing
+        ? { customerPrice: product.price, supplierPrice: comboPricing.supplierPrice, commission: comboPricing.commission }
+        : computeProductPricing({
+            mrp: product.mrp,
+            isDiscountable: product.is_discountable,
+            discountPercent: Number(product.discount_percent),
+            netMarkupPercent: Number(product.net_markup_percent),
+            supplierDiscountPercent: pricingSettings.supplierDiscountPercent,
+          });
+      return { item, product, pricing, comboVarietyId: comboPricing ? item.productId : null };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
 
@@ -290,7 +345,11 @@ export async function POST(request: Request) {
   // commission pricing snapshot, computed once, never re-derived later. ──
   const orderItemsPayload = validLines.map((l) => ({
     order_id: order.id,
-    product_id: l.product.id,
+    // A combo pack variety has no row in `products` (see the combo_variety_id
+    // column added by supabase/migrations/20260918000001_combo_packs.sql) —
+    // product_id's FK would reject its id, so it's tracked there instead.
+    product_id: l.comboVarietyId ? null : l.product.id,
+    combo_variety_id: l.comboVarietyId,
     sku: l.product.sku,
     name_en: l.product.name_en,
     name_ta: l.product.name_ta,

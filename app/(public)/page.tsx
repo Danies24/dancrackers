@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { ExploreCrackers } from "@/components/marketing/explore-crackers";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
+import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
+import { getActiveComboPacks } from "@/lib/combo-packs";
 import { brandConfig, getHeadlineOffer, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 // No title metadata here — the layout's `default` title (brandConfig.seo.defaultTitle)
@@ -22,10 +24,11 @@ const TRUST_FEATURES = [
 ];
 
 export default async function HomePage() {
-  const [categories, products, maxDiscountPercent] = await Promise.all([
+  const [categories, products, maxDiscountPercent, comboPacks] = await Promise.all([
     getCategoryWithCounts(),
     getCatalogue(),
     getMaxActiveDiscountPercent(),
+    getActiveComboPacks(),
   ]);
   const catalogueEmpty = categories.every((c) => c.productCount === 0);
   const showcaseProducts = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller));
@@ -57,6 +60,24 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Combo Packs — the primary showcase, immediately below the hero and
+          above the regular category rails (§6.2 MUST). */}
+      {comboPacks.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10 pt-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">Curated for you</p>
+              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Combo Packs</h2>
+            </div>
+          </div>
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+            {comboPacks.map((combo) => (
+              <ComboPackCard key={combo.id} combo={combo} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <>
       {catalogueEmpty ? (
