@@ -2,14 +2,45 @@ import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/database";
 
-export type ProductRow = Omit<Database["public"]["Views"]["public_products"]["Row"], "category">;
 export type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
+
+/**
+ * The generated type for the `public_products` VIEW marks every column
+ * nullable — Postgres can't prove a view's output is NOT NULL the way it
+ * can a table's, even though these columns are exactly as non-null in
+ * practice as they are on the base `products` table (the view's WHERE and
+ * its inner join to categories preserve that). Hand-corrected here rather
+ * than trusting the overly-conservative generated shape.
+ */
+export interface ProductRow {
+  id: string;
+  sku: string;
+  slug: string;
+  name_en: string;
+  name_ta: string | null;
+  category_id: string;
+  unit: string;
+  status: string;
+  is_bestseller: boolean;
+  is_featured: boolean;
+  min_qty: number;
+  image_url: string | null;
+  image_urls: string[];
+  video_url: string | null;
+  description: string | null;
+  display_order: number;
+  price: number | null;
+  is_discountable: boolean;
+  mrp: number | null;
+  discount_percent: number | null;
+}
 
 export interface ProductWithCategory extends ProductRow {
   // The view builds this as a jsonb object directly (see the migration) —
   // never a PostgREST embed, since a plain view has no FK for PostgREST's
-  // relationship detection to key off.
-  category: Pick<CategoryRow, "id" | "slug" | "name_en" | "name_ta"> | null;
+  // relationship detection to key off. Never null: every product has a
+  // category (NOT NULL + inner join).
+  category: Pick<CategoryRow, "id" | "slug" | "name_en" | "name_ta">;
 }
 
 /**

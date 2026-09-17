@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -343,6 +348,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_products"
+            referencedColumns: ["id"]
+          },
         ]
       }
       order_ref_counters: {
@@ -573,7 +585,41 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_products"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      pricing_settings: {
+        Row: {
+          default_discount_percent: number
+          default_net_markup_percent: number
+          id: boolean
+          supplier_discount_percent: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          default_discount_percent?: number
+          default_net_markup_percent?: number
+          id?: boolean
+          supplier_discount_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          default_discount_percent?: number
+          default_net_markup_percent?: number
+          id?: boolean
+          supplier_discount_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       products: {
         Row: {
@@ -682,60 +728,41 @@ export type Database = {
         }
         Relationships: []
       }
-      pricing_settings: {
-        Row: {
-          default_discount_percent: number
-          default_net_markup_percent: number
-          id: boolean
-          supplier_discount_percent: number
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          default_discount_percent?: number
-          default_net_markup_percent?: number
-          id?: boolean
-          supplier_discount_percent?: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          default_discount_percent?: number
-          default_net_markup_percent?: number
-          id?: boolean
-          supplier_discount_percent?: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       public_products: {
         Row: {
-          category: Json
-          category_id: string
+          category: Json | null
+          category_id: string | null
           description: string | null
           discount_percent: number | null
-          display_order: number
-          id: string
+          display_order: number | null
+          id: string | null
           image_url: string | null
-          image_urls: string[]
-          is_bestseller: boolean
-          is_discountable: boolean
-          is_featured: boolean
-          min_qty: number
+          image_urls: string[] | null
+          is_bestseller: boolean | null
+          is_discountable: boolean | null
+          is_featured: boolean | null
+          min_qty: number | null
           mrp: number | null
-          name_en: string
+          name_en: string | null
           name_ta: string | null
           price: number | null
-          sku: string
-          slug: string
-          status: string
-          unit: string
+          sku: string | null
+          slug: string | null
+          status: string | null
+          unit: string | null
           video_url: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -875,4 +902,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
