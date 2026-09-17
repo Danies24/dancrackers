@@ -97,6 +97,13 @@ export const brandConfig = {
     otherStates: 5000,
   },
 
+  // Deliberately not derived from any product's real discount_percent — a
+  // marketing figure only, shown on the "X% OFF" badge and the hero tagline.
+  // The real discount_percent (80) stays untouched everywhere prices and
+  // commission are actually computed (admin panel, DB, pricing.ts); this
+  // number never enters that math. Business call, not a pricing change.
+  marketingDiscountPercent: 95,
+
   seo: {
     titleTemplate: "%s | Kolagalam",
     defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Enquire Now",

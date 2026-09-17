@@ -13,7 +13,10 @@ import { formatRupees, formatUnit } from "@/lib/format";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { brandConfig } from "@/config/brandConfig";
 import type { ProductWithCategory } from "@/lib/data";
+
+const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
 /**
  * The one product card component, used on /products, category pages, home
@@ -74,7 +77,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
         <div className="absolute left-2 top-2 flex flex-col gap-1">
           {product.is_discountable && product.discount_percent != null && (
             <span className="rounded-full bg-maroon px-2 py-0.5 text-[10px] font-bold text-on-fill">
-              {Math.round(product.discount_percent)}% OFF
+              {DISPLAY_DISCOUNT_LABEL}
             </span>
           )}
           {product.is_bestseller && <Badge variant="bestseller" />}
@@ -95,14 +98,6 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
         <div className="mt-auto flex flex-col gap-0.5 pt-1">
           {product.price == null ? (
             <p className="text-xs text-muted">Ask for price</p>
-          ) : product.is_discountable && product.mrp != null ? (
-            <>
-              <span className="tabular-nums text-xs text-muted line-through">{formatRupees(product.mrp)}</span>
-              <p className="tabular-nums text-base font-bold text-ink">
-                {formatRupees(product.price)}{" "}
-                <span className="text-xs font-normal text-muted">per {formatUnit(product.unit)}</span>
-              </p>
-            </>
           ) : !product.is_discountable ? (
             <>
               <span className="text-xs text-muted">Special price</span>

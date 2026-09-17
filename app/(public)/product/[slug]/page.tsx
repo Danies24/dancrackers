@@ -9,7 +9,9 @@ import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
-import { getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+
+const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
 export const revalidate = 300;
 
@@ -72,7 +74,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="mb-1 flex flex-wrap gap-1.5">
             {product.is_discountable && product.discount_percent != null && (
               <span className="rounded-full bg-maroon px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-on-fill">
-                {Math.round(product.discount_percent)}% OFF
+                {DISPLAY_DISCOUNT_LABEL}
               </span>
             )}
             {product.is_bestseller && <Badge variant="bestseller" />}
@@ -103,11 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </p>
             ) : (
               <div>
-                {product.is_discountable && product.mrp != null ? (
-                  <p className="tabular-nums text-sm text-muted line-through">{formatRupees(product.mrp)}</p>
-                ) : !product.is_discountable ? (
-                  <p className="text-sm text-muted">Special price</p>
-                ) : null}
+                {!product.is_discountable && <p className="text-sm text-muted">Special price</p>}
                 <p className="flex items-center gap-2 tabular-nums">
                   <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
                   <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>

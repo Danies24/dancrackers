@@ -44,7 +44,9 @@ export default async function HomePage() {
             <span className="text-gradient-festival">Straight to You.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            {maxDiscountPercent > 0 ? getHeadlineOffer(maxDiscountPercent) : "Direct from Sivakasi."}
+            {maxDiscountPercent > 0
+              ? getHeadlineOffer(brandConfig.marketingDiscountPercent)
+              : "Direct from Sivakasi."}
           </p>
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/products">

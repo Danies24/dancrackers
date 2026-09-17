@@ -11,6 +11,7 @@ import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
+import { brandConfig } from "@/config/brandConfig";
 
 /** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
 function CartLineSkeleton() {
@@ -31,9 +32,14 @@ function CartLineSkeleton() {
 
 export default function CartPage() {
   const { items, setQty, remove } = useCart();
-  // The delivery state isn't known until the enquiry form, so the minimum-order
-  // gate is enforced there (both client- and server-side) — not here.
+  // The delivery state (and so the exact ₹3,000/₹5,000 threshold) isn't known
+  // until the enquiry form, where the real gate is enforced client- and
+  // server-side. Here we only gate on the lower of the two — ₹3,000 — so a
+  // cart that can't possibly clear the minimum for ANY state never lets the
+  // customer proceed; a Tamil Nadu order can still be blocked on the next
+  // step once their state confirms the ₹5,000 floor doesn't apply to them.
   const { loading, activeLines, unavailableLines, totals } = useValidatedCart();
+  const belowFloor = totals.grandTotal < brandConfig.orderMinimums.tamilNadu;
 
   useEffect(() => {
     if (!loading && items.length > 0) {
@@ -142,15 +148,11 @@ export default function CartPage() {
       {!loading && activeLines.length > 0 && (
         <>
           <div className="mt-6 rounded-lg border border-border bg-surface p-4">
-            {totals.mrpTotal > 0 && <Row label="MRP total" value={totals.mrpTotal} muted strike />}
             {totals.netRateSubtotal > 0 && totals.discountableSubtotal > 0 && (
               <>
                 <Row label="Discountable items" value={totals.discountableSubtotal} muted />
                 <Row label="Net-rate items (no discount)" value={totals.netRateSubtotal} muted />
               </>
-            )}
-            {totals.youSave > 0 && (
-              <Row label="You save" value={-totals.youSave} className="text-teal-ink" />
             )}
             <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
               <span className="font-semibold text-ink">Total</span>
@@ -159,8 +161,17 @@ export default function CartPage() {
           </div>
 
           <p className="mt-3 text-xs text-muted">
-            Minimum order ₹3,000 (Tamil Nadu) / ₹5,000 (other states) — confirmed on the next step. Orders under
-            ₹5,000 are collected from the nearest parcel office.
+            {belowFloor ? (
+              <span className="font-semibold text-maroon-ink">
+                Add {formatRupees(brandConfig.orderMinimums.tamilNadu - totals.grandTotal)} more to reach the ₹
+                {brandConfig.orderMinimums.tamilNadu.toLocaleString("en-IN")} minimum order.
+              </span>
+            ) : (
+              <>
+                Minimum order ₹3,000 (Tamil Nadu) / ₹5,000 (other states) — confirmed on the next step. Orders under
+                ₹5,000 are collected from the nearest parcel office.
+              </>
+            )}
           </p>
 
           <ReferralCodeField />
@@ -169,12 +180,18 @@ export default function CartPage() {
             className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4 md:static md:mt-6 md:border-0 md:bg-transparent md:p-0"
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
-            <Link
-              href="/enquiry"
-              onClick={() => trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length })}
-            >
-              <Button size="full">Continue to Enquiry →</Button>
-            </Link>
+            {belowFloor ? (
+              <Button size="full" disabled>
+                Continue to Enquiry →
+              </Button>
+            ) : (
+              <Link
+                href="/enquiry"
+                onClick={() => trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length })}
+              >
+                <Button size="full">Continue to Enquiry →</Button>
+              </Link>
+            )}
             <p className="mt-2 text-center text-xs text-ink-soft">
               No payment on this site. We will call you to confirm before anything is charged.
             </p>
