@@ -157,11 +157,24 @@ export function getSiteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? brandConfig.brand.siteUrl;
 }
 
-export function getManufacturerFacilitatorNotice(): { manufacturedBy: string; facilitatedBy: string } {
+const UNCONFIRMED = "TODO(confirm)";
+
+export function getManufacturerFacilitatorNotice(): {
+  manufacturedBy: string;
+  facilitatedBy: string;
+  licenceLine: string | null;
+  gstinLine: string | null;
+} {
   const supplier = getPrimarySupplier();
   return {
     manufacturedBy: `${supplier.role}: ${supplier.name}, ${supplier.address}`,
     facilitatedBy: `${brandConfig.legal.facilitator.role}: ${brandConfig.legal.facilitator.name}, ${getFormattedAddress()}`,
+    // Never shown until a real value replaces the placeholder — a visible
+    // "TODO(confirm)" on a live compliance notice would look broken, and
+    // this repo's convention is to omit an unconfirmed legal fact entirely
+    // rather than print the placeholder to customers.
+    licenceLine: supplier.licenceNo && supplier.licenceNo !== UNCONFIRMED ? `Licence No.: ${supplier.licenceNo}` : null,
+    gstinLine: brandConfig.legal.gstin && brandConfig.legal.gstin !== UNCONFIRMED ? `GSTIN: ${brandConfig.legal.gstin}` : null,
   };
 }
 

@@ -95,6 +95,8 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         <p>{notice.manufacturedBy}</p>
+        {notice.licenceLine && <p>{notice.licenceLine}</p>}
+        {notice.gstinLine && <p>{notice.gstinLine}</p>}
         <p>{notice.facilitatedBy}</p>
         <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>
       </div>
