@@ -53,18 +53,18 @@ export const brandConfig = {
     facilitator: { name: "Kolagalam", role: "Orders facilitated by" },
     suppliers: [
       {
-        // INTENTIONALLY BLANK — confirm the real manufacturer's legal name
-        // and details in writing before this appears on a live page.
-        name: "",
+        name: "Sree Sai Ram Crackers (Kids Crackers Park)",
         role: "Manufactured and sold by",
         city: "Sivakasi",
-        address: "",
-        phone: "",
-        licenceNo: "",
+        address: "3/268 D Sivakasi–Sattur Road, Opp. Sri Sankari Mahal, Chinnakamanpatti, Sivakasi 626 189",
+        phone: "99946 37193 / 96297 24212",
+        // TODO(confirm): licence number — get in writing from the supplier before this appears on a live page.
+        licenceNo: "TODO(confirm)",
         isPrimary: true,
       },
     ],
-    gstin: null,
+    // TODO(confirm): GSTIN — get in writing from the supplier before this appears on a live page.
+    gstin: "TODO(confirm)" as string | null,
     complianceNotice:
       "Online sale of firecrackers is not permitted. This website collects enquiries only. No payment is taken here. Payment is made directly to the supplier after confirmation.",
   },
@@ -82,15 +82,23 @@ export const brandConfig = {
     ],
     whyUs: [
       "We visit the mills ourselves and photograph real products — no photocopied price lists.",
-      "Every price is clear upfront — no bargaining, no hidden markup.",
+      "Every price is clear upfront, discounted straight off the printed MRP.",
       "A real person calls you within 2 hours to confirm your order.",
       "You pay the licensed supplier directly — we never touch your money.",
     ],
   },
 
+  // Order minimums by delivery state — orders below the applicable minimum
+  // are blocked at enquiry submission (server-side authoritative, client
+  // shows the message as soon as a state is picked).
+  orderMinimums: {
+    tamilNadu: 3000,
+    otherStates: 5000,
+  },
+
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Order Online",
+    defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Enquire Now",
     defaultDescription:
       "Browse the full Sivakasi crackers price list with photos. Build your order, we call you to confirm. Supplied by licensed Sivakasi manufacturers.",
     keywords: ["Sivakasi crackers", "Diwali crackers online", "firecrackers Chennai", "Kolagalam"],
@@ -152,7 +160,22 @@ export function getSiteUrl(): string {
 export function getManufacturerFacilitatorNotice(): { manufacturedBy: string; facilitatedBy: string } {
   const supplier = getPrimarySupplier();
   return {
-    manufacturedBy: `${supplier.role}: ${supplier.name}`,
+    manufacturedBy: `${supplier.role}: ${supplier.name}, ${supplier.address}`,
     facilitatedBy: `${brandConfig.legal.facilitator.role}: ${brandConfig.legal.facilitator.name}, ${getFormattedAddress()}`,
   };
+}
+
+/** The minimum order value for a delivery state — Tamil Nadu vs everywhere else (§ orderMinimums). */
+export function getMinimumOrderValue(state?: string | null): number {
+  const isTamilNadu = (state ?? "").trim().toLowerCase() === "tamil nadu";
+  return isTamilNadu ? brandConfig.orderMinimums.tamilNadu : brandConfig.orderMinimums.otherStates;
+}
+
+/**
+ * Headline discount claim — always derived from the real, currently-active
+ * highest discount_percent (passed in by the caller, computed from the DB),
+ * never a hardcoded number, so it can never overstate the actual discount.
+ */
+export function getHeadlineOffer(maxActiveDiscountPercent: number): string {
+  return `Direct from Sivakasi · Up to ${Math.round(maxActiveDiscountPercent)}% off MRP`;
 }

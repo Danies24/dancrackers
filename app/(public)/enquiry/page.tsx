@@ -20,8 +20,10 @@ import {
   nameSchema,
   phoneSchema,
   pincodeSchema,
+  stateSchema,
 } from "@/lib/validation";
-import { getPhoneE164 } from "@/config/brandConfig";
+import { getMinimumOrderValue, getPhoneE164 } from "@/config/brandConfig";
+import { INDIAN_STATES } from "@/lib/indian-states";
 import { trackEvent } from "@/lib/analytics";
 
 const SESSION_KEY = "dc_enquiry_draft";
@@ -35,6 +37,7 @@ const formSchema = z
     address: addressSchema,
     apartment: z.string().max(100).optional(),
     city: citySchema,
+    state: stateSchema,
     pincode: pincodeSchema,
     landmark: z.string().max(100).optional(),
     email: emailSchema,
@@ -56,7 +59,6 @@ type FormValues = z.infer<typeof formSchema>;
 export default function EnquiryPage() {
   const router = useRouter();
   const { items, clear } = useCart();
-  const { loading, activeLines, totals, belowMinimum } = useValidatedCart();
   const [hydrated, setHydrated] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -94,6 +96,7 @@ export default function EnquiryPage() {
       address: draft?.address ?? "",
       apartment: draft?.apartment ?? "",
       city: draft?.city ?? "Chennai",
+      state: draft?.state ?? "Tamil Nadu",
       pincode: draft?.pincode ?? "",
       landmark: draft?.landmark ?? "",
       email: draft?.email ?? "",
@@ -103,6 +106,8 @@ export default function EnquiryPage() {
   });
 
   const values = watch();
+  const { loading, activeLines, totals, belowMinimum, shortfall } = useValidatedCart(values.state);
+
   useEffect(() => {
     try {
       window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(values));
@@ -155,6 +160,7 @@ export default function EnquiryPage() {
             address: formValues.address,
             apartment: formValues.apartment || undefined,
             city: formValues.city,
+            state: formValues.state,
             pincode: formValues.pincode,
             landmark: formValues.landmark || undefined,
             preferredCallTime: formValues.preferredCallTime,
@@ -221,10 +227,12 @@ export default function EnquiryPage() {
 
       {belowMinimum && !loading && (
         <p className="mt-3 text-sm text-amber">
-          Your cart is below the minimum order value.{" "}
+          Minimum order for {values.state || "this state"} is {formatRupees(getMinimumOrderValue(values.state))}.
+          Add {formatRupees(shortfall)} more, or{" "}
           <Link href="/cart" className="font-semibold underline">
-            Go back to cart
+            go back to cart
           </Link>
+          .
         </p>
       )}
 
@@ -279,6 +287,30 @@ export default function EnquiryPage() {
         <Input label="Apartment / building" autoComplete="address-line2" {...register("apartment")} />
 
         <Input label="City" required autoComplete="address-level2" error={errors.city?.message} {...register("city")} />
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="state" className="text-sm font-medium text-ink-soft">
+            State <span className="text-red">*</span>
+          </label>
+          <select
+            id="state"
+            required
+            autoComplete="address-level1"
+            {...register("state")}
+            className="h-12 rounded-md border border-border bg-surface px-3 text-[16px]"
+          >
+            {INDIAN_STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          {errors.state?.message && <p className="text-xs text-red-ink">{errors.state.message}</p>}
+          <p className="text-xs text-muted">
+            Minimum order: ₹3,000 for Tamil Nadu, ₹5,000 for other states. Orders under ₹5,000 are collected from
+            the nearest parcel office.
+          </p>
+        </div>
 
         <Input
           label="Pincode"

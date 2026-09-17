@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createPublicClient } from "@/lib/supabase/public";
-import { getSettings } from "@/lib/data";
 
 const bodySchema = z.object({
   productIds: z.array(z.string().uuid()).max(500),
@@ -12,6 +11,9 @@ export interface ValidateResultItem {
   exists: boolean;
   status: string | null;
   price: number | null;
+  /** Only present for discountable items — null for net-rate items and for anything not orderable. */
+  mrp: number | null;
+  discountPercent: number | null;
   isDiscountable: boolean | null;
   name_en: string | null;
   name_ta: string | null;
@@ -22,10 +24,11 @@ export interface ValidateResultItem {
 }
 
 /**
- * POST /api/products/validate (§15.3, §22.1). Powers cart/enquiry
- * revalidation: current price, status, and whether the product still
- * exists, per item — plus the settings the client needs to compute totals
- * locally (discount_percent, min_order_value) without a separate endpoint.
+ * POST /api/products/validate. Powers cart/enquiry revalidation: current
+ * price, status, and whether the product still exists, per item. Reads
+ * exclusively from `public_products` — the customer-safe view — so a
+ * net-rate item's real supplier rate (its mrp column) never reaches this
+ * response even indirectly; the view itself nulls it out at the source.
  */
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
@@ -40,8 +43,8 @@ export async function POST(request: Request) {
   const { productIds } = parsed.data;
   const supabase = createPublicClient();
   const { data, error } = await supabase
-    .from("products")
-    .select("id, status, price, is_discountable, name_en, name_ta, unit, image_url, sku, slug")
+    .from("public_products")
+    .select("id, status, price, mrp, discount_percent, is_discountable, name_en, name_ta, unit, image_url, sku, slug")
     .in("id", productIds);
 
   if (error) {
@@ -60,6 +63,8 @@ export async function POST(request: Request) {
         exists: false,
         status: null,
         price: null,
+        mrp: null,
+        discountPercent: null,
         isDiscountable: null,
         name_en: null,
         name_ta: null,
@@ -73,6 +78,8 @@ export async function POST(request: Request) {
       exists: true,
       status: p.status,
       price: p.price,
+      mrp: p.mrp,
+      discountPercent: p.discount_percent,
       isDiscountable: p.is_discountable,
       name_en: p.name_en,
       name_ta: p.name_ta,
@@ -83,13 +90,5 @@ export async function POST(request: Request) {
     };
   });
 
-  const settings = await getSettings();
-
-  return NextResponse.json({
-    items,
-    settings: {
-      discountPercent: Number(settings.discount_percent ?? 0),
-      minOrderValue: Number(settings.min_order_value ?? 0),
-    },
-  });
+  return NextResponse.json({ items });
 }

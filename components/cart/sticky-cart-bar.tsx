@@ -27,7 +27,6 @@ export function StickyCartBar() {
 
   const totals = computeTotals(
     items.map((i) => ({ price: i.priceAtAdd, quantity: i.qty, isDiscountable: true })),
-    0,
   );
 
   return (

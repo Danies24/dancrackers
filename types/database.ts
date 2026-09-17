@@ -272,43 +272,61 @@ export type Database = {
       }
       order_items: {
         Row: {
+          discount_percent: number | null
           id: string
           is_discountable: boolean
+          line_commission: number | null
+          line_supplier_total: number | null
           line_total: number
           name_en: string
           name_ta: string | null
+          net_markup_percent: number | null
           order_id: string
           product_id: string | null
           quantity: number
           sku: string
           unit: string
+          unit_mrp: number | null
           unit_price: number
+          unit_supplier_price: number | null
         }
         Insert: {
+          discount_percent?: number | null
           id?: string
           is_discountable: boolean
+          line_commission?: number | null
+          line_supplier_total?: number | null
           line_total: number
           name_en: string
           name_ta?: string | null
+          net_markup_percent?: number | null
           order_id: string
           product_id?: string | null
           quantity: number
           sku: string
           unit: string
+          unit_mrp?: number | null
           unit_price: number
+          unit_supplier_price?: number | null
         }
         Update: {
+          discount_percent?: number | null
           id?: string
           is_discountable?: boolean
+          line_commission?: number | null
+          line_supplier_total?: number | null
           line_total?: number
           name_en?: string
           name_ta?: string | null
+          net_markup_percent?: number | null
           order_id?: string
           product_id?: string | null
           quantity?: number
           sku?: string
           unit?: string
+          unit_mrp?: number | null
           unit_price?: number
+          unit_supplier_price?: number | null
         }
         Relationships: [
           {
@@ -351,6 +369,7 @@ export type Database = {
           commission_amount: number | null
           commission_paid_at: string | null
           commission_rate: number | null
+          commission_total: number | null
           confirmed_at: string | null
           created_at: string
           customer_id: string
@@ -358,6 +377,7 @@ export type Database = {
           discount_amount: number
           discount_percent: number
           discountable_subtotal: number
+          dispatched_at: string | null
           email: string | null
           first_contacted_at: string | null
           grand_total: number
@@ -366,6 +386,8 @@ export type Database = {
           ip_hash: string | null
           landmark: string | null
           lost_reason: string | null
+          lr_number: string | null
+          mrp_total: number | null
           name: string
           needs_review: boolean
           net_rate_subtotal: number
@@ -374,13 +396,23 @@ export type Database = {
           phone: string
           pincode: string
           preferred_call_time: string | null
+          pricing_estimated: boolean
           source_url: string | null
+          state: string | null
           status: string
           subtotal: number
+          supplier_paid_amount: number | null
+          supplier_paid_at: string | null
+          supplier_payment_ref: string | null
+          supplier_payment_status: string
+          supplier_total: number | null
           total_quantity: number
+          tracking_url: string | null
+          transport_name: string | null
           updated_at: string
           user_agent: string | null
           whatsapp: string | null
+          you_save: number | null
         }
         Insert: {
           address: string
@@ -390,6 +422,7 @@ export type Database = {
           commission_amount?: number | null
           commission_paid_at?: string | null
           commission_rate?: number | null
+          commission_total?: number | null
           confirmed_at?: string | null
           created_at?: string
           customer_id: string
@@ -397,6 +430,7 @@ export type Database = {
           discount_amount?: number
           discount_percent?: number
           discountable_subtotal: number
+          dispatched_at?: string | null
           email?: string | null
           first_contacted_at?: string | null
           grand_total: number
@@ -405,6 +439,8 @@ export type Database = {
           ip_hash?: string | null
           landmark?: string | null
           lost_reason?: string | null
+          lr_number?: string | null
+          mrp_total?: number | null
           name: string
           needs_review?: boolean
           net_rate_subtotal: number
@@ -413,13 +449,23 @@ export type Database = {
           phone: string
           pincode: string
           preferred_call_time?: string | null
+          pricing_estimated?: boolean
           source_url?: string | null
+          state?: string | null
           status?: string
           subtotal: number
+          supplier_paid_amount?: number | null
+          supplier_paid_at?: string | null
+          supplier_payment_ref?: string | null
+          supplier_payment_status?: string
+          supplier_total?: number | null
           total_quantity: number
+          tracking_url?: string | null
+          transport_name?: string | null
           updated_at?: string
           user_agent?: string | null
           whatsapp?: string | null
+          you_save?: number | null
         }
         Update: {
           address?: string
@@ -429,6 +475,7 @@ export type Database = {
           commission_amount?: number | null
           commission_paid_at?: string | null
           commission_rate?: number | null
+          commission_total?: number | null
           confirmed_at?: string | null
           created_at?: string
           customer_id?: string
@@ -436,6 +483,7 @@ export type Database = {
           discount_amount?: number
           discount_percent?: number
           discountable_subtotal?: number
+          dispatched_at?: string | null
           email?: string | null
           first_contacted_at?: string | null
           grand_total?: number
@@ -444,6 +492,8 @@ export type Database = {
           ip_hash?: string | null
           landmark?: string | null
           lost_reason?: string | null
+          lr_number?: string | null
+          mrp_total?: number | null
           name?: string
           needs_review?: boolean
           net_rate_subtotal?: number
@@ -452,13 +502,23 @@ export type Database = {
           phone?: string
           pincode?: string
           preferred_call_time?: string | null
+          pricing_estimated?: boolean
           source_url?: string | null
+          state?: string | null
           status?: string
           subtotal?: number
+          supplier_paid_amount?: number | null
+          supplier_paid_at?: string | null
+          supplier_payment_ref?: string | null
+          supplier_payment_status?: string
+          supplier_total?: number | null
           total_quantity?: number
+          tracking_url?: string | null
+          transport_name?: string | null
           updated_at?: string
           user_agent?: string | null
           whatsapp?: string | null
+          you_save?: number | null
         }
         Relationships: [
           {
@@ -520,6 +580,7 @@ export type Database = {
           category_id: string
           created_at: string
           description: string | null
+          discount_percent: number
           display_order: number
           id: string
           image_url: string | null
@@ -528,8 +589,10 @@ export type Database = {
           is_discountable: boolean
           is_featured: boolean
           min_qty: number
+          mrp: number | null
           name_en: string
           name_ta: string | null
+          net_markup_percent: number
           price: number | null
           sku: string
           slug: string
@@ -542,6 +605,7 @@ export type Database = {
           category_id: string
           created_at?: string
           description?: string | null
+          discount_percent?: number
           display_order?: number
           id?: string
           image_url?: string | null
@@ -550,8 +614,10 @@ export type Database = {
           is_discountable?: boolean
           is_featured?: boolean
           min_qty?: number
+          mrp?: number | null
           name_en: string
           name_ta?: string | null
+          net_markup_percent?: number
           price?: number | null
           sku: string
           slug: string
@@ -564,6 +630,7 @@ export type Database = {
           category_id?: string
           created_at?: string
           description?: string | null
+          discount_percent?: number
           display_order?: number
           id?: string
           image_url?: string | null
@@ -572,8 +639,10 @@ export type Database = {
           is_discountable?: boolean
           is_featured?: boolean
           min_qty?: number
+          mrp?: number | null
           name_en?: string
           name_ta?: string | null
+          net_markup_percent?: number
           price?: number | null
           sku?: string
           slug?: string
@@ -613,9 +682,55 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_settings: {
+        Row: {
+          default_discount_percent: number
+          default_net_markup_percent: number
+          id: boolean
+          supplier_discount_percent: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          default_discount_percent?: number
+          default_net_markup_percent?: number
+          id?: boolean
+          supplier_discount_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          default_discount_percent?: number
+          default_net_markup_percent?: number
+          id?: boolean
+          supplier_discount_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      public_products: {
+        Row: {
+          category_id: string
+          discount_percent: number | null
+          display_order: number
+          id: string
+          image_url: string | null
+          is_bestseller: boolean
+          is_discountable: boolean
+          mrp: number | null
+          name_en: string
+          name_ta: string | null
+          price: number | null
+          sku: string
+          slug: string
+          status: string
+          unit: string
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_order_ref: { Args: never; Returns: string }
