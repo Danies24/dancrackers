@@ -191,6 +191,154 @@ export type Database = {
         }
         Relationships: []
       }
+      combo_pack_items: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          product_id: string
+          quantity: number
+          variety_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          product_id: string
+          quantity: number
+          variety_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          product_id?: string
+          quantity?: number
+          variety_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_pack_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_pack_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_pack_items_variety_id_fkey"
+            columns: ["variety_id"]
+            isOneToOne: false
+            referencedRelation: "combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_pack_items_variety_id_fkey"
+            columns: ["variety_id"]
+            isOneToOne: false
+            referencedRelation: "public_combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      combo_pack_varieties: {
+        Row: {
+          combo_pack_id: string
+          commission: number
+          commission_pct: number
+          created_at: string
+          display_order: number
+          id: string
+          selling_price: number
+          slug: string
+          supplier_cost: number
+          tier_label: string
+          total_items: number
+          updated_at: string
+        }
+        Insert: {
+          combo_pack_id: string
+          commission?: number
+          commission_pct?: number
+          created_at?: string
+          display_order?: number
+          id?: string
+          selling_price?: number
+          slug: string
+          supplier_cost?: number
+          tier_label?: string
+          total_items?: number
+          updated_at?: string
+        }
+        Update: {
+          combo_pack_id?: string
+          commission?: number
+          commission_pct?: number
+          created_at?: string
+          display_order?: number
+          id?: string
+          selling_price?: number
+          slug?: string
+          supplier_cost?: number
+          tier_label?: string
+          total_items?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_pack_varieties_combo_pack_id_fkey"
+            columns: ["combo_pack_id"]
+            isOneToOne: false
+            referencedRelation: "combo_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      combo_packs: {
+        Row: {
+          badge_text: string
+          created_at: string
+          display_order: number
+          hero_image_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          badge_text?: string
+          created_at?: string
+          display_order?: number
+          hero_image_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string
+          created_at?: string
+          display_order?: number
+          hero_image_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
@@ -277,6 +425,7 @@ export type Database = {
       }
       order_items: {
         Row: {
+          combo_variety_id: string | null
           discount_percent: number | null
           id: string
           is_discountable: boolean
@@ -296,6 +445,7 @@ export type Database = {
           unit_supplier_price: number | null
         }
         Insert: {
+          combo_variety_id?: string | null
           discount_percent?: number | null
           id?: string
           is_discountable: boolean
@@ -315,6 +465,7 @@ export type Database = {
           unit_supplier_price?: number | null
         }
         Update: {
+          combo_variety_id?: string | null
           discount_percent?: number | null
           id?: string
           is_discountable?: boolean
@@ -334,6 +485,20 @@ export type Database = {
           unit_supplier_price?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "order_items_combo_variety_id_fkey"
+            columns: ["combo_variety_id"]
+            isOneToOne: false
+            referencedRelation: "combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_combo_variety_id_fkey"
+            columns: ["combo_variety_id"]
+            isOneToOne: false
+            referencedRelation: "public_combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
@@ -730,6 +895,54 @@ export type Database = {
       }
     }
     Views: {
+      public_combo_pack_items: {
+        Row: {
+          category: Json | null
+          display_order: number | null
+          id: string | null
+          name_en: string | null
+          name_ta: string | null
+          quantity: number | null
+          unit: string | null
+          variety_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_pack_items_variety_id_fkey"
+            columns: ["variety_id"]
+            isOneToOne: false
+            referencedRelation: "combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_pack_items_variety_id_fkey"
+            columns: ["variety_id"]
+            isOneToOne: false
+            referencedRelation: "public_combo_pack_varieties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_combo_pack_varieties: {
+        Row: {
+          combo_pack_id: string | null
+          display_order: number | null
+          id: string | null
+          selling_price: number | null
+          slug: string | null
+          tier_label: string | null
+          total_items: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_pack_varieties_combo_pack_id_fkey"
+            columns: ["combo_pack_id"]
+            isOneToOne: false
+            referencedRelation: "combo_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_products: {
         Row: {
           category: Json | null
@@ -767,6 +980,10 @@ export type Database = {
     }
     Functions: {
       generate_order_ref: { Args: never; Returns: string }
+      recompute_combo_variety: {
+        Args: { p_variety_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

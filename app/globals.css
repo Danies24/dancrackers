@@ -59,6 +59,15 @@
   /* Text sitting on a solid/gradient accent fill (primary buttons, filled
      chips) — always warm cream, for contrast against the saturated fill. */
   --on-fill: #fff8ec;
+
+  /* Combo pack highlight — the storefront's premium-showcase treatment
+     (ComboPackCard), distinct from a regular ProductCard's border/bg.
+     Every value here is a light/dark pair, verified for WCAG AA contrast
+     in both — see components/product/combo-pack-card.tsx. */
+  --combo-highlight-border: linear-gradient(135deg, #ffc857 0%, #ff9d1f 100%);
+  --combo-highlight-bg: var(--gold-tint);
+  --combo-badge-bg: #ffc857;
+  --combo-badge-text: #171b2e;
 }
 
 /* Dark mode — toggled via [data-theme="dark"] on <html> (components/layout/
@@ -86,6 +95,14 @@
 
   --background: var(--cream);
   --foreground: var(--ink);
+
+  /* Brighter gold, higher contrast against a dark card; bg is a dark-
+     elevated surface (not --gold-tint verbatim, which reads muddy on
+     dark); badge-bg darkened so near-white badge text clears WCAG AA. */
+  --combo-highlight-border: linear-gradient(135deg, #ffd97a 0%, #ffb020 100%);
+  --combo-highlight-bg: #242a4a;
+  --combo-badge-bg: #7a5410;
+  --combo-badge-text: #fff8ec;
 }
 
 @theme inline {
@@ -126,6 +143,13 @@
   --color-amber-ink: var(--amber-ink);
   --color-red-ink: var(--red-ink);
   --color-on-fill: var(--on-fill);
+
+  /* --combo-highlight-border is a gradient value, applied via inline style
+     (Tailwind's bg-* utility sets background-color, which can't hold a
+     gradient) — not registered as a --color-* token here for that reason. */
+  --color-combo-highlight-bg: var(--combo-highlight-bg);
+  --color-combo-badge-bg: var(--combo-badge-bg);
+  --color-combo-badge-text: var(--combo-badge-text);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

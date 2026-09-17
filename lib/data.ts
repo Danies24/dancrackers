@@ -1,5 +1,6 @@
 import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
+import { getComboVarietyBySlug, type ComboVarietyDetail } from "@/lib/combo-packs";
 import type { Database } from "@/types/database";
 
 export type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
@@ -39,8 +40,18 @@ export interface ProductWithCategory extends ProductRow {
   // The view builds this as a jsonb object directly (see the migration) —
   // never a PostgREST embed, since a plain view has no FK for PostgREST's
   // relationship detection to key off. Never null: every product has a
-  // category (NOT NULL + inner join).
+  // category (NOT NULL + inner join). For a combo pack variety (see
+  // `combo` below) this is a synthetic placeholder — the product page skips
+  // the category chip entirely whenever `combo` is set.
   category: Pick<CategoryRow, "id" | "slug" | "name_en" | "name_ta">;
+  // Set only when this "product" is actually a combo pack variety resolved
+  // by getProductBySlug()'s fallback (see combo-packs.ts) — everything
+  // above is a synthetic shape (price = the variety's computed total, no
+  // real mrp/discount) so the page's existing price block renders it
+  // correctly with zero changes; the page branches on this field only to
+  // swap the description section for "what's inside" and show the tier
+  // switcher.
+  combo?: ComboVarietyDetail;
 }
 
 /**
@@ -110,7 +121,38 @@ export async function getProductBySlug(slug: string): Promise<ProductWithCategor
     .maybeSingle();
 
   if (error) throw error;
-  return data as ProductWithCategory | null;
+  if (data) return data as ProductWithCategory;
+
+  // Not a regular catalogue product — try resolving it as a combo pack
+  // variety, independently addressable at this same /product/[slug] route
+  // (see supabase/migrations/20260918000001_combo_packs.sql).
+  const combo = await getComboVarietyBySlug(slug);
+  if (!combo) return null;
+
+  return {
+    id: combo.varietyId,
+    sku: `COMBO-${combo.varietySlug.toUpperCase()}`,
+    slug: combo.varietySlug,
+    name_en: `${combo.packName} — ${combo.tierLabel}`,
+    name_ta: null,
+    category_id: "",
+    category: { id: "", slug: "", name_en: "Combo Pack", name_ta: null },
+    unit: "pack",
+    status: "active",
+    is_bestseller: false,
+    is_featured: false,
+    min_qty: 1,
+    image_url: combo.heroImageUrl,
+    image_urls: [],
+    video_url: null,
+    description: null,
+    display_order: 0,
+    price: combo.sellingPrice,
+    is_discountable: false,
+    mrp: null,
+    discount_percent: null,
+    combo,
+  };
 }
 
 export async function getRelatedProducts(
