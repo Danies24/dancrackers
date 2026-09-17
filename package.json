@@ -13,10 +13,11 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > types/database.ts",
+    "db:types": "supabase gen types typescript --linked > types/database.ts",
     "import:catalogue": "tsx scripts/import-catalogue.ts",
     "generate:qr": "tsx scripts/generate-qr.ts",
-    "admin:create-user": "tsx scripts/create-admin-user.ts"
+    "admin:create-user": "tsx scripts/create-admin-user.ts",
+    "upload:ssr-images": "node scripts/upload-ssr-images.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -38,6 +39,7 @@
     "react-hook-form": "^7.87.0",
     "resend": "^6.26.0",
     "server-only": "^0.0.1",
+    "sharp": "^0.35.4",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.5.4"
   },
