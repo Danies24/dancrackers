@@ -155,6 +155,24 @@ export async function getProductBySlug(slug: string): Promise<ProductWithCategor
   };
 }
 
+/**
+ * Every orderable product's slug — feeds /product/[slug]'s
+ * generateStaticParams so all ~200 product pages are pre-rendered at
+ * build/deploy time instead of each one paying a cold on-demand-ISR render
+ * on its first visit after every revalidate window (the actual cause of
+ * "product page takes a long time to open" from the catalogue page).
+ */
+export async function getAllProductSlugs(): Promise<string[]> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("public_products")
+    .select("slug")
+    .eq("status", "active")
+    .not("price", "is", null);
+  if (error) throw error;
+  return (data ?? []).map((p) => p.slug as string);
+}
+
 export async function getRelatedProducts(
   categoryId: string,
   excludeProductId: string,

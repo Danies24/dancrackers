@@ -115,6 +115,17 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
 }
 
 /**
+ * Every active variety's slug — feeds /product/[slug]'s generateStaticParams
+ * so a combo pack's own detail pages are pre-rendered at build/deploy time
+ * too, same as regular products (§ getAllProductSlugs in lib/data.ts).
+ */
+export async function getAllComboVarietySlugs(): Promise<string[]> {
+  const supabase = createPublicClient();
+  const { data } = await supabase.from("public_combo_pack_varieties").select("slug");
+  return (data ?? []).map((v) => v.slug).filter((slug): slug is string => slug != null);
+}
+
+/**
  * Resolves a combo variety by its own slug — the fallback getProductBySlug()
  * reaches for when a plain products lookup misses (see
  * supabase/migrations/20260918000001_combo_packs.sql for why a variety is

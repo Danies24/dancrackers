@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
@@ -9,12 +10,31 @@ import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
-import { getProductBySlug, getRelatedProducts } from "@/lib/data";
+import { getAllProductSlugs, getProductBySlug, getRelatedProducts } from "@/lib/data";
+import { getAllComboVarietySlugs } from "@/lib/combo-packs";
 import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
 export const revalidate = 300;
+// Every product/combo-variety slug not in the two lists below is dynamic — a
+// product added since the last deploy still opens fine, just via an
+// on-demand ISR render the first time (same as before this fix).
+export const dynamicParams = true;
+
+/**
+ * Pre-renders every product/combo-variety page at build/deploy time. Without
+ * this, each of the ~200 pages paid a cold on-demand-ISR render (two
+ * sequential Supabase round trips, plus a serverless invocation) on its
+ * first click after every 300s revalidate window — the actual cause of
+ * "clicking a product card takes a long time to open the page". With the
+ * catalogue this small, pre-rendering all of them is cheap and eliminates
+ * that cold path almost entirely.
+ */
+export async function generateStaticParams() {
+  const [productSlugs, comboSlugs] = await Promise.all([getAllProductSlugs(), getAllComboVarietySlugs()]);
+  return [...new Set([...productSlugs, ...comboSlugs])].map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -39,7 +59,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = !product.combo && product.category_id ? await getRelatedProducts(product.category_id, product.id) : [];
   const images = product.image_url ? [product.image_url, ...(product.image_urls ?? [])] : [];
   const isUnavailable = product.status === "unavailable";
   const isCallForRate = !product.price;
@@ -168,16 +187,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
 
-      {related.length > 0 && (
-        <div className="mt-12">
-          <h2 className="mb-4 font-display text-xl font-semibold text-ink">You may also like</h2>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </div>
+      {!product.combo && product.category_id && (
+        <Suspense fallback={null}>
+          <RelatedProducts categoryId={product.category_id} excludeProductId={product.id} />
+        </Suspense>
       )}
+    </div>
+  );
+}
+
+/**
+ * Streamed in below the fold, after the main content has already painted —
+ * "You may also like" is never on the critical path for a page that's
+ * pre-rendered for the click-through itself (§ generateStaticParams above).
+ */
+async function RelatedProducts({ categoryId, excludeProductId }: { categoryId: string; excludeProductId: string }) {
+  const related = await getRelatedProducts(categoryId, excludeProductId);
+  if (related.length === 0) return null;
+
+  return (
+    <div className="mt-12">
+      <h2 className="mb-4 font-display text-xl font-semibold text-ink">You may also like</h2>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+        {related.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+      </div>
     </div>
   );
 }
