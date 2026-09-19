@@ -15,6 +15,31 @@ import { cn } from "@/lib/utils";
 import type { ComboPackSummary } from "@/lib/combo-packs";
 
 /**
+ * Short badge text for each variety's size-picker button. Uses the tier
+ * label's first letter (e.g. "Small" -> "S"), but when two or more
+ * varieties in the same pack share that first letter (e.g. "Mini Pack" and
+ * "Mega Pack" both start with "M"), every variety that collides falls back
+ * to its first two letters uppercased ("MI", "ME") instead — generic and
+ * pack-agnostic, so it keeps working if tier labels change later.
+ */
+function getVarietyBadgeLabels(varieties: Array<{ id: string; tierLabel: string }>): Map<string, string> {
+  const firstLetterCounts = new Map<string, number>();
+  for (const v of varieties) {
+    const letter = v.tierLabel.trim().charAt(0).toUpperCase();
+    firstLetterCounts.set(letter, (firstLetterCounts.get(letter) ?? 0) + 1);
+  }
+
+  const labels = new Map<string, string>();
+  for (const v of varieties) {
+    const trimmed = v.tierLabel.trim();
+    const letter = trimmed.charAt(0).toUpperCase();
+    const isUnique = (firstLetterCounts.get(letter) ?? 0) <= 1;
+    labels.set(v.id, isUnique ? letter : trimmed.slice(0, 2).toUpperCase());
+  }
+  return labels;
+}
+
+/**
  * The storefront's premium-showcase treatment for a combo pack — a
  * distinct, named component (not a themed ProductCard) per the design
  * brief: reads as a special offer the way a marketplace visually separates
@@ -40,6 +65,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
   const selected = combo.varieties[selectedIndex] ?? combo.varieties[0];
   const cartItem = findItem({ v: 1, updatedAt: 0, items }, selected.id);
   const inCart = !!cartItem;
+  const badgeLabels = getVarietyBadgeLabels(combo.varieties);
 
   function handleAdd() {
     const sku = `COMBO-${selected.slug.toUpperCase()}`;
@@ -116,7 +142,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
                     : "border-border bg-surface text-ink-soft hover:border-maroon-ink/50",
                 )}
               >
-                {v.tierLabel.charAt(0).toUpperCase()}
+                {badgeLabels.get(v.id) ?? v.tierLabel.charAt(0).toUpperCase()}
               </button>
             ))}
           </div>
