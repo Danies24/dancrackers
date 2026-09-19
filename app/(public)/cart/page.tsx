@@ -143,12 +143,6 @@ export default function CartPage() {
       {!loading && activeLines.length > 0 && (
         <>
           <div className="mt-6 rounded-lg border border-border bg-surface p-4">
-            {totals.netRateSubtotal > 0 && totals.discountableSubtotal > 0 && (
-              <>
-                <Row label="Discountable items" value={totals.discountableSubtotal} muted />
-                <Row label="Net-rate items (no discount)" value={totals.netRateSubtotal} muted />
-              </>
-            )}
             <Row label="Item subtotal" value={totals.subtotal} muted />
             <Row
               label={`Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%)`}
