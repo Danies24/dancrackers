@@ -4,9 +4,21 @@ import { CatalogueClient, CatalogueLoadingSkeleton } from "@/components/product/
 import { SkyShotIcon } from "@/components/marketing/sky-shot-icon";
 import { getActiveCategories, getCatalogue } from "@/lib/data";
 
+import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+
 export const metadata: Metadata = {
-  title: "All Crackers — Full Price List 2026",
-  description: "188 crackers with photos, prices and Tamil names. Search, filter, and build your Deepavali order.",
+  title: "Sivakasi Crackers Price List 2026",
+  description:
+    "Browse the complete Sivakasi crackers price list for 2026 with photos and Tamil names. Build your Diwali enquiry list.",
+  alternates: {
+    canonical: getCanonicalUrl("/products"),
+  },
+  openGraph: {
+    title: "Sivakasi Crackers Price List 2026",
+    description:
+      "Browse the complete Sivakasi crackers price list for 2026 with photos and Tamil names. Build your Diwali enquiry list.",
+    url: getCanonicalUrl("/products"),
+  },
 };
 
 export const revalidate = 300;

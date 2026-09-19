@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getAllProductSlugs, getProductBySlug, getRelatedProducts } from "@/lib/data";
 import { getAllComboVarietySlugs } from "@/lib/combo-packs";
-import { brandConfig, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
@@ -44,13 +44,29 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return {};
+  const canonicalUrl = getCanonicalUrl(`/product/${product.slug}`);
+  const priceSnippet = product.price ? ` (${formatRupees(product.price)})` : "";
+  let rawTitle = `${product.name_en}${priceSnippet}`;
+  if (rawTitle.length > 45) {
+    rawTitle = product.name_en.length > 45 ? `${product.name_en.slice(0, 42)}...` : product.name_en;
+  }
+  const desc = product.price
+    ? `${product.name_en} (${product.name_ta || ""}) at ${formatRupees(product.price)} per ${formatUnit(product.unit)}. Sivakasi crackers enquiry from Kolagalam.`
+    : `${product.name_en} Sivakasi crackers price list & Diwali enquiry from Kolagalam.`;
+  const cleanDesc = desc.replace(/\s+/g, " ").slice(0, 155);
+
   return {
-    title: product.price
-      ? `${product.name_en}${product.name_ta ? ` (${product.name_ta})` : ""} — ${formatRupees(product.price)} per ${formatUnit(product.unit)}`
-      : product.name_en,
-    description: product.price
-      ? `${product.name_en} at ${formatRupees(product.price)} per ${formatUnit(product.unit)}. Part of our ${product.category?.name_en ?? ""} range from licensed Sivakasi manufacturers.`
-      : undefined,
+    title: rawTitle,
+    description: cleanDesc,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: rawTitle,
+      description: cleanDesc,
+      url: canonicalUrl,
+      images: product.image_url ? [product.image_url] : undefined,
+    },
   };
 }
 

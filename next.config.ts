@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
+  },
   async redirects() {
     const canonicalHost = process.env.NEXT_PUBLIC_CANONICAL_HOST?.trim();
     if (!canonicalHost) {

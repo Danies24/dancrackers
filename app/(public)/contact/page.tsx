@@ -1,8 +1,29 @@
 import type { Metadata } from "next";
 import { Phone, Mail, MapPin } from "lucide-react";
-import { brandConfig, getFormattedAddress, getPhoneDisplay, getPhoneE164, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
+import {
+  brandConfig,
+  getCanonicalUrl,
+  getFormattedAddress,
+  getPhoneDisplay,
+  getPhoneE164,
+  getPrimaryEmail,
+  getPrimarySupplier,
+} from "@/config/brandConfig";
 
-export const metadata: Metadata = { title: "Contact Us" };
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description:
+    "Contact Kolagalam for Sivakasi crackers enquiries. Call, WhatsApp, or reach us directly for Diwali 2026 bookings and support.",
+  alternates: {
+    canonical: getCanonicalUrl("/contact"),
+  },
+  openGraph: {
+    title: "Contact Us",
+    description:
+      "Contact Kolagalam for Sivakasi crackers enquiries. Call, WhatsApp, or reach us directly for Diwali 2026 bookings and support.",
+    url: getCanonicalUrl("/contact"),
+  },
+};
 
 export default function ContactPage() {
   const email = getPrimaryEmail();

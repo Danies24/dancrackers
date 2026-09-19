@@ -1,8 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { getCanonicalUrl } from "@/config/brandConfig";
+
 export const metadata: Metadata = {
-  title: "Firecracker Safety Instructions (Tamil & English)",
+  title: "Firecracker Safety Guide",
+  description:
+    "Essential firecracker safety instructions in Tamil and English. Safe handling tips for a joyful and secure Diwali celebration.",
+  alternates: {
+    canonical: getCanonicalUrl("/safety"),
+  },
+  openGraph: {
+    title: "Firecracker Safety Guide",
+    description:
+      "Essential firecracker safety instructions in Tamil and English. Safe handling tips for a joyful and secure Diwali celebration.",
+    url: getCanonicalUrl("/safety"),
+  },
 };
 
 // [BLOCKED — PRD §12.9, §42.1 item 9] This is a SAMPLE safety text, sourced

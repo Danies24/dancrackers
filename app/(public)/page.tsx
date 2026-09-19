@@ -7,12 +7,20 @@ import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form"
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
+import type { Metadata } from "next";
 import { getActiveComboPacks } from "@/lib/combo-packs";
-import { brandConfig, getHeadlineOffer, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getHeadlineOffer, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
-// No title metadata here — the layout's `default` title (brandConfig.seo.defaultTitle)
-// is used as-is for the homepage. An explicit title here would instead fill the
-// layout's `%s | ${brand}` template, duplicating the brand name.
+export const metadata: Metadata = {
+  title: {
+    absolute: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List",
+  },
+  description:
+    "Browse 2026 Sivakasi crackers price list from Kolagalam (கோலாகலம்). Premium sparklers, rockets, ground chakkars & gift boxes direct to your door.",
+  alternates: {
+    canonical: getCanonicalUrl("/"),
+  },
+};
 
 export const revalidate = 300;
 

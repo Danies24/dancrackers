@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
-import { brandConfig, getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
 
-export const metadata: Metadata = { title: "Terms of Service" };
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "Terms of service for Kolagalam crackers catalogue and enquiry facilitator service. Understand our enquiry process and conditions.",
+  alternates: {
+    canonical: getCanonicalUrl("/terms"),
+  },
+  openGraph: {
+    title: "Terms of Service",
+    description:
+      "Terms of service for Kolagalam crackers catalogue and enquiry facilitator service. Understand our enquiry process and conditions.",
+    url: getCanonicalUrl("/terms"),
+  },
+};
 
 export default function TermsPage() {
   const email = getPrimaryEmail();

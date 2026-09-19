@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { brandConfig, getPrimarySupplier } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
-  title: `How to Order Crackers from ${brandConfig.brand.name}`,
+  title: "How to Order Crackers",
+  description:
+    "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay supplier directly. Fast and transparent.",
+  alternates: {
+    canonical: getCanonicalUrl("/how-it-works"),
+  },
+  openGraph: {
+    title: "How to Order Crackers",
+    description:
+      "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay supplier directly. Fast and transparent.",
+    url: getCanonicalUrl("/how-it-works"),
+  },
 };
 
 const supplier = getPrimarySupplier();

@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
-import { getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
+import { getCanonicalUrl, getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Privacy policy for Kolagalam: how we collect, handle and protect your contact and delivery enquiry details.",
+  alternates: {
+    canonical: getCanonicalUrl("/privacy"),
+  },
+  openGraph: {
+    title: "Privacy Policy",
+    description:
+      "Privacy policy for Kolagalam: how we collect, handle and protect your contact and delivery enquiry details.",
+    url: getCanonicalUrl("/privacy"),
+  },
+};
 
 export default function PrivacyPage() {
   const email = getPrimaryEmail();

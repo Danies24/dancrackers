@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
-import { brandConfig, getManufacturerFacilitatorNotice, getPrimarySupplier } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getManufacturerFacilitatorNotice, getPrimarySupplier } from "@/config/brandConfig";
 
-export const metadata: Metadata = { title: "Compliance Notice" };
+export const metadata: Metadata = {
+  title: "Compliance & Legal Notice",
+  description:
+    "Important compliance notice: Kolagalam is an order booking facilitator, not a manufacturer or seller. Read full legal disclosures.",
+  alternates: {
+    canonical: getCanonicalUrl("/compliance"),
+  },
+  openGraph: {
+    title: "Compliance & Legal Notice",
+    description:
+      "Important compliance notice: Kolagalam is an order booking facilitator, not a manufacturer or seller. Read full legal disclosures.",
+    url: getCanonicalUrl("/compliance"),
+  },
+};
 
 export default function CompliancePage() {
   const notice = getManufacturerFacilitatorNotice();

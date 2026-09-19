@@ -12,6 +12,8 @@ async function getCategory(slug: string) {
   return categories.find((c) => c.slug === slug) ?? null;
 }
 
+import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+
 export async function generateMetadata({
   params,
 }: {
@@ -20,9 +22,27 @@ export async function generateMetadata({
   const { category: slug } = await params;
   const category = await getCategory(slug);
   if (!category) return {};
+  const canonicalUrl = getCanonicalUrl(`/products/${category.slug}`);
+  let rawTitle = `${category.name_en} Price List 2026`;
+  if (rawTitle.length > 45) {
+    rawTitle = category.name_en.length > 45 ? `${category.name_en.slice(0, 42)}...` : category.name_en;
+  }
+  const desc = category.description
+    ? `${category.description.slice(0, 100)} — Kolagalam Sivakasi crackers price list 2026.`
+    : `Browse ${category.name_en} (${category.name_ta || ""}) price list 2026 with photos. Sivakasi crackers enquiry from Kolagalam.`;
+  const cleanDesc = desc.replace(/\s+/g, " ").slice(0, 155);
+
   return {
-    title: `${category.name_en} — Price List 2026`,
-    description: `Browse ${category.name_en} with rates and photos.`,
+    title: rawTitle,
+    description: cleanDesc,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: rawTitle,
+      description: cleanDesc,
+      url: canonicalUrl,
+    },
   };
 }
 

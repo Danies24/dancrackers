@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
-import { brandConfig, getPrimarySupplier } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
 
-export const metadata: Metadata = { title: `About ${brandConfig.brand.name}` };
+export const metadata: Metadata = {
+  title: `About ${brandConfig.brand.name}`,
+  description:
+    "Learn about Kolagalam — your trusted Sivakasi crackers enquiry facilitator. Genuine products, honest prices, direct delivery across Tamil Nadu.",
+  alternates: {
+    canonical: getCanonicalUrl("/about"),
+  },
+  openGraph: {
+    title: `About ${brandConfig.brand.name}`,
+    description:
+      "Learn about Kolagalam — your trusted Sivakasi crackers enquiry facilitator. Genuine products, honest prices, direct delivery across Tamil Nadu.",
+    url: getCanonicalUrl("/about"),
+  },
+};
 
 export default function AboutPage() {
   const supplier = getPrimarySupplier();
