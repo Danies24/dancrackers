@@ -121,16 +121,16 @@ export const brandConfig = {
   // Single source of truth — never hardcode dates or deadline copy in components.
   orderDeadline: {
     enabled: true,
-    iso: "2026-10-18T23:59:59+05:30", // TODO: replace with the supplier's confirmed last booking date
+    iso: "2026-10-25T23:59:59+05:30", // Cutoff: 25 Oct 2026 23:59:59 IST
     blockAfterDeadline: false, // when true, the enquiry APIs reject submissions after the deadline
     labels: {
       en: {
-        title: "Order by 18 Oct",
+        title: "Order by 25 Oct",
         closedTitle: "Season orders closed",
         closedMessage: "We are no longer accepting new enquiries for this season. For urgent queries, reach us on WhatsApp or call.",
-        reminderText: "Last date to send your enquiry: 18 Oct 2026",
+        reminderText: "Last date to send your enquiry: 25 Oct 2026",
         closedReminderText: "Season orders are now closed. You can still reach us directly.",
-        successNote: "Your enquiry was submitted before the season booking deadline (18 Oct).",
+        successNote: "Your enquiry was submitted before the season booking deadline (25 Oct).",
         units: {
           days: "Days",
           hours: "Hours",
@@ -145,12 +145,12 @@ export const brandConfig = {
         },
       },
       ta: {
-        title: "அக்டோபர் 18-க்குள் ஆர்டர் செய்யுங்கள்",
+        title: "அக்டோபர் 25-க்குள் ஆர்டர் செய்யுங்கள்",
         closedTitle: "இந்த ஆண்டுக்கான முன்பதிவு முடிந்தது",
         closedMessage: "இந்த தீபாவளிக்கான புதிய முன்பதிவுகள் நிறைவடைந்துவிட்டன. அவசர தேவைகளுக்கு எங்களை வாட்ஸ்அப் அல்லது தொலைபேசியில் தொடர்பு கொள்ளவும்.",
-        reminderText: "விசாரணை அனுப்ப கடைசி நாள்: 18 அக்டோபர் 2026",
+        reminderText: "விசாரணை அனுப்ப கடைசி நாள்: 25 அக்டோபர் 2026",
         closedReminderText: "முன்பதிவு நிறைவடைந்தது. எங்களை நேரடியாக தொடர்பு கொள்ளலாம்.",
-        successNote: "சீசன் முன்பதிவு முடிவதற்குள் (18 அக்டோபர்) உங்கள் விசாரணை பெறப்பட்டது.",
+        successNote: "சீசன் முன்பதிவு முடிவதற்குள் (25 அக்டோபர்) உங்கள் விசாரணை பெறப்பட்டது.",
         units: {
           days: "நாள்",
           hours: "மணி",
