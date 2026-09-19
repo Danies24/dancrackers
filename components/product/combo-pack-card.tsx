@@ -121,7 +121,10 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
             ))}
           </div>
 
-          <p className="mt-auto pt-2 tabular-nums text-base font-bold text-ink">{formatRupees(selected.sellingPrice)}</p>
+          <p className="mt-auto pt-2 tabular-nums text-base font-bold text-ink">
+            {formatRupees(selected.sellingPrice)}{" "}
+            <span className="text-xs font-normal text-muted">({selected.totalItems} items)</span>
+          </p>
 
           <div className="pt-1">
             {cartItem ? (

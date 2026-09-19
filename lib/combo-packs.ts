@@ -36,6 +36,7 @@ export interface ComboPackCardVariety {
   slug: string;
   tierLabel: string;
   sellingPrice: number;
+  totalItems: number;
 }
 
 export interface ComboPackSummary {
@@ -125,6 +126,7 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
           slug: v.slug,
           tierLabel: v.tier_label,
           sellingPrice: v.selling_price,
+          totalItems: v.total_items,
         })),
       };
     })
