@@ -151,7 +151,7 @@ export default function CartPage() {
             )}
             <Row label="Item subtotal" value={totals.subtotal} muted />
             <Row
-              label="Packaging charge"
+              label={`Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%)`}
               value={totals.packagingCharge}
               muted={totals.packagingCharge === 0}
               free={totals.packagingCharge === 0}

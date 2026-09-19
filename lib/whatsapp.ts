@@ -58,7 +58,7 @@ export function buildCustomerMessage(input: CustomerMessageInput): string {
   if (input.subtotal != null && (input.packagingCharge || input.deliveryCharge)) {
     chargeLines.push("", `Item subtotal: ${formatRupees(input.subtotal)}`);
     chargeLines.push(
-      `Packaging charge: ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
+      `Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%): ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
     );
     chargeLines.push(`Delivery charge: ${input.deliveryCharge ? formatRupees(input.deliveryCharge) : "Free"}`);
   }
