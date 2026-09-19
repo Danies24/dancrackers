@@ -57,7 +57,7 @@ describe("SEO Foundation: getSiteUrl & getCanonicalUrl", () => {
   });
 
   it("never returns localhost in production mode", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
     expect(getSiteUrl()).toBe(brandConfig.brand.siteUrl);
     expect(getSiteUrl()).not.toContain("localhost");

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { brandConfig, getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
+import { getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "How to Order Crackers",

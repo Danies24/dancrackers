@@ -4,7 +4,7 @@ import { CatalogueClient, CatalogueLoadingSkeleton } from "@/components/product/
 import { SkyShotIcon } from "@/components/marketing/sky-shot-icon";
 import { getActiveCategories, getCatalogue } from "@/lib/data";
 
-import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+import { getCanonicalUrl } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "Sivakasi Crackers Price List 2026",

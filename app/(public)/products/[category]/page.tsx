@@ -12,7 +12,7 @@ async function getCategory(slug: string) {
   return categories.find((c) => c.slug === slug) ?? null;
 }
 
-import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+import { getCanonicalUrl } from "@/config/brandConfig";
 
 export async function generateMetadata({
   params,

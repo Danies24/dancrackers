@@ -53,7 +53,10 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     },
   };
 
-  const socialUrls = Object.values(brandConfig.contact.social || {}).filter(Boolean) as string[];
+  const rawSocial = brandConfig.contact.social as Record<string, string | undefined> | undefined;
+  const socialUrls = rawSocial
+    ? Object.values(rawSocial).filter((url): url is string => typeof url === "string" && url.length > 0)
+    : [];
   if (socialUrls.length > 0) {
     schema.sameAs = socialUrls;
   }

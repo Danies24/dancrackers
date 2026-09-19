@@ -27,10 +27,10 @@ export default async function Image() {
           <span style={{ fontSize: 76, fontWeight: 700, color: "#FFFFFF" }}>{brandConfig.brand.name}</span>
           <span style={{ fontSize: 44, fontWeight: 600, color: "#F5D9A8" }}>({brandConfig.brand.nameTamil})</span>
         </div>
-        <div style={{ fontSize: 32, marginTop: 24, color: "#F5D9A8", fontWeight: 600, maxWidth: 900 }}>
+        <div style={{ display: "flex", fontSize: 32, marginTop: 24, color: "#F5D9A8", fontWeight: 600, maxWidth: 900 }}>
           {brandConfig.brand.tagline}
         </div>
-        <div style={{ fontSize: 22, marginTop: 16, color: "rgba(255,255,255,0.8)" }}>
+        <div style={{ display: "flex", fontSize: 22, marginTop: 16, color: "rgba(255,255,255,0.8)" }}>
           {brandConfig.brand.descriptor} • Diwali 2026 Price List & Enquiries
         </div>
       </div>

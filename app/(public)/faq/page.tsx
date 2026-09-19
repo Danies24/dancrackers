@@ -7,8 +7,6 @@ import {
   getCanonicalUrl,
   getPhoneDisplay,
   getPhoneE164,
-  getPrimaryEmail,
-  getPrimarySupplier,
 } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
@@ -85,10 +83,8 @@ const FAQ_LIST: FAQItem[] = [
 ];
 
 export default function FAQPage() {
-  const supplier = getPrimarySupplier();
   const phoneDisplay = getPhoneDisplay();
   const phoneE164 = getPhoneE164();
-  const email = getPrimaryEmail();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
