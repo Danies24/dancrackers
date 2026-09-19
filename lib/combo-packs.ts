@@ -30,6 +30,14 @@ interface PublicComboItemRow {
   category: { name_en: string } | null;
 }
 
+/** A variety as the card needs it — no itemGroups, so listing every combo's every variety here never triggers the heavier per-variety item fetch. */
+export interface ComboPackCardVariety {
+  id: string;
+  slug: string;
+  tierLabel: string;
+  sellingPrice: number;
+}
+
 export interface ComboPackSummary {
   id: string;
   slug: string;
@@ -39,6 +47,8 @@ export interface ComboPackSummary {
   heroImageUrl: string | null;
   badgeText: string;
   fromPrice: number;
+  /** Every active variety, in display order — a single-entry array for a pack that's been collapsed to one tier. */
+  varieties: ComboPackCardVariety[];
 }
 
 export interface ComboVarietyOption {
@@ -98,7 +108,8 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
 
   return (packs ?? [])
     .map((pack) => {
-      const cheapest = (varietiesByPack.get(pack.id) ?? [])[0];
+      const packVarieties = varietiesByPack.get(pack.id) ?? [];
+      const cheapest = packVarieties[0];
       if (!cheapest) return null;
       return {
         id: pack.id,
@@ -109,6 +120,12 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
         heroImageUrl: pack.hero_image_url,
         badgeText: pack.badge_text,
         fromPrice: cheapest.selling_price,
+        varieties: packVarieties.map((v) => ({
+          id: v.id,
+          slug: v.slug,
+          tierLabel: v.tier_label,
+          sellingPrice: v.selling_price,
+        })),
       };
     })
     .filter((p): p is ComboPackSummary => p !== null);

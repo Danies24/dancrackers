@@ -1,6 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Stepper } from "@/components/ui/stepper";
+import { useCart } from "@/components/cart/cart-provider";
+import { useToast } from "@/components/ui/toast";
+import { findItem } from "@/lib/cart";
+import { trackEvent } from "@/lib/analytics";
 import { formatRupees } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { ComboPackSummary } from "@/lib/combo-packs";
 
 /**
@@ -8,19 +19,50 @@ import type { ComboPackSummary } from "@/lib/combo-packs";
  * distinct, named component (not a themed ProductCard) per the design
  * brief: reads as a special offer the way a marketplace visually separates
  * a sponsored/assured listing from a plain one, while staying restrained
- * ("warm, not loud" — a highlight, not a flashing discount banner). A pure
- * navigation tile: tapping it goes to the pack's default (cheapest)
- * variety page, where the normal product-page Add to Cart lives.
+ * ("warm, not loud" — a highlight, not a flashing discount banner).
+ *
+ * A single-variety pack (collapsed to one tier) behaves exactly like a
+ * regular ProductCard: price, a stepper once it's in the cart, an Add
+ * button otherwise. A multi-variety pack additionally gets an inline
+ * Small/Medium/Large-style picker (first tier selected by default) —
+ * switching it swaps the price and which cart line Add/the stepper act on,
+ * entirely client-side, no navigation. Only the image and title are links;
+ * the price/picker/cart-controls area is a plain div so tapping it never
+ * navigates, same split ProductCard uses.
  */
 export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
+  const { items, add, setQty } = useCart();
+  const { show } = useToast();
+  const [justAdded, setJustAdded] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const hasMultipleVarieties = combo.varieties.length > 1;
+  const selected = combo.varieties[selectedIndex] ?? combo.varieties[0];
+  const cartItem = findItem({ v: 1, updatedAt: 0, items }, selected.id);
+  const inCart = !!cartItem;
+
+  function handleAdd() {
+    const sku = `COMBO-${selected.slug.toUpperCase()}`;
+    add({ productId: selected.id, sku, price: selected.sellingPrice }, 1);
+    trackEvent("add_to_cart", {
+      product_id: selected.id,
+      name: `${combo.name} — ${selected.tierLabel}`,
+      price: selected.sellingPrice,
+      quantity: 1,
+      source: "combo_card",
+    });
+    setJustAdded(true);
+    show(`Added ${combo.name} — ${selected.tierLabel} to cart`, { label: "View cart", onClick: () => {} });
+    setTimeout(() => setJustAdded(false), 1200);
+  }
+
   return (
-    <Link
-      href={`/product/${combo.varietySlug}`}
-      className="group block shrink-0 snap-start rounded-[22px] p-[2px] transition-transform duration-300 ease-out hover:-translate-y-1"
+    <div
+      className="group flex h-full shrink-0 snap-start flex-col overflow-hidden rounded-[22px] p-[2px] transition-transform duration-300 ease-out hover:-translate-y-1"
       style={{ background: "var(--combo-highlight-border)" }}
     >
       <div className="flex h-full w-[220px] flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg sm:w-[260px] md:w-full">
-        <div className="relative aspect-square overflow-hidden bg-cream">
+        <Link href={`/product/${selected.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
           {combo.heroImageUrl ? (
             <Image
               src={combo.heroImageUrl}
@@ -37,16 +79,72 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
           <span className="absolute left-2 top-2 rounded-full bg-combo-badge-bg px-2.5 py-1 text-[10px] font-bold tracking-wide text-combo-badge-text">
             {combo.badgeText}
           </span>
-        </div>
+          {inCart && (
+            <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-teal px-2 py-0.5 text-[10px] font-semibold text-on-fill shadow-soft">
+              <Check size={11} aria-hidden strokeWidth={3} /> In Cart
+            </span>
+          )}
+        </Link>
 
         <div className="flex flex-1 flex-col gap-1 p-3">
-          <h3 className="line-clamp-1 text-sm font-semibold text-ink">{combo.name}</h3>
-          {combo.tagline && <p className="line-clamp-2 text-xs text-ink-soft">{combo.tagline}</p>}
-          <p className="mt-auto pt-2 text-sm text-ink-soft">
-            From <span className="tabular-nums text-base font-bold text-ink">{formatRupees(combo.fromPrice)}</span>
-          </p>
+          <Link href={`/product/${selected.slug}`}>
+            <h3 className="line-clamp-1 text-sm font-semibold text-ink">{combo.name}</h3>
+            {combo.tagline && <p className="line-clamp-2 text-xs text-ink-soft">{combo.tagline}</p>}
+          </Link>
+
+          {/* Always reserved, even for a single-variety pack — a spacer with
+              the same height, invisible rather than unmounted, so every
+              combo card lands at the same height regardless of tier count
+              (a switcher pack would otherwise sit taller than a plain one). */}
+          <div
+            className={cn("mt-1.5 flex h-7 gap-1.5", !hasMultipleVarieties && "invisible")}
+            role={hasMultipleVarieties ? "group" : undefined}
+            aria-label={hasMultipleVarieties ? `${combo.name} size` : undefined}
+          >
+            {(hasMultipleVarieties ? combo.varieties : [combo.varieties[0]]).map((v, i) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setSelectedIndex(i)}
+                aria-pressed={i === selectedIndex}
+                aria-label={v.tierLabel}
+                tabIndex={hasMultipleVarieties ? 0 : -1}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold transition-colors",
+                  i === selectedIndex
+                    ? "border-maroon-ink bg-maroon text-on-fill"
+                    : "border-border bg-surface text-ink-soft hover:border-maroon-ink/50",
+                )}
+              >
+                {v.tierLabel.charAt(0).toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-auto pt-2 tabular-nums text-base font-bold text-ink">{formatRupees(selected.sellingPrice)}</p>
+
+          <div className="pt-1">
+            {cartItem ? (
+              <Stepper
+                value={cartItem.qty}
+                onIncrement={() => setQty(selected.id, cartItem.qty + 1)}
+                onDecrement={() => setQty(selected.id, cartItem.qty - 1)}
+                label={`${combo.name} — ${selected.tierLabel}`}
+                className="w-full justify-between"
+              />
+            ) : (
+              <Button
+                size="full"
+                variant="primary"
+                onClick={handleAdd}
+                aria-label={`Add ${combo.name} — ${selected.tierLabel} to cart`}
+              >
+                {justAdded ? "Added ✓" : "Add"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
