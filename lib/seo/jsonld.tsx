@@ -45,7 +45,8 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     },
     address: {
       "@type": "PostalAddress",
-      addressLocality: brandConfig.contact.address.city,
+      streetAddress: brandConfig.contact.address.line1,
+      addressLocality: brandConfig.contact.address.district,
       addressRegion: brandConfig.contact.address.state,
       postalCode: brandConfig.contact.address.pincode,
       addressCountry: brandConfig.contact.address.country,

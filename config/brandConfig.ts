@@ -168,9 +168,9 @@ export const brandConfig = {
 
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List & Order Enquiry",
+    defaultTitle: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List",
     defaultDescription:
-      "Browse the authentic Sivakasi crackers price list with photos. Build your Deepavali enquiry online and we will call you to confirm. Supplied by licensed Sivakasi manufacturers.",
+      "Browse authentic Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Build your Diwali enquiry online; we call you to confirm.",
     keywords: [
       "Kolagalam",
       "Kolagalam crackers",
