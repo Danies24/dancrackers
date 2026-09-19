@@ -117,6 +117,56 @@ export const brandConfig = {
   // number never enters that math. Business call, not a pricing change.
   marketingDiscountPercent: 95,
 
+  // Cutoff date for season bookings (§23 / feature: Order By Countdown).
+  // Single source of truth — never hardcode dates or deadline copy in components.
+  orderDeadline: {
+    enabled: true,
+    iso: "2026-10-18T23:59:59+05:30", // TODO: replace with the supplier's confirmed last booking date
+    blockAfterDeadline: false, // when true, the enquiry APIs reject submissions after the deadline
+    labels: {
+      en: {
+        title: "Order by 18 Oct",
+        closedTitle: "Season orders closed",
+        closedMessage: "We are no longer accepting new enquiries for this season. For urgent queries, reach us on WhatsApp or call.",
+        reminderText: "Last date to send your enquiry: 18 Oct 2026",
+        closedReminderText: "Season orders are now closed. You can still reach us directly.",
+        successNote: "Your enquiry was submitted before the season booking deadline (18 Oct).",
+        units: {
+          days: "Days",
+          hours: "Hours",
+          minutes: "Mins",
+          seconds: "Secs",
+        },
+        shortUnits: {
+          d: "d",
+          h: "h",
+          m: "m",
+          s: "s",
+        },
+      },
+      ta: {
+        title: "அக்டோபர் 18-க்குள் ஆர்டர் செய்யுங்கள்",
+        closedTitle: "இந்த ஆண்டுக்கான முன்பதிவு முடிந்தது",
+        closedMessage: "இந்த தீபாவளிக்கான புதிய முன்பதிவுகள் நிறைவடைந்துவிட்டன. அவசர தேவைகளுக்கு எங்களை வாட்ஸ்அப் அல்லது தொலைபேசியில் தொடர்பு கொள்ளவும்.",
+        reminderText: "விசாரணை அனுப்ப கடைசி நாள்: 18 அக்டோபர் 2026",
+        closedReminderText: "முன்பதிவு நிறைவடைந்தது. எங்களை நேரடியாக தொடர்பு கொள்ளலாம்.",
+        successNote: "சீசன் முன்பதிவு முடிவதற்குள் (18 அக்டோபர்) உங்கள் விசாரணை பெறப்பட்டது.",
+        units: {
+          days: "நாள்",
+          hours: "மணி",
+          minutes: "நிமிடம்",
+          seconds: "வினாடி",
+        },
+        shortUnits: {
+          d: "நாள்",
+          h: "மணி",
+          m: "நிமி",
+          s: "விநா",
+        },
+      },
+    },
+  },
+
   seo: {
     titleTemplate: "%s | Kolagalam",
     defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Enquire Now",

@@ -22,9 +22,10 @@ import {
   pincodeSchema,
   stateSchema,
 } from "@/lib/validation";
-import { brandConfig, getMinimumOrderValue, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
 import { INDIAN_STATES } from "@/lib/indian-states";
-import { trackEvent } from "@/lib/analytics";
+import { trackEnquirySubmitState, trackEvent } from "@/lib/analytics";
+import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 const SESSION_KEY = "dc_enquiry_draft";
 
@@ -193,12 +194,15 @@ export default function EnquiryPage() {
           );
         } catch {}
         submittedRef.current = true;
+        const deadlineInfo = getOrderDeadlineStatus(brandConfig.orderDeadline.iso);
+        trackEnquirySubmitState(deadlineInfo.urgency);
         trackEvent("enquiry_submitted", {
           order_ref: data.orderRef,
           value: data.totals?.grandTotal,
           item_count: data.totals?.totalQuantity,
           captain_code: getReferral() ?? undefined,
           city: formValues.city,
+          deadline_state: deadlineInfo.urgency,
         });
         clear();
         router.push(`/enquiry/success?ref=${encodeURIComponent(data.orderRef)}`);
@@ -361,9 +365,54 @@ export default function EnquiryPage() {
           </div>
         )}
 
-        <Button type="submit" size="full" disabled={submitting || belowMinimum}>
-          {submitting ? "Submitting…" : "Submit Enquiry"}
-        </Button>
+        {isOrderDeadlineBlocked() ? (
+          <div className="flex flex-col gap-2">
+            <Button type="button" size="full" disabled variant="secondary">
+              {brandConfig.orderDeadline.labels.en.closedTitle}
+            </Button>
+            <div className="flex items-center justify-center gap-3 text-xs">
+              <a
+                href={getWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-whatsapp hover:underline"
+              >
+                WhatsApp Us
+              </a>
+              <span className="text-muted">·</span>
+              <a
+                href={`tel:+${getPhoneE164()}`}
+                className="font-semibold text-maroon-ink hover:underline"
+              >
+                Call {getPhoneDisplay()}
+              </a>
+            </div>
+          </div>
+        ) : (
+          <Button type="submit" size="full" disabled={submitting || belowMinimum}>
+            {submitting ? "Submitting…" : "Submit Enquiry"}
+          </Button>
+        )}
+
+        <p className="mt-2 text-center text-xs text-ink-soft">
+          {brandConfig.orderDeadline.enabled ? (
+            getOrderDeadlineStatus(brandConfig.orderDeadline.iso).isClosed ? (
+              brandConfig.orderDeadline.labels.en.closedReminderText
+            ) : (
+              <>
+                <span className="font-semibold text-maroon-ink">
+                  {brandConfig.orderDeadline.labels.en.reminderText}
+                </span>
+                <span className="hidden text-muted sm:inline"> · </span>
+                <span className="hidden text-ink-soft sm:inline" lang="ta">
+                  {brandConfig.orderDeadline.labels.ta.reminderText}
+                </span>
+              </>
+            )
+          ) : (
+            "A real person calls you within 2 hours to confirm your items and delivery address."
+          )}
+        </p>
       </form>
     </div>
   );

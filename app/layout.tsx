@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col bg-cream text-ink">
         <Script id="theme-init" strategy="beforeInteractive">
-          {`try{if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`}
+          {`try{const p=new URLSearchParams(window.location.search);if(p.get('theme')==='dark'||localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`}
         </Script>
         <ToastProvider>{children}</ToastProvider>
         <AnalyticsScripts />

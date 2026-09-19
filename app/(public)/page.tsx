@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { ExploreCrackers } from "@/components/marketing/explore-crackers";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
+import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
 import { getActiveComboPacks } from "@/lib/combo-packs";
@@ -51,7 +52,8 @@ export default async function HomePage() {
               ? getHeadlineOffer(brandConfig.marketingDiscountPercent)
               : "Direct from Sivakasi."}
           </p>
-          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <OrderCountdownHero />
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/products">
               <Button variant="secondary">
                 View Products <PlayCircle size={16} aria-hidden />

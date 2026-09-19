@@ -9,6 +9,7 @@ import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashIp } from "@/lib/hash";
 import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { sendEnquiryNotifications } from "@/lib/notifications";
+import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 const MIN_SUBMIT_SECONDS = 3;
 
@@ -29,6 +30,19 @@ export async function POST(request: Request) {
     );
   }
   const input = parsed.data;
+
+  if (isOrderDeadlineBlocked()) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "deadline_passed",
+          message:
+            "Season bookings are now closed for Diwali 2026. Please contact us directly on WhatsApp or phone.",
+        },
+      },
+      { status: 403 },
+    );
+  }
 
   // Honeypot + minimum time-to-submit (§30.2). Silent drop — respond as if
   // nothing were wrong, without ever creating an order, so a bot never

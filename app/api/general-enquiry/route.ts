@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nameSchema, phoneSchema } from "@/lib/validation";
 import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
+import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 /**
  * A lightweight top-of-funnel lead form (homepage). Deliberately NOT the
@@ -30,6 +31,19 @@ export async function POST(request: Request) {
     );
   }
   const input = parsed.data;
+
+  if (isOrderDeadlineBlocked()) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "deadline_passed",
+          message:
+            "Season bookings are now closed for Diwali 2026. Please contact us directly on WhatsApp or phone.",
+        },
+      },
+      { status: 403 },
+    );
+  }
 
   const tooFast = typeof input.formRenderedAt === "number" && Date.now() - input.formRenderedAt < 3000;
   if (input.company || tooFast) {

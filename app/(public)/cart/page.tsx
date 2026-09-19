@@ -12,6 +12,8 @@ import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
+import { brandConfig, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
+import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 /** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
 function CartLineSkeleton() {
@@ -175,7 +177,30 @@ export default function CartPage() {
             <div className="mb-3">
               <CartProgressBar subtotal={totals.subtotal} />
             </div>
-            {belowMinimum ? (
+            {isOrderDeadlineBlocked() ? (
+              <div className="flex flex-col gap-2">
+                <Button size="full" disabled variant="secondary">
+                  {brandConfig.orderDeadline.labels.en.closedTitle}
+                </Button>
+                <div className="flex items-center justify-center gap-3 text-xs">
+                  <a
+                    href={getWhatsAppLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-whatsapp hover:underline"
+                  >
+                    WhatsApp Us
+                  </a>
+                  <span className="text-muted">·</span>
+                  <a
+                    href={`tel:+${getPhoneE164()}`}
+                    className="font-semibold text-maroon-ink hover:underline"
+                  >
+                    Call {getPhoneDisplay()}
+                  </a>
+                </div>
+              </div>
+            ) : belowMinimum ? (
               <Button size="full" disabled>
                 Continue to Enquiry →
               </Button>
@@ -188,7 +213,23 @@ export default function CartPage() {
               </Link>
             )}
             <p className="mt-2 text-center text-xs text-ink-soft">
-              No payment on this site. We will call you to confirm before anything is charged.
+              {brandConfig.orderDeadline.enabled ? (
+                getOrderDeadlineStatus(brandConfig.orderDeadline.iso).isClosed ? (
+                  brandConfig.orderDeadline.labels.en.closedReminderText
+                ) : (
+                  <>
+                    <span className="font-semibold text-maroon-ink">
+                      {brandConfig.orderDeadline.labels.en.reminderText}
+                    </span>
+                    <span className="hidden text-muted sm:inline"> · </span>
+                    <span className="hidden text-ink-soft sm:inline" lang="ta">
+                      {brandConfig.orderDeadline.labels.ta.reminderText}
+                    </span>
+                  </>
+                )
+              ) : (
+                "No payment on this site. We will call you to confirm before anything is charged."
+              )}
             </p>
           </div>
 

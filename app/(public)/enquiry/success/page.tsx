@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatRupees } from "@/lib/format";
-import { getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
 import { trackEvent } from "@/lib/analytics";
 
 interface LastOrder {
@@ -95,6 +95,13 @@ function SuccessContent() {
         <p className="mt-3 text-sm text-ink-soft">
           {order.totalQuantity} items · <strong>{formatRupees(order.grandTotal)}</strong>
         </p>
+      )}
+
+      {brandConfig.orderDeadline.enabled && (
+        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-teal/30 bg-teal/5 px-3 py-1 text-xs font-medium text-teal-ink">
+          <span>✓</span>
+          <span>{brandConfig.orderDeadline.labels.en.successNote}</span>
+        </div>
       )}
 
       <div className="mt-6 rounded-lg border border-border bg-surface p-4 text-left">

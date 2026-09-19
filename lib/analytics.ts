@@ -28,3 +28,25 @@ export function setCaptainCodeProperty(code: string): void {
     // no-op
   }
 }
+
+const COUNTDOWN_VIEWED_KEY = "dc_countdown_viewed";
+
+/** Fire once per session when the countdown is displayed (§29.2). */
+export function trackCountdownView(state: string): void {
+  try {
+    if (typeof window !== "undefined") {
+      const alreadyViewed = window.sessionStorage.getItem(COUNTDOWN_VIEWED_KEY);
+      if (!alreadyViewed) {
+        window.sessionStorage.setItem(COUNTDOWN_VIEWED_KEY, "1");
+        trackEvent("countdown_view", { urgency_state: state });
+      }
+    }
+  } catch {
+    trackEvent("countdown_view", { urgency_state: state });
+  }
+}
+
+/** Fire on enquiry submit to record which countdown state converted. */
+export function trackEnquirySubmitState(state: string): void {
+  trackEvent("enquiry_submit_state", { urgency_state: state });
+}
