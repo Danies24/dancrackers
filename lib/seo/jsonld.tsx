@@ -1,5 +1,4 @@
-import React from "react";
-import { brandConfig, getCanonicalUrl, getSiteUrl } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPhoneE164, getSiteUrl } from "@/config/brandConfig";
 
 export interface BreadcrumbItem {
   name: string;
@@ -28,7 +27,7 @@ export interface ProductJsonLdParams {
 export function buildOrganizationJsonLd(): Record<string, unknown> {
   const siteUrl = getSiteUrl();
   const canonicalHome = getCanonicalUrl("/");
-  const phoneE164 = `+91${brandConfig.contact.phoneDigits}`;
+  const phoneE164 = `+${getPhoneE164()}`;
 
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -36,7 +35,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     name: brandConfig.brand.name,
     alternateName: [brandConfig.brand.nameTamil, `${brandConfig.brand.name} Crackers`],
     url: canonicalHome,
-    logo: `${siteUrl}${brandConfig.brand.logo}`,
+    logo: `${siteUrl}${brandConfig.brand.logo.primary}`,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: phoneE164,

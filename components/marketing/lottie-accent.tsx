@@ -1,6 +1,10 @@
 "use client";
 
-import { Lottie } from "lottie-react";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("lottie-react").then((mod) => mod.Lottie), {
+  ssr: false,
+});
 
 /**
  * Thin wrapper around lottie-react, ready for a real licensed Diwali
