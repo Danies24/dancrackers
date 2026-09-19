@@ -58,17 +58,17 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
 
   return (
     <div
-      className="group flex h-full shrink-0 snap-start flex-col overflow-hidden rounded-[22px] p-[2px] transition-transform duration-300 ease-out hover:-translate-y-1"
+      className="group flex shrink-0 snap-start flex-col overflow-hidden rounded-[22px] p-[2px] transition-transform duration-300 ease-out hover:-translate-y-1"
       style={{ background: "var(--combo-highlight-border)" }}
     >
-      <div className="flex h-full w-[220px] flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg sm:w-[260px] md:w-full">
+      <div className="flex w-[250px] flex-1 flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg sm:w-[280px] md:w-full">
         <Link href={`/product/${selected.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
           {combo.heroImageUrl ? (
             <Image
               src={combo.heroImageUrl}
               alt={combo.name}
               fill
-              sizes="(max-width: 640px) 220px, 260px"
+              sizes="(max-width: 640px) 250px, 280px"
               className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             />
           ) : (
@@ -116,7 +116,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
                     : "border-border bg-surface text-ink-soft hover:border-maroon-ink/50",
                 )}
               >
-                {v.tierLabel.split(" ")[0]}
+                {v.tierLabel}
               </button>
             ))}
           </div>

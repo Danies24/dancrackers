@@ -16,20 +16,20 @@
 
 -- ── Rename the 3 existing tiers ──────────────────────────────────────
 update combo_pack_varieties
-set tier_label = 'Mini Pack'
+set tier_label = 'Mini'
 where slug = 'family-pack-small';
 
 update combo_pack_varieties
-set tier_label = 'Small Pack'
+set tier_label = 'Small'
 where slug = 'family-pack-medium';
 
 update combo_pack_varieties
-set tier_label = 'Mega Pack', display_order = 4
+set tier_label = 'Mega', display_order = 4
 where slug = 'family-pack-large';
 
--- ── New "Big Pack" (7k) variety, same combo_pack_id as the others ───
+-- ── New "Big" (7k) variety, same combo_pack_id as the others ───
 insert into combo_pack_varieties (combo_pack_id, slug, tier_label, display_order)
-select combo_pack_id, 'family-pack-big', 'Big Pack', 3
+select combo_pack_id, 'family-pack-big', 'Big', 3
 from combo_pack_varieties
 where slug = 'family-pack-small'
 on conflict (slug) do update set tier_label = excluded.tier_label, display_order = excluded.display_order;
@@ -124,8 +124,8 @@ begin
   join combo_packs p on p.id = v.combo_pack_id
   where p.slug = 'family-pack';
 
-  if v_labels <> array['Mini Pack', 'Small Pack', 'Big Pack', 'Mega Pack'] then
-    raise exception 'Expected family-pack tier_labels [Mini Pack, Small Pack, Big Pack, Mega Pack] in display_order, found %', v_labels;
+  if v_labels <> array['Mini', 'Small', 'Big', 'Mega'] then
+    raise exception 'Expected family-pack tier_labels [Mini, Small, Big, Mega] in display_order, found %', v_labels;
   end if;
 
   select count(*) into v_zero_count
@@ -137,5 +137,5 @@ begin
     raise exception 'Expected every family-pack variety to have selling_price > 0, found % at 0', v_zero_count;
   end if;
 
-  raise notice 'OK: family-pack has 4 varieties [Mini Pack, Small Pack, Big Pack, Mega Pack], all priced.';
+  raise notice 'OK: family-pack has 4 varieties [Mini, Small, Big, Mega], all priced.';
 end $$;
