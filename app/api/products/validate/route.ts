@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createPublicClient } from "@/lib/supabase/public";
+import { getComboUiPrice } from "@/lib/combo-packs";
 
 const bodySchema = z.object({
   productIds: z.array(z.string().uuid()).max(500),
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
         byId.set(c.id, {
           id: c.id,
           status: "active",
-          price: c.selling_price,
+          price: getComboUiPrice(c.slug, c.selling_price),
           mrp: null,
           discount_percent: null,
           is_discountable: false,

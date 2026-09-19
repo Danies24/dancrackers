@@ -10,6 +10,7 @@ import { hashIp } from "@/lib/hash";
 import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { sendEnquiryNotifications } from "@/lib/notifications";
 import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
+import { getComboUiPrice } from "@/lib/combo-packs";
 
 const MIN_SUBMIT_SECONDS = 3;
 
@@ -157,20 +158,21 @@ export async function POST(request: Request) {
       for (const c of combos) {
         const pack = packById.get(c.combo_pack_id);
         if (!pack?.is_active) continue;
+        const effectivePrice = getComboUiPrice(c.slug, c.selling_price);
         byId.set(c.id, {
           id: c.id,
           sku: `COMBO-${c.slug.toUpperCase()}`,
           name_en: `${pack.name} — ${c.tier_label}`,
           name_ta: null,
           unit: "pack",
-          price: c.selling_price,
+          price: effectivePrice,
           mrp: null,
           is_discountable: false,
           discount_percent: 0,
           net_markup_percent: 0,
           status: "active",
         });
-        comboPricingById.set(c.id, { supplierPrice: c.supplier_cost, commission: c.commission });
+        comboPricingById.set(c.id, { supplierPrice: c.supplier_cost, commission: effectivePrice - c.supplier_cost });
       }
     }
   }
