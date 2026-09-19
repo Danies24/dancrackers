@@ -5,7 +5,7 @@ import { getPhoneDisplay, getPrimarySupplier, getPrimarySupplierWhatsApp } from 
 
 /**
  * GET /api/admin/orders/[id]/supplier-message. The formatted order-to-
- * supplier text — what Kolagalam actually pays Sree Sai Ram, never the
+ * supplier text — what Kolagalam actually pays the supplier, never the
  * customer's price. Uses each line's unit_supplier_price/line_supplier_total
  * and the order's supplier_total, not unit_price/line_total/grand_total.
  */

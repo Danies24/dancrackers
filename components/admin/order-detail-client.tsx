@@ -203,8 +203,8 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
                 <th className="pb-1 text-right">Qty</th>
                 <th className="pb-1 text-right">Customer price</th>
                 <th className="pb-1 text-right">Customer amount</th>
-                <th className="pb-1 text-right">Sree Sai Ram price</th>
-                <th className="pb-1 text-right">Sree Sai Ram amount</th>
+                <th className="pb-1 text-right">Supplier price</th>
+                <th className="pb-1 text-right">Supplier amount</th>
                 <th className="pb-1 text-right">Commission</th>
               </tr>
             </thead>
@@ -236,7 +236,7 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
         <div className="mt-3 rounded-md bg-cream p-3 text-sm">
           <p>
             Customer pays <strong className="tabular-nums">{formatRupees(Number(order.grand_total))}</strong> ·{" "}
-            <strong className="tabular-nums">You pay Sree Sai Ram {formatRupees(Number(order.supplier_total ?? 0))}</strong> ·{" "}
+            <strong className="tabular-nums">You pay Supplier {formatRupees(Number(order.supplier_total ?? 0))}</strong> ·{" "}
             You keep{" "}
             <strong
               className={`tabular-nums ${Number(order.commission_total ?? 0) > 0 ? "text-teal-ink" : "text-red-ink"}`}

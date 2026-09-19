@@ -54,18 +54,17 @@ export const brandConfig = {
     facilitator: { name: "Kolagalam", role: "Orders facilitated by" },
     suppliers: [
       {
-        name: "Sree Sai Ram Crackers (Kids Crackers Park)",
+        name: "",
         role: "Manufactured and sold by",
         city: "Sivakasi",
-        address: "3/268 D Sivakasi–Sattur Road, Opp. Sri Sankari Mahal, Chinnakamanpatti, Sivakasi 626 189",
-        phone: "99946 37193 / 96297 24212",
+        address: "",
         // The single number every "contact supplier" WhatsApp button on the
         // site uses (order-detail's "Send on WhatsApp" for the supplier
-        // order today; anywhere else later) — kept separate from the
-        // display-only `phone` string above since a wa.me link needs one
-        // canonical 10-digit number, not a "/"-joined pair. This is their
-        // primary published contact number (kidscrackerspark.com, "CALL US
-        // ANYTIME") — swap here, once, if that ever changes.
+        // order today; anywhere else later) — kept separate from any
+        // display-only phone string since a wa.me link needs one
+        // canonical 10-digit number, not a "/"-joined pair. This is the
+        // configured supplier's primary published contact number — swap
+        // here, once, if that ever changes.
         whatsapp: "9629724212",
         // TODO(confirm): licence number — get in writing from the supplier before this appears on a live page.
         licenceNo: "TODO(confirm)",
@@ -154,7 +153,7 @@ export function getPrimarySupplier(): Supplier {
 }
 
 /**
- * ADMIN-ONLY. Sree Sai Ram's own WhatsApp number — used exclusively by the
+ * ADMIN-ONLY. The configured supplier's own WhatsApp number — used exclusively by the
  * login-gated "Send order to supplier" button in /admin/orders, so staff can
  * actually message the supplier to place an order. Never call this from
  * anything under app/(public)/* or a public API route: a customer must
@@ -202,14 +201,12 @@ export function getSiteUrl(): string {
 const UNCONFIRMED = "TODO(confirm)";
 
 export function getManufacturerFacilitatorNotice(): {
-  manufacturedBy: string;
   facilitatedBy: string;
   licenceLine: string | null;
   gstinLine: string | null;
 } {
   const supplier = getPrimarySupplier();
   return {
-    manufacturedBy: `${supplier.role}: ${supplier.name}, ${supplier.address}`,
     facilitatedBy: `${brandConfig.legal.facilitator.role}: ${brandConfig.legal.facilitator.name}, ${getFormattedAddress()}`,
     // Never shown until a real value replaces the placeholder — a visible
     // "TODO(confirm)" on a live compliance notice would look broken, and

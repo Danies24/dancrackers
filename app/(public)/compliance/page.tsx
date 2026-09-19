@@ -30,7 +30,6 @@ export default function CompliancePage() {
           </p>
         </Section>
         <Section title="Who does what">
-          <p>{notice.manufacturedBy}</p>
           <p>{notice.facilitatedBy}</p>
           <p className="mt-2">
             {supplier.name || "The supplier"} holds the licences required to manufacture and sell fireworks,

@@ -43,7 +43,7 @@ const patchSchema = z.object({
   note: z.string().max(2000).optional(),
   captainCode: z.string().trim().toUpperCase().nullable().optional(),
   commissionPaid: z.boolean().optional(),
-  // Supplier payment — what Kolagalam actually paid Sree Sai Ram for this order.
+  // Supplier payment — what Kolagalam actually paid the supplier for this order.
   supplierPaymentStatus: z.enum(["pending", "paid"]).optional(),
   supplierPaidAmount: z.number().nonnegative().optional(),
   supplierPaymentRef: z.string().max(200).optional(),

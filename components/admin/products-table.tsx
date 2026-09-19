@@ -172,7 +172,7 @@ export function ProductsTable({
 
   function exportCsv() {
     const header = [
-      "SKU", "Name EN", "Name TA", "Category", "Unit", "MRP", "Sree Sai Ram price", "Discountable",
+      "SKU", "Name EN", "Name TA", "Category", "Unit", "MRP", "Supplier price", "Discountable",
       "Discount %", "Markup %", "Customer price", "Commission", "Commission % of bill", "Status", "Bestseller",
     ];
     const rows = filtered.map((p) => {
@@ -211,7 +211,7 @@ export function ProductsTable({
       {/* Header strip: global supplier % + bulk pricing actions + live totals */}
       <div className="mb-3 flex flex-wrap items-end gap-4 rounded-lg border border-border bg-cream p-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted">Supplier discount % (Sree Sai Ram)</label>
+          <label className="text-xs font-semibold text-muted">Supplier discount %</label>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -287,7 +287,7 @@ export function ProductsTable({
             <p className="tabular-nums font-bold text-ink">{formatRupees(totals.customer)}</p>
           </div>
           <div>
-            <p className="text-muted">Pay Sree Sai Ram</p>
+            <p className="text-muted">Pay Supplier</p>
             <p className="tabular-nums font-bold text-ink">{formatRupees(totals.supplier)}</p>
           </div>
           <div>
@@ -367,8 +367,8 @@ export function ProductsTable({
               <th className="p-2">Category</th>
               <th className="p-2">Unit</th>
               <th className="p-2">MRP / PDF rate</th>
-              <th className="p-2" title="Kids Crackers Park PDF — 90% off for discount items, net rate for net items">
-                Sree Sai Ram price
+              <th className="p-2" title="Supplier PDF — 90% off for discount items, net rate for net items">
+                Supplier price
               </th>
               <th className="p-2">Net rate</th>
               <th className="p-2">Discount % / Markup %</th>
@@ -424,7 +424,7 @@ export function ProductsTable({
                       className="w-20 rounded border border-border px-1.5 py-1 text-right tabular-nums"
                     />
                   </td>
-                  <td className="p-2 tabular-nums text-muted" title="Kids Crackers Park PDF — 90% off for discount items, net rate for net items">
+                  <td className="p-2 tabular-nums text-muted" title="Supplier PDF — 90% off for discount items, net rate for net items">
                     {supplierPrice != null ? formatRupees(supplierPrice) : "—"}
                   </td>
                   <td className="p-2">

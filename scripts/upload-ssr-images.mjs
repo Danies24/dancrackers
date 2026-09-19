@@ -1,5 +1,5 @@
 /**
- * Bulk-upload the Sree Sai Ram / Kids Crackers Park product photos.
+ * Bulk-upload the supplier's product photos.
  *
  * Reads <dir>/SSR-###.{jpg,png} (skips an `extras/` subfolder), resizes each
  * to max 800px on the long edge and re-encodes as WebP q80 via sharp,

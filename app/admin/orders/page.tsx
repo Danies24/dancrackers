@@ -91,8 +91,8 @@ export default async function AdminOrdersPage({
       </div>
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <SummaryCard label="Payable to Sree Sai Ram (pending)" value={formatRupees(summary.payablePending)} tone="amber" />
-        <SummaryCard label="Paid to Sree Sai Ram" value={formatRupees(summary.paidToSupplier)} tone="ink" />
+        <SummaryCard label="Payable to Supplier (pending)" value={formatRupees(summary.payablePending)} tone="amber" />
+        <SummaryCard label="Paid to Supplier" value={formatRupees(summary.paidToSupplier)} tone="ink" />
         <SummaryCard label="Commission earned" value={formatRupees(summary.commissionEarned)} tone="teal" />
         <SummaryCard label="Orders (this view)" value={String(orders?.length ?? 0)} tone="ink" />
       </div>

@@ -95,7 +95,6 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
         className="border-t border-border bg-maroon-tint px-4 py-4 text-center text-xs leading-relaxed text-ink-soft"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8rem)" }}
       >
-        <p>{notice.manufacturedBy}</p>
         {notice.licenceLine && <p>{notice.licenceLine}</p>}
         {notice.gstinLine && <p>{notice.gstinLine}</p>}
         <p>{notice.facilitatedBy}</p>
