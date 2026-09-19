@@ -75,6 +75,21 @@ describe("buildCustomerMessage — truncation past 12 items (§17.2)", () => {
     expect(msg).toContain("₹5,856");
     expect(msg).toContain("Please confirm.");
   });
+
+  it("includes packaging charge (3%) when subtotal and charges are present", () => {
+    const msg = buildCustomerMessage({
+      orderRef: "DC-2609-0147",
+      name: "Priya R",
+      phone: "9876543210",
+      items: [baseItem],
+      subtotal: 1000,
+      packagingCharge: 30,
+      deliveryCharge: 200,
+      grandTotal: 1230,
+      address: "12/4 Sunrise Apartments",
+    });
+    expect(msg).toContain("Packaging charge (3%): ₹30");
+  });
 });
 
 describe("buildSupplierMessage — includes SKU on every line (§17.4)", () => {
