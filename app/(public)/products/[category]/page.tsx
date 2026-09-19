@@ -46,6 +46,8 @@ export async function generateMetadata({
   };
 }
 
+import { JsonLd, buildBreadcrumbJsonLd, buildItemListJsonLd } from "@/lib/seo/jsonld";
+
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category: slug } = await params;
   const [category, categories, products] = await Promise.all([
@@ -56,10 +58,39 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   if (!category) notFound();
 
+  const categoryProducts = products.filter((p) => p.category_id === category.id);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", url: getCanonicalUrl("/") },
+    { name: "Products", url: getCanonicalUrl("/products") },
+    { name: category.name_en, url: getCanonicalUrl(`/products/${category.slug}`) },
+  ]);
+  const itemListJsonLd = buildItemListJsonLd(
+    category.name_en,
+    categoryProducts.map((p) => ({
+      name: p.name_en,
+      url: getCanonicalUrl(`/product/${p.slug}`),
+      image: p.image_url ?? undefined,
+    }))
+  );
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <nav className="mb-2 text-xs text-muted">
-        <Link href="/">Home</Link> / <Link href="/products">Products</Link> / {category.name_en}
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={itemListJsonLd} />
+      <nav aria-label="Breadcrumb" className="mb-2 text-xs text-muted">
+        <ol className="flex items-center gap-1.5">
+          <li>
+            <Link href="/" className="hover:underline">Home</Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/products" className="hover:underline">Products</Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="font-medium text-ink">
+            {category.name_en}
+          </li>
+        </ol>
       </nav>
       <h1 className="font-display text-2xl font-semibold text-ink">{category.name_en}</h1>
       {category.name_ta && (

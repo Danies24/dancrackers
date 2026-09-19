@@ -70,6 +70,8 @@ export async function generateMetadata({
   };
 }
 
+import { JsonLd, buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonld";
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -79,8 +81,37 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const isUnavailable = product.status === "unavailable";
   const isCallForRate = !product.price;
 
+  const crumbs = [
+    { name: "Home", url: getCanonicalUrl("/") },
+    { name: "Products", url: getCanonicalUrl("/products") },
+  ];
+  if (product.category) {
+    crumbs.push({
+      name: product.category.name_en,
+      url: getCanonicalUrl(`/products/${product.category.slug}`),
+    });
+  }
+  crumbs.push({
+    name: product.name_en,
+    url: getCanonicalUrl(`/product/${product.slug}`),
+  });
+
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(crumbs);
+  const productJsonLd = buildProductJsonLd({
+    name: product.name_en,
+    description:
+      product.description ??
+      `${product.name_en} Sivakasi crackers price list & Diwali order enquiry from Kolagalam.`,
+    sku: product.sku ?? undefined,
+    image: product.image_url ?? undefined,
+    url: getCanonicalUrl(`/product/${product.slug}`),
+    category: product.category?.name_en ?? undefined,
+  });
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={productJsonLd} />
       <ProductViewTracker
         productId={product.id}
         sku={product.sku}
@@ -88,14 +119,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         category={product.category?.name_en}
         price={product.price}
       />
-      <nav className="mb-4 text-xs text-muted">
-        <Link href="/">Home</Link> / <Link href="/products">Products</Link>
-        {product.category && (
-          <>
-            {" "}
-            / <Link href={`/products/${product.category.slug}`}>{product.category.name_en}</Link>
-          </>
-        )}
+      <nav aria-label="Breadcrumb" className="mb-4 text-xs text-muted">
+        <ol className="flex items-center gap-1.5 flex-wrap">
+          <li>
+            <Link href="/" className="hover:underline">Home</Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/products" className="hover:underline">Products</Link>
+          </li>
+          {product.category && (
+            <>
+              <li aria-hidden="true">/</li>
+              <li>
+                <Link href={`/products/${product.category.slug}`} className="hover:underline">
+                  {product.category.name_en}
+                </Link>
+              </li>
+            </>
+          )}
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="font-medium text-ink">
+            {product.name_en}
+          </li>
+        </ol>
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">

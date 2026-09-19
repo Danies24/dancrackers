@@ -32,6 +32,8 @@ const TRUST_FEATURES = [
   { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
 ];
 
+import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
+
 export default async function HomePage() {
   const [categories, products, maxDiscountPercent, comboPacks] = await Promise.all([
     getCategoryWithCounts(),
@@ -41,9 +43,13 @@ export default async function HomePage() {
   ]);
   const catalogueEmpty = categories.every((c) => c.productCount === 0);
   const showcaseProducts = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller));
+  const orgJsonLd = buildOrganizationJsonLd();
+  const websiteJsonLd = buildWebSiteJsonLd();
 
   return (
     <div>
+      <JsonLd data={orgJsonLd} />
+      <JsonLd data={websiteJsonLd} />
       {/* Hero */}
       <section className="relative overflow-hidden bg-cream px-4 pb-8 pt-10 text-center md:pb-12 md:pt-14">
         <SparkField />
