@@ -1,43 +1,53 @@
 import type { MetadataRoute } from "next";
 import { getActiveCategories, getCatalogue } from "@/lib/data";
+import { getCanonicalUrl } from "@/config/brandConfig";
 
-const STATIC_PAGES = [
+const STATIC_PATHS = [
   "",
   "/products",
   "/how-it-works",
   "/safety",
   "/about",
   "/contact",
+  "/faq",
+  "/compliance",
   "/terms",
   "/privacy",
-  "/compliance",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
   const [categories, products] = await Promise.all([
     getActiveCategories().catch(() => []),
     getCatalogue().catch(() => []),
   ]);
 
-  const staticEntries: MetadataRoute.Sitemap = STATIC_PAGES.map((path) => ({
-    url: `${siteUrl}${path}`,
-    changeFrequency: path === "" ? "daily" : "weekly",
-    priority: path === "" ? 1 : 0.7,
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
+    url: getCanonicalUrl(path),
   }));
 
-  const categoryEntries: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${siteUrl}/products/${c.slug}`,
-    changeFrequency: "daily",
-    priority: 0.8,
-  }));
+  const categoryEntries: MetadataRoute.Sitemap = categories
+    .filter((c) => Boolean(c.slug))
+    .map((c) => ({
+      url: getCanonicalUrl(`/products/${c.slug}`),
+      ...(c.created_at ? { lastModified: new Date(c.created_at) } : {}),
+    }));
 
-  const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${siteUrl}/product/${p.slug}`,
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
+  const productEntries: MetadataRoute.Sitemap = products
+    .filter((p) => Boolean(p.slug) && p.status === "active")
+    .map((p) => ({
+      url: getCanonicalUrl(`/product/${p.slug}`),
+    }));
 
-  return [...staticEntries, ...categoryEntries, ...productEntries];
+  // Deduplicate and return clean array of absolute URLs
+  const seen = new Set<string>();
+  const allEntries: MetadataRoute.Sitemap = [];
+
+  for (const entry of [...staticEntries, ...categoryEntries, ...productEntries]) {
+    if (!seen.has(entry.url)) {
+      seen.add(entry.url);
+      allEntries.push(entry);
+    }
+  }
+
+  return allEntries;
 }

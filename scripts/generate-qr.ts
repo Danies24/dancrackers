@@ -12,6 +12,8 @@ import QRCode from "qrcode";
 import { createClient } from "@supabase/supabase-js";
 import { buildCaptainKitMessage } from "../lib/whatsapp";
 
+import { getSiteUrl } from "../config/brandConfig";
+
 config({ path: ".env.local" });
 
 async function main() {
@@ -21,7 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  const siteUrl = siteUrlArg ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = siteUrlArg ?? getSiteUrl();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

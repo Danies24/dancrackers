@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { enquirySchema, normalizePhone } from "@/lib/validation";
 import { computeProductPricing, computeTotals, isBelowMinimumOrder, round2 } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/pricing-settings";
-import { getMinimumOrderValue } from "@/config/brandConfig";
+import { getMinimumOrderValue, getSiteUrl } from "@/config/brandConfig";
 import { getSettings } from "@/lib/data";
 import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashIp } from "@/lib/hash";
@@ -416,7 +416,7 @@ export async function POST(request: Request) {
       )
     : null;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   await sendEnquiryNotifications({
     orderRef: order.order_ref,
     name: input.customer.name,

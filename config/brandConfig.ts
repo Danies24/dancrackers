@@ -14,8 +14,7 @@ export const brandConfig = {
     name: "Kolagalam",
     nameTamil: "கோலாகலம்",
     descriptor: "Sivakasi Crackers",
-    // TODO: write a real tagline for Kolagalam (shown in the OG image and site metadata).
-    tagline: "TODO: Kolagalam tagline",
+    tagline: "Authentic Sivakasi Crackers Direct To Your Doorstep",
     // Replace once a real custom domain (e.g. kolagalam.com) is registered —
     // NEXT_PUBLIC_SITE_URL takes priority at runtime (see getSiteUrl()),
     // this is only the fallback if that env var isn't set.
@@ -169,10 +168,19 @@ export const brandConfig = {
 
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam — Sivakasi Crackers, Direct to You | Enquire Now",
+    defaultTitle: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List & Order Enquiry",
     defaultDescription:
-      "Browse the full Sivakasi crackers price list with photos. Build your order, we call you to confirm. Supplied by licensed Sivakasi manufacturers.",
-    keywords: ["Sivakasi crackers", "Diwali crackers online", "firecrackers Chennai", "Kolagalam"],
+      "Browse the authentic Sivakasi crackers price list with photos. Build your Deepavali enquiry online and we will call you to confirm. Supplied by licensed Sivakasi manufacturers.",
+    keywords: [
+      "Kolagalam",
+      "Kolagalam crackers",
+      "Sivakasi crackers",
+      "Sivakasi crackers price list",
+      "Diwali crackers enquiry",
+      "கோலாகலம்",
+      "கோலாகலம் பட்டாசு",
+      "சிவகாசி பட்டாசு",
+    ],
   },
 
   messages: {
@@ -243,9 +251,59 @@ export function getFormattedAddress(): string {
   return `${line1}, ${district}, ${state} ${pincode}`;
 }
 
-/** Runtime site URL — NEXT_PUBLIC_SITE_URL wins once a real domain is set; brandConfig is only the fallback. */
+/**
+ * Single source of truth for the site URL across metadata, robots, sitemap, canonicals, Open Graph, and JSON-LD.
+ *
+ * Resolution order:
+ * 1. NEXT_PUBLIC_SITE_URL
+ * 2. https://${VERCEL_PROJECT_PRODUCTION_URL} (if set)
+ * 3. brandConfig.brand.siteUrl ("https://kolagalam.vercel.app")
+ *
+ * Trailing slashes are stripped.
+ * In a production build (NODE_ENV === "production"), localhost is never returned.
+ */
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? brandConfig.brand.siteUrl;
+  let resolved: string | undefined;
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    resolved = process.env.NEXT_PUBLIC_SITE_URL.trim();
+  } else if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    const v = process.env.VERCEL_PROJECT_PRODUCTION_URL.trim();
+    resolved = v.startsWith("http://") || v.startsWith("https://") ? v : `https://${v}`;
+  } else {
+    resolved = brandConfig.brand.siteUrl;
+  }
+
+  // Strip trailing slash
+  resolved = resolved.replace(/\/+$/, "");
+
+  // Never return localhost in a production build
+  if (process.env.NODE_ENV === "production" && resolved.includes("localhost")) {
+    return brandConfig.brand.siteUrl.replace(/\/+$/, "");
+  }
+
+  return resolved;
+}
+
+/**
+ * Builds an absolute canonical URL from getSiteUrl().
+ * - Strips query strings (?...) and fragment identifiers (#...)
+ * - Home page ("" or "/") always returns `${siteUrl}/` (with trailing slash)
+ * - All other paths return `${siteUrl}/${cleanPath}` (without trailing slash)
+ */
+export function getCanonicalUrl(path: string = ""): string {
+  const siteUrl = getSiteUrl();
+  // Strip query strings and hashes
+  const cleanPath = path.split("?")[0].split("#")[0].trim();
+
+  // Normalize slashes
+  const normalized = cleanPath.replace(/^\/+/, "").replace(/\/+$/, "");
+
+  if (!normalized) {
+    return `${siteUrl}/`;
+  }
+
+  return `${siteUrl}/${normalized}`;
 }
 
 const UNCONFIRMED = "TODO(confirm)";

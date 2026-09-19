@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeCaptainStats } from "@/lib/captain-stats";
 import { CaptainDetailClient } from "@/components/admin/captain-detail-client";
+import { getSiteUrl } from "@/config/brandConfig";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function AdminCaptainDetailPage({ params }: { params: Promi
 
   if (!captain) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const link = `${siteUrl.replace(/\/$/, "")}/c/${captain.code}`;
   const qrDataUrl = await QRCode.toDataURL(link, { width: 400, margin: 2 });
 
