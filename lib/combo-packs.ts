@@ -97,6 +97,13 @@ export const COMBO_UI_PRICE_OVERRIDES: Record<string, number> = {
   "night-pack-standard": 6000,
   "kids-special-pack": 9000,
   "kids-special-pack-standard": 9000,
+  "family-pack": 3000,
+  "family-pack-mini": 3000,
+  "family-pack-small": 5000,
+  "family-pack-medium": 7000,
+  "family-pack-big": 10000,
+  "family-pack-large": 15000,
+  "family-pack-mega": 15000,
 };
 
 export function getComboUiPrice(slug: string, defaultPrice: number): number {
