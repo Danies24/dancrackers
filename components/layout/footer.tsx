@@ -99,11 +99,13 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
       >
         {notice.licenceLine && <p>{notice.licenceLine}</p>}
         {notice.gstinLine && <p>{notice.gstinLine}</p>}
-        <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>
-        <div className="mt-3 text-xs font-medium text-ink-soft space-y-0.5">
+        <div className="text-xs font-medium text-ink-soft space-y-0.5">
           <p>&copy; 2026 Kolagalam. All Rights Reserved.</p>
           <p>Orders facilitated &amp; Developed by : Kolagalam Team.</p>
         </div>
+        <p className="mx-auto mt-2 max-w-2xl text-[11px] leading-relaxed text-ink-soft/80">
+          {brandConfig.legal.complianceNotice}
+        </p>
       </div>
     </footer>
   );
