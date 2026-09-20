@@ -2,8 +2,9 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { Search, X, LayoutGrid, List as ListIcon } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductListRow } from "@/components/product/product-list-row";
 import { ProductCardSkeleton } from "@/components/ui/skeleton";
 import { searchProducts, sortProducts, type SortOption } from "@/lib/catalogue-search";
 import { trackEvent } from "@/lib/analytics";
@@ -14,7 +15,6 @@ const PAGE_SIZE = 40;
 interface CatalogueClientProps {
   products: ProductWithCategory[];
   categories: CategoryRow[];
-  /** Pre-selected category (category page); locked, no "All" chip shown as active elsewhere. */
   lockedCategory?: string;
 }
 
@@ -26,15 +26,28 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
   const [category, setCategory] = useState(lockedCategory ?? searchParams.get("category") ?? "");
   const [sort, setSort] = useState<SortOption>((searchParams.get("sort") as SortOption) ?? "recommended");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Debounce search input 250ms (§13.4) before it affects results/URL.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dc_view_mode");
+      if (saved === "list" || saved === "grid") setViewMode(saved);
+    } catch {}
+  }, []);
+
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem("dc_view_mode", mode);
+    } catch {}
+  };
+
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 250);
     return () => clearTimeout(t);
   }, [query]);
 
-  // URL is the source of truth (§13.5) — keep it in sync without a page reload.
   useEffect(() => {
     const params = new URLSearchParams();
     if (debouncedQuery) params.set("q", debouncedQuery);
@@ -53,22 +66,19 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
     return result;
   }, [products, category, debouncedQuery, sort]);
 
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
+  const visible = viewMode === "list" ? filtered : filtered.slice(0, visibleCount);
+  const hasMore = viewMode === "grid" && visibleCount < filtered.length;
 
   useEffect(() => {
     if (debouncedQuery) trackEvent("search_performed", { search_term: debouncedQuery, results_count: filtered.length });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
 
   useEffect(() => {
     if (category) trackEvent("filter_applied", { filter_type: "category", filter_value: category });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
   useEffect(() => {
     if (sort !== "recommended") trackEvent("sort_applied", { value: sort });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
   const clearFilters = useCallback(() => {
@@ -77,24 +87,55 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
     setSort("recommended");
   }, [lockedCategory]);
 
+  // Group by category for list view
+  const groupedProducts = useMemo(() => {
+    if (viewMode !== "list") return [];
+    
+    // Create an ordered list of groups based on categories array
+    const groupMap = new Map<string, ProductWithCategory[]>();
+    for (const p of visible) {
+      const catId = p.category_id || p.category?.id || "other";
+      if (!groupMap.has(catId)) groupMap.set(catId, []);
+      groupMap.get(catId)!.push(p);
+    }
+    
+    const groups = [];
+    for (const cat of categories) {
+      if (groupMap.has(cat.id)) {
+        groups.push({ category: cat, products: groupMap.get(cat.id)! });
+        groupMap.delete(cat.id);
+      }
+    }
+    
+    // Add any remaining
+    for (const [catId, prods] of groupMap.entries()) {
+      const fallbackCat = prods[0].category || { name_en: "Other" };
+      groups.push({ category: fallbackCat, products: prods });
+    }
+    
+    return groups;
+  }, [visible, categories, viewMode]);
+
   return (
     <div>
       {!lockedCategory && (
         <div className="sticky top-16 z-20 -mx-4 border-b border-border bg-cream/95 px-4 py-3 backdrop-blur">
-          <div className="relative mb-3">
-            <Search
-              size={18}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search crackers, e.g. flower pot, சக்கரம்..."
-              aria-label="Search products"
-              className="h-11 w-full rounded-md border border-border bg-surface pl-10 pr-4 text-[16px]"
-            />
+          <div className="relative mb-3 flex gap-2">
+            <div className="relative flex-1">
+              <Search
+                size={18}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search crackers, e.g. flower pot, சக்கரம்..."
+                aria-label="Search products"
+                className="h-11 w-full rounded-md border border-border bg-surface pl-10 pr-4 text-[16px]"
+              />
+            </div>
           </div>
           <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1">
             <CategoryChip label="All" active={category === ""} onClick={() => setCategory("")} />
@@ -115,27 +156,70 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
           {filtered.length} {filtered.length === 1 ? "product" : "products"}
           {debouncedQuery && ` for "${debouncedQuery}"`}
         </p>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortOption)}
-          aria-label="Sort products"
-          className="h-9 rounded-md border border-border bg-surface px-2 text-sm"
-        >
-          <option value="recommended">Recommended</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-md border border-border bg-surface overflow-hidden">
+            <button
+              onClick={() => handleViewModeChange("grid")}
+              className={`p-1.5 transition-colors ${viewMode === "grid" ? "bg-maroon-tint text-maroon-ink" : "text-muted hover:bg-surface-hover"}`}
+              aria-label="Grid view"
+            >
+              <LayoutGrid size={18} />
+            </button>
+            <button
+              onClick={() => handleViewModeChange("list")}
+              className={`p-1.5 border-l border-border transition-colors ${viewMode === "list" ? "bg-maroon-tint text-maroon-ink" : "text-muted hover:bg-surface-hover"}`}
+              aria-label="List view"
+            >
+              <ListIcon size={18} />
+            </button>
+          </div>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortOption)}
+            aria-label="Sort products"
+            className="h-9 rounded-md border border-border bg-surface px-2 text-sm"
+          >
+            <option value="recommended">Recommended</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
         <EmptyResults query={debouncedQuery} onClear={clearFilters} />
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {visible.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {viewMode === "grid" ? (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {visible.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-col pb-8">
+              {category ? (
+                // Single category selected, just list them
+                visible.map((p) => (
+                  <ProductListRow key={p.id} product={p} />
+                ))
+              ) : (
+                // Grouped by category when "All" is selected
+                groupedProducts.map((group) => (
+                  <div key={group.category.id || group.category.name_en} className="mb-6">
+                    <h2 className="sticky top-[124px] z-10 -mx-4 px-4 py-2 bg-cream/95 backdrop-blur font-display text-lg font-semibold text-ink border-y border-border/50 mb-3 shadow-sm">
+                      {group.category.name_en} {group.category.name_ta && <span className="text-sm font-normal text-muted ml-1" lang="ta">({group.category.name_ta})</span>}
+                    </h2>
+                    <div className="flex flex-col">
+                      {group.products.map(p => (
+                        <ProductListRow key={p.id} product={p} />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
           {hasMore && (
             <div className="mt-6 flex justify-center">
               <button
