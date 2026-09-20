@@ -114,7 +114,10 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
               <Stepper
                 value={cartItem.qty}
                 onIncrement={() => setQty(product.id, cartItem.qty + 1)}
-                onDecrement={() => setQty(product.id, cartItem.qty - 1)}
+                onDecrement={() => {
+                  setJustAdded(false);
+                  setQty(product.id, cartItem.qty - 1);
+                }}
                 label={product.name_en}
                 className="w-full justify-between"
               />

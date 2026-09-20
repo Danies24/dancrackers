@@ -134,7 +134,10 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
               <Stepper
                 value={cartItem.qty}
                 onIncrement={() => setQty(selected.id, cartItem.qty + 1)}
-                onDecrement={() => setQty(selected.id, cartItem.qty - 1)}
+                onDecrement={() => {
+                  setJustAdded(false);
+                  setQty(selected.id, cartItem.qty - 1);
+                }}
                 label={`${combo.name} — ${selected.tierLabel}`}
                 className="w-full justify-between"
               />

@@ -39,12 +39,23 @@ export function ProductDetailActions({ productId, sku, price, name }: Props) {
           <Stepper
             value={cartItem.qty}
             onIncrement={() => setQty(productId, cartItem.qty + 1)}
-            onDecrement={() => setQty(productId, cartItem.qty - 1)}
+            onDecrement={() => {
+              setQty(productId, cartItem.qty - 1);
+              if (cartItem.qty - 1 <= 0) {
+                show(`Removed ${name} from cart`);
+              }
+            }}
             label={name}
           />
         ) : (
           <>
-            <Stepper value={qty} onIncrement={() => setLocalQty((q) => q + 1)} onDecrement={() => setLocalQty((q) => Math.max(1, q - 1))} label={name} />
+            <Stepper
+              value={qty}
+              min={1}
+              onIncrement={() => setLocalQty((q) => q + 1)}
+              onDecrement={() => setLocalQty((q) => Math.max(1, q - 1))}
+              label={name}
+            />
             <Button onClick={handleAdd} className="flex-1">
               Add to Cart
             </Button>
@@ -62,7 +73,12 @@ export function ProductDetailActions({ productId, sku, price, name }: Props) {
           <Stepper
             value={cartItem.qty}
             onIncrement={() => setQty(productId, cartItem.qty + 1)}
-            onDecrement={() => setQty(productId, cartItem.qty - 1)}
+            onDecrement={() => {
+              setQty(productId, cartItem.qty - 1);
+              if (cartItem.qty - 1 <= 0) {
+                show(`Removed ${name} from cart`);
+              }
+            }}
             label={name}
           />
         ) : (
