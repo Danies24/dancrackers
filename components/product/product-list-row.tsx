@@ -52,19 +52,19 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-3 overflow-hidden rounded-xl border p-2 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-2",
+        "group relative flex items-center gap-2 overflow-hidden rounded-xl border p-2 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-2",
         inCart
           ? "border-teal bg-teal-tint shadow-sm"
           : "border-border bg-surface shadow-sm hover:border-maroon-ink/50",
       )}
     >
-      <Link href={`/product/${product.slug}`} className="relative block h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white">
+      <Link href={`/product/${product.slug}`} className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
             alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
             fill
-            sizes="64px"
+            sizes="56px"
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
         ) : (
@@ -92,7 +92,7 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
         </Link>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end justify-center pr-2">
+      <div className="flex shrink-0 flex-col items-end justify-center pr-1">
         {product.price == null ? (
           <p className="text-xs text-muted">Ask for price</p>
         ) : (
@@ -114,18 +114,19 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
         )}
       </div>
 
-      <div className="shrink-0 w-[90px]">
+      <div className="shrink-0 w-[76px]">
         {product.price && !isUnavailable && (
           cartItem ? (
             <Stepper
               value={cartItem.qty}
+              size="sm"
               onIncrement={() => setQty(product.id, cartItem.qty + 1)}
               onDecrement={() => {
                 setJustAdded(false);
                 setQty(product.id, cartItem.qty - 1);
               }}
               label={product.name_en}
-              className="w-full h-8 px-1"
+              className="w-full justify-between"
             />
           ) : (
             <Button
@@ -133,9 +134,9 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
               variant="primary"
               onClick={handleAdd}
               aria-label={`Add ${product.name_en} to cart`}
-              className="h-8 w-full text-xs font-semibold px-2"
+              className="h-8 w-full text-xs font-semibold px-0"
             >
-              {justAdded ? "Added ✓" : "Add"}
+              {justAdded ? "✓" : "Add"}
             </Button>
           )
         )}
