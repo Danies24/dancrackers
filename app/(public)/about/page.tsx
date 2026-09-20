@@ -1,60 +1,178 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+import { Sparkles, Store, Award, Truck, ShieldCheck, Phone, Mail, MapPin } from "lucide-react";
+import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
-  title: `About ${brandConfig.brand.name}`,
+  title: "About Us",
   description:
-    "Learn about Kolagalam — crackers direct from Sivakasi to your area across Tamil Nadu. Honest wholesale prices, real photos, personal order confirmation.",
+    "Kolagalam crackers online store — wholesaler of fireworks in Sivakasi since 1990. Factory-direct crackers across Tamil Nadu and all over India.",
   alternates: {
     canonical: getCanonicalUrl("/about"),
   },
   openGraph: {
     title: `About ${brandConfig.brand.name}`,
     description:
-      "Learn about Kolagalam — crackers direct from Sivakasi to your area across Tamil Nadu. Honest wholesale prices, real photos, personal order confirmation.",
+      "Kolagalam crackers online store — wholesaler of fireworks in Sivakasi since 1990. Factory-direct crackers across Tamil Nadu and all over India.",
     url: getCanonicalUrl("/about"),
   },
 };
 
+const HIGHLIGHTS = [
+  {
+    title: "Since 1990",
+    desc: "Over 34 years of trusted fireworks manufacturing and wholesale experience in Sivakasi.",
+    icon: Award,
+  },
+  {
+    title: "Own Shop in Sivakasi",
+    desc: "Direct physical presence close to the mills, guaranteeing genuine quality and factory-direct rates.",
+    icon: Store,
+  },
+  {
+    title: "Serving All Over India",
+    desc: "Proud to have lit up millions of lives and festive celebrations across Tamil Nadu and nationwide.",
+    icon: Sparkles,
+  },
+  {
+    title: "Waterproof Dispatch",
+    desc: "Packed with care in waterproof cartons and dispatched quickly through trusted lorry logistics.",
+    icon: Truck,
+  },
+];
+
 export default function AboutPage() {
-  const team = brandConfig.team.filter((member) => member.showOnAboutPage);
+  const email = getPrimaryEmail();
+  const phone = getPhoneDisplay();
+  const phoneRaw = getPhoneE164();
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="font-display text-2xl font-semibold text-ink">{brandConfig.about.headline}</h1>
-
-      <div className="mt-6 flex flex-col gap-4 text-sm leading-relaxed text-ink-soft">
-        {team.length > 0 && (
-          <p>
-            {brandConfig.brand.name} is run by {team.map((m) => m.name).join(" and ")}.{" "}
-            {team.map((m) => `${m.name} ${m.bio}`).join(" ")}
-          </p>
-        )}
-
-        {brandConfig.about.story.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+    <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
+      {/* Header Badge & Title */}
+      <div className="text-center">
+        <span className="inline-block rounded-full border border-border bg-gold-tint px-3.5 py-1 text-xs font-semibold tracking-wide text-gold-ink">
+          SINCE 1990 &bull; SIVAKASI, TAMIL NADU
+        </span>
+        <h1 className="mt-3 font-display text-3xl font-bold text-ink md:text-4xl">
+          About <span className="text-gradient-festival">Kolagalam</span>
+        </h1>
+        <p className="mt-2 text-sm text-ink-soft md:text-base">
+          நேரடி சிவகாசி பட்டாசு மொத்த விற்பனை மற்றும் இணைய சேவை
+        </p>
       </div>
 
-      <div className="mt-8">
-        <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why families order with us</h2>
-        <ul className="flex flex-col gap-2.5 text-sm text-ink-soft">
+      {/* Main Story Box: About Company */}
+      <div className="mt-8 rounded-3xl border border-border bg-surface p-6 shadow-soft md:p-8">
+        <h2 className="font-display text-xl font-bold text-ink md:text-2xl">About Company</h2>
+        <div className="mt-4 space-y-4 text-sm leading-relaxed text-ink-soft md:text-[15px]">
+          <p className="rounded-2xl border border-maroon-ink/10 bg-maroon-tint/40 p-4 font-medium text-ink">
+            We are &quot;Kolagalam&quot; crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 1990 and has been successfully running our company with selling crackers in all over india. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.
+          </p>
+
+          <h3 className="pt-2 font-display text-base font-semibold text-ink">
+            Spreading Our Store to Online Customers
+          </h3>
+          <p>
+            Rooted in our decades-long heritage in Sivakasi, we are currently spreading our wholesale store experience directly to online customers. Through Kolagalam, families across Tamil Nadu and all of India can now explore authentic Sivakasi crackers straight from the manufacturing hub — without middleman markups, travel hassles, or photocopied price lists.
+          </p>
+          <p>
+            We personally visit the mills in Sivakasi to photograph every genuine product and inspect packaging quality. When you place an enquiry, our dedicated team calls you personally to verify every single item and confirm your total. After your payment is completed securely, we carefully pack your crackers in waterproof cartons and dispatch them directly to your nearest transport hub.
+          </p>
+        </div>
+      </div>
+
+      {/* 4 Highlight Cards */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {HIGHLIGHTS.map((h, i) => {
+          const Icon = h.icon;
+          return (
+            <div key={i} className="flex gap-4 rounded-2xl border border-border bg-surface p-5 shadow-soft">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-tint text-gold-ink">
+                <Icon size={22} aria-hidden />
+              </div>
+              <div>
+                <h3 className="font-display text-sm font-bold text-ink">{h.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-ink-soft">{h.desc}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Why Families Order With Us */}
+      <div className="mt-8 rounded-3xl border border-border bg-surface p-6 shadow-soft md:p-8">
+        <h2 className="font-display text-lg font-bold text-ink md:text-xl">Why Families Order With Kolagalam</h2>
+        <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {brandConfig.about.whyUs.map((point, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="text-maroon-ink">•</span>
+            <li key={i} className="flex items-start gap-2.5 text-xs md:text-sm text-ink-soft">
+              <ShieldCheck size={18} className="mt-0.5 shrink-0 text-maroon-ink" />
               <span>{point}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="mt-8">
+      {/* Support & Contact Details */}
+      <div className="mt-8 rounded-3xl border border-border bg-surface p-6 shadow-soft md:p-8">
+        <h2 className="font-display text-lg font-bold text-ink">Customer Care & Enquiry Desk</h2>
+        <p className="mt-1 text-xs text-ink-soft">
+          எங்களை நேரடியாக அழைக்க அல்லது வாட்ஸ்அப் மூலம் தொடர்புகொள்ள:
+        </p>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3.5">
+            <span className="text-xs font-semibold text-ink-soft">Order Enquiry</span>
+            <a href={`tel:+${phoneRaw}`} className="text-xs font-bold text-maroon-ink hover:underline">
+              {phone}
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3.5">
+            <span className="text-xs font-semibold text-ink-soft">Order & Payment Confirm</span>
+            <a href={`tel:+${phoneRaw}`} className="text-xs font-bold text-maroon-ink hover:underline">
+              {phone}
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3.5">
+            <span className="text-xs font-semibold text-ink-soft">Despatch & Transport Confirm</span>
+            <a href={`tel:+${phoneRaw}`} className="text-xs font-bold text-maroon-ink hover:underline">
+              {phone}
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3.5">
+            <span className="text-xs font-semibold text-ink-soft">Customer Support</span>
+            <a href={`tel:+${phoneRaw}`} className="text-xs font-bold text-maroon-ink hover:underline">
+              {phone}
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-xs text-ink-soft">
+          <div className="flex items-center gap-1.5">
+            <Mail size={15} className="text-maroon-ink" />
+            <a href={`mailto:${email.address}`} className="font-medium text-ink hover:underline">
+              {email.address}
+            </a>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Phone size={15} className="text-maroon-ink" />
+            <a href={`tel:+${phoneRaw}`} className="font-medium text-ink hover:underline">
+              +91 {phone}
+            </a>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <MapPin size={15} className="text-maroon-ink" />
+            <span>Sivakasi, Tamil Nadu</span>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Button */}
+      <div className="mt-8 text-center">
         <Link
           href="/products"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary px-6 h-12 text-[15px] font-semibold text-on-fill shadow-sm hover:-translate-y-0.5 hover:glow-orange transition-all duration-200"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary px-8 h-12 text-[15px] font-semibold text-on-fill shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:glow-orange"
         >
-          Browse Crackers &rarr;
+          Explore Our Crackers Range &rarr;
         </Link>
       </div>
     </div>

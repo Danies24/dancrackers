@@ -75,18 +75,21 @@ export const brandConfig = {
   team: [] as ReadonlyArray<{ name: string; role: string; bio: string; photo: string; showOnAboutPage: boolean }>,
 
   about: {
-    headline: "About Us",
+    headline: "About Kolagalam",
+    companySummary:
+      'We are "Kolagalam" crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 1990 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
     story: [
-      "We are based near Sivakasi, close to the mills — so we can visit in person, check products, and photograph them ourselves, rather than relying on a photocopied price list. One part of the team handles the catalogue, technology, and the order desk; another handles field relationships and customer calls.",
-      "Kolagalam brings crackers direct from Sivakasi to your area across Tamil Nadu, at factory-direct, wholesale prices. No extra travel charges. No extra commission. No worries.",
-      "Every order is handled by a real person. Once you send your order, we call you to confirm every item and the total, and we stay in touch until your crackers are on their way.",
+      'We are "Kolagalam" crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 1990 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
+      "Currently, we are spreading our physical Sivakasi wholesale store directly to online customers across Tamil Nadu and all of India. With Kolagalam, families get factory-direct wholesale crackers without travel hassles, extra broker commissions, or photocopied lists.",
+      "We visit the Sivakasi mills in person, verify quality, and photograph products ourselves. Every order is handled by a real person: once you submit your enquiry, we call you to confirm every item and total, guide you with payment via UPI or bank transfer, and arrange waterproof carton dispatch to your nearest transport hub.",
     ],
     whyUs: [
-      "We visit the mills ourselves and photograph real products — no photocopied price lists.",
-      "Every price is clear upfront, discounted straight off the printed MRP.",
-      "Direct from Sivakasi to your area across Tamil Nadu — wholesale prices, no extra travel charges.",
-      "A real person calls you to confirm every item and the total before dispatch.",
-      "Pay securely by UPI or bank transfer after our confirmation call.",
+      "Wholesaler and shop in Sivakasi with over 30 years of trusted legacy since 1990.",
+      "Spreading direct wholesale factory prices straight to online customers across India.",
+      "Photographed at Sivakasi mills — real products with authentic supplier printed MRP.",
+      "Transparent upfront prices with genuine discounts off printed MRP.",
+      "Safe waterproof carton packaging with door/hub delivery through trusted lorry services.",
+      "Personal telephone confirmation for every single order before dispatch.",
     ],
   },
 

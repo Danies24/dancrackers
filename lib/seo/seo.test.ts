@@ -279,6 +279,7 @@ describe("SEO Foundation: On-Page Metadata Constraints", () => {
       { name: "faq", loader: () => import("@/app/(public)/faq/page") },
       { name: "terms", loader: () => import("@/app/(public)/terms/page") },
       { name: "privacy", loader: () => import("@/app/(public)/privacy/page") },
+      { name: "shipping", loader: () => import("@/app/(public)/shipping/page") },
     ];
 
     for (const page of pages) {

@@ -53,13 +53,16 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           <h3 className="mb-3 font-display text-base font-semibold text-maroon-ink">Information</h3>
           <ul className="space-y-2 text-sm text-ink-soft">
             <li>
+              <Link href="/shipping">Shipping & Delivery</Link>
+            </li>
+            <li>
               <Link href="/safety">Safety</Link>
             </li>
             <li>
               <Link href="/faq">FAQ</Link>
             </li>
             <li>
-              <Link href="/terms">Terms</Link>
+              <Link href="/terms">Terms & Conditions</Link>
             </li>
             <li>
               <Link href="/privacy">Privacy</Link>
@@ -98,6 +101,9 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
         {notice.gstinLine && <p>{notice.gstinLine}</p>}
         <p>{notice.facilitatedBy}</p>
         <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>
+        <p className="mt-3 text-xs font-medium text-ink-soft">
+          &copy; 2026 Kolagalam. All Rights Reserved. Developed by Danies.
+        </p>
       </div>
     </footer>
   );
