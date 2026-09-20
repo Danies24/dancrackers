@@ -12,6 +12,12 @@ import { cn } from "@/lib/utils";
  */
 export function ImageWithSkeleton({ className, alt, onLoad, ...props }: ImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(props.src);
+
+  if (props.src !== prevSrc) {
+    setPrevSrc(props.src);
+    setLoaded(false);
+  }
 
   return (
     <>

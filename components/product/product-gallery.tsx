@@ -83,7 +83,7 @@ export function ProductGallery({ images, name, category }: Props) {
               type="button"
               onClick={() => openPreview(i)}
               aria-label={`View full image ${i + 1} of ${images.length} for ${name}`}
-              className="relative aspect-square w-full shrink-0 snap-center bg-cream cursor-zoom-in text-left focus:outline-none focus:ring-2 focus:ring-maroon"
+              className="relative aspect-square w-full shrink-0 snap-center bg-white cursor-zoom-in text-left focus:outline-none focus:ring-2 focus:ring-maroon"
             >
               <ImageWithSkeleton
                 src={src}
@@ -173,13 +173,13 @@ export function ProductGallery({ images, name, category }: Props) {
               </button>
             )}
 
-            <div className="relative h-[68vh] sm:h-[76vh] w-full max-w-3xl">
+            <div className="relative h-[68vh] sm:h-[76vh] w-full max-w-3xl bg-white rounded-lg">
               <ImageWithSkeleton
                 src={images[active] ?? images[0]}
                 alt={`${name} — ${category}`}
                 fill
                 sizes="100vw"
-                className="object-contain"
+                className="object-contain p-2 sm:p-4"
                 priority
               />
             </div>

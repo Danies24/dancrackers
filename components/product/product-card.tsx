@@ -59,7 +59,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
           <Check size={11} aria-hidden strokeWidth={3} /> In Cart
         </span>
       )}
-      <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
+      <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
