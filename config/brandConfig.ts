@@ -166,15 +166,19 @@ export const brandConfig = {
 
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List",
+    defaultTitle: "Kolagalam (கோலாகலம்) — Best Sivakasi Crackers Online",
     defaultDescription:
-      "Browse authentic Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Build your Diwali enquiry online; we call you to confirm.",
+      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Best place to buy wholesale Diwali crackers online.",
     keywords: [
       "Kolagalam",
       "Kolagalam crackers",
       "Sivakasi crackers",
+      "Sivakasi crackers online",
+      "best Sivakasi crackers",
+      "budget friendly Diwali Sivakasi crackers online",
       "Sivakasi crackers price list",
       "Diwali crackers enquiry",
+      "wholesale crackers online",
       "கோலாகலம்",
       "கோலாகலம் பட்டாசு",
       "சிவகாசி பட்டாசு",
