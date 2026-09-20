@@ -7,9 +7,10 @@ import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form"
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
+import { rankProducts } from "@/lib/ranking";
 import type { Metadata } from "next";
 import { getActiveComboPacks } from "@/lib/combo-packs";
-import { brandConfig, getCanonicalUrl, getHeadlineOffer, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: {
@@ -24,12 +25,11 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-// TODO(confirm): delivery-area claim — Tamil Nadu is confirmed, other states are enquiry-only until served-area data is finalized.
 const TRUST_FEATURES = [
-  { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Quality Assured", body: "Premium and tested products." },
-  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Competitive Pricing", body: "Best rates for bulk orders." },
-  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Tamil Nadu Delivery", body: "Other states on enquiry." },
-  { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Dedicated Support", body: "Always here to help." },
+  { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Real Mill Photos", body: "Photographed at Sivakasi mills — no photocopied lists." },
+  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Direct to Your Area", body: "Delivered across Tamil Nadu at wholesale rates." },
+  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Wholesale Pricing", body: "Clear upfront prices, up to 95% off MRP." },
+  { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Personal Confirmation", body: "We call you to confirm every item and total." },
 ];
 
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
@@ -42,7 +42,7 @@ export default async function HomePage() {
     getActiveComboPacks(),
   ]);
   const catalogueEmpty = categories.every((c) => c.productCount === 0);
-  const showcaseProducts = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller));
+  const showcaseProducts = rankProducts(products);
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
 
@@ -62,9 +62,7 @@ export default async function HomePage() {
             <span className="text-gradient-festival">Straight to You.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            {maxDiscountPercent > 0
-              ? getHeadlineOffer(brandConfig.marketingDiscountPercent)
-              : "Direct from Sivakasi."}
+            Direct from Sivakasi to your area across Tamil Nadu. Wholesale prices, no extra charges. Build your order and we&apos;ll call you to confirm.
           </p>
           <OrderCountdownHero />
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -165,8 +163,8 @@ export default async function HomePage() {
             "Browse and add to cart",
             "Submit your enquiry (no payment)",
             "We call you within 2 hours to confirm",
-            "You pay the supplier directly",
-            "The supplier despatches to your address",
+            "Pay securely by UPI or bank transfer after our confirmation call",
+            "Careful packing and despatch to your area",
           ].map((step, i) => (
             <li key={step} className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-primary text-sm font-bold text-on-fill">

@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
-import { brandConfig, getCanonicalUrl, getManufacturerFacilitatorNotice, getPrimarySupplier } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getManufacturerFacilitatorNotice } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "Compliance & Legal Notice",
   description:
-    "Important compliance notice: Kolagalam is an order booking facilitator, not a manufacturer or seller. Read full legal disclosures.",
+    "Important compliance notice: Kolagalam is an order booking facilitator for authentic Sivakasi crackers. Read our full legal disclosures.",
   alternates: {
     canonical: getCanonicalUrl("/compliance"),
   },
   openGraph: {
     title: "Compliance & Legal Notice",
     description:
-      "Important compliance notice: Kolagalam is an order booking facilitator, not a manufacturer or seller. Read full legal disclosures.",
+      "Important compliance notice: Kolagalam is an order booking facilitator for authentic Sivakasi crackers. Read our full legal disclosures.",
     url: getCanonicalUrl("/compliance"),
   },
 };
 
 export default function CompliancePage() {
   const notice = getManufacturerFacilitatorNotice();
-  const supplier = getPrimarySupplier();
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -45,9 +44,9 @@ export default function CompliancePage() {
         <Section title="Who does what">
           <p>{notice.facilitatedBy}</p>
           <p className="mt-2">
-            {supplier.name || "The supplier"} holds the licences required to manufacture and sell fireworks,
-            invoices the customer directly, and is the seller of record. {brandConfig.legal.facilitator.name}{" "}
-            never possesses, stores, transports or sells fireworks, and never receives payment for them.
+            Fireworks are manufactured and sold by licensed fireworks mills in Sivakasi holding the required
+            statutory licences. Orders are facilitated by {brandConfig.legal.facilitator.name} directly connecting
+            you with authentic Sivakasi fireworks.
           </p>
         </Section>
         <Section title="What happens on this site">
@@ -55,8 +54,8 @@ export default function CompliancePage() {
             <li>You browse a priced catalogue and build a list of what you want.</li>
             <li>You submit an enquiry with your contact and delivery details. No payment is requested or possible.</li>
             <li>A team member calls you to confirm the order and the final amount.</li>
-            <li>You pay the supplier directly, by a method they specify.</li>
-            <li>The supplier despatches your order.</li>
+            <li>Pay securely by UPI or bank transfer after our confirmation call.</li>
+            <li>Your order is packed carefully and despatched to your area.</li>
           </ol>
         </Section>
         <Section title="Local restrictions">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DiyaIcon } from "@/components/marketing/diya-icon";
-import { brandConfig, getFormattedAddress, getManufacturerFacilitatorNotice, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
+import { brandConfig, getManufacturerFacilitatorNotice, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
 import type { CategoryRow } from "@/lib/data";
 
 /**
@@ -80,7 +80,6 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
                 {email.address}
               </a>
             </li>
-            <li>{getFormattedAddress()}</li>
           </ul>
         </div>
       </div>

@@ -35,15 +35,15 @@ const FAQ_LIST: FAQItem[] = [
   {
     question: "Why can't I just pay online directly on this site?",
     answer:
-      "Under Indian court directives and the Explosives Rules, firecrackers cannot be sold through direct online checkouts. Kolagalam operates strictly as an enquiry and catalogue facilitator. You select items to generate an estimate, and all transactions and payments are handled directly with our licensed supplier over the phone.",
+      "Under Indian court directives and the Explosives Rules, firecrackers cannot be sold through direct online checkouts. Kolagalam operates strictly as an enquiry and catalogue facilitator. You select items to generate your order list, and we call you to confirm every item and the final total before payment and dispatch.",
     linkText: "Read our full compliance notice",
     linkHref: "/compliance",
   },
   {
-    question: "Is Kolagalam a direct seller or manufacturer?",
+    question: "How does Kolagalam bring crackers from Sivakasi?",
     answer:
-      "No. Kolagalam is an enquiry facilitator. Our partnered licensed manufacturer in Sivakasi manufactures and sells every firecracker listed here. We simplify browsing, catalogue selection, and enquiry coordination.",
-    linkText: "About our facilitator model",
+      "Kolagalam brings crackers direct from Sivakasi to your area across Tamil Nadu at factory-direct wholesale prices. We visit mills in person, check products, photograph them ourselves, and personally confirm every order over the phone.",
+    linkText: "Learn more about us",
     linkHref: "/about",
   },
   {
@@ -61,7 +61,7 @@ const FAQ_LIST: FAQItem[] = [
   {
     question: "How do I pay for my crackers?",
     answer:
-      "Once you confirm your enquiry with our team on the phone, payment is made directly to the licensed manufacturer's bank account via UPI or NEFT/RTGS. We never collect payments through this website.",
+      "Once you confirm your enquiry with our team on the phone, you pay securely by UPI or bank transfer after our confirmation call. No payment is taken on this website.",
   },
   {
     question: "Where do you deliver across Tamil Nadu?",

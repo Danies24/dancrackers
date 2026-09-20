@@ -242,5 +242,5 @@ update settings set value = '10' where key = 'discount_percent';
 update settings set value = '1000' where key = 'min_order_value';
 update settings set value = '"9000000099"' where key = 'whatsapp_business_number';
 update settings set value = '"9000000098"' where key = 'supplier_whatsapp_number';
-update settings set value = '["600001","600002","600096","626204"]' where key = 'served_pincodes';
+update settings set value = '["600001","600002","600096","626123"]' where key = 'served_pincodes';
 

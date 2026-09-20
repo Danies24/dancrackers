@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { brandConfig, getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
+import Link from "next/link";
+import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: `About ${brandConfig.brand.name}`,
   description:
-    "Learn about Kolagalam — your trusted Sivakasi crackers enquiry facilitator. Genuine products, honest prices, direct delivery across Tamil Nadu.",
+    "Learn about Kolagalam — crackers direct from Sivakasi to your area across Tamil Nadu. Honest wholesale prices, real photos, personal order confirmation.",
   alternates: {
     canonical: getCanonicalUrl("/about"),
   },
   openGraph: {
     title: `About ${brandConfig.brand.name}`,
     description:
-      "Learn about Kolagalam — your trusted Sivakasi crackers enquiry facilitator. Genuine products, honest prices, direct delivery across Tamil Nadu.",
+      "Learn about Kolagalam — crackers direct from Sivakasi to your area across Tamil Nadu. Honest wholesale prices, real photos, personal order confirmation.",
     url: getCanonicalUrl("/about"),
   },
 };
 
 export default function AboutPage() {
-  const supplier = getPrimarySupplier();
   const team = brandConfig.team.filter((member) => member.showOnAboutPage);
 
   return (
@@ -32,37 +32,31 @@ export default function AboutPage() {
           </p>
         )}
 
-        <p>
-          We are not the manufacturer or seller of the fireworks on this site.{" "}
-          <strong>{supplier.name || "Our supplier"}</strong> manufactures and sells every product here, and
-          holds the licences required to do so. We facilitate your order — building a clear, priced catalogue,
-          collecting your enquiry, and connecting you with the supplier so you can confirm and pay them
-          directly.
-        </p>
-
         {brandConfig.about.story.map((paragraph, i) => (
           <p key={i}>{paragraph}</p>
         ))}
-
-        <p>
-          For product quality, warranty or manufacturing questions, the supplier is directly reachable — see
-          our <a href="/contact" className="font-semibold text-maroon-ink">Contact</a> page.
-        </p>
       </div>
 
-      {brandConfig.about.whyUs.length > 0 && (
-        <div className="mt-8">
-          <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why choose us</h2>
-          <ul className="flex flex-col gap-2 text-sm text-ink-soft">
-            {brandConfig.about.whyUs.map((point, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-maroon-ink">•</span>
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="mt-8">
+        <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why families order with us</h2>
+        <ul className="flex flex-col gap-2.5 text-sm text-ink-soft">
+          {brandConfig.about.whyUs.map((point, i) => (
+            <li key={i} className="flex gap-2">
+              <span className="text-maroon-ink">•</span>
+              <span>{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-8">
+        <Link
+          href="/products"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary px-6 h-12 text-[15px] font-semibold text-on-fill shadow-sm hover:-translate-y-0.5 hover:glow-orange transition-all duration-200"
+        >
+          Browse Crackers &rarr;
+        </Link>
+      </div>
     </div>
   );
 }

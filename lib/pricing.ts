@@ -45,6 +45,19 @@ export function roundRupee(value: number): number {
   return Math.round(value);
 }
 
+/**
+ * Derived display MRP calculation (§4.1):
+ * mrp = price × 20, rounded to the nearest whole rupee.
+ * Struck-through display only alongside a 95% OFF badge.
+ * NEVER enters cart totals, discounts, admin numbers, or supplier messages (§4.3).
+ */
+export const MRP_MULTIPLIER = 20;
+export const DISPLAY_DISCOUNT_PERCENT = 95;
+
+export function getDisplayMrp(price: number): number {
+  return Math.round(price * MRP_MULTIPLIER);
+}
+
 export function lineTotal(line: PricingLine): number {
   return round2(line.price * line.quantity);
 }

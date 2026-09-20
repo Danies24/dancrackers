@@ -1,4 +1,4 @@
-import { brandConfig, getCanonicalUrl, getPhoneE164, getSiteUrl } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getPhoneE164, getPrimaryEmail, getSiteUrl } from "@/config/brandConfig";
 
 export interface BreadcrumbItem {
   name: string;
@@ -22,12 +22,13 @@ export interface ProductJsonLdParams {
 
 /**
  * Builds Schema.org Organization structured data.
- * Includes official brand details, address, contact point, and bilingual language support.
+ * Includes official brand details, contact point, email, and bilingual language support.
  */
 export function buildOrganizationJsonLd(): Record<string, unknown> {
   const siteUrl = getSiteUrl();
   const canonicalHome = getCanonicalUrl("/");
   const phoneE164 = `+${getPhoneE164()}`;
+  const email = getPrimaryEmail();
 
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -36,20 +37,13 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     alternateName: [brandConfig.brand.nameTamil, `${brandConfig.brand.name} Crackers`],
     url: canonicalHome,
     logo: `${siteUrl}${brandConfig.brand.logo.primary}`,
+    email: email.address,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: phoneE164,
       contactType: "customer service",
       areaServed: "IN",
       availableLanguage: ["en", "ta"],
-    },
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: brandConfig.contact.address.line1,
-      addressLocality: brandConfig.contact.address.district,
-      addressRegion: brandConfig.contact.address.state,
-      postalCode: brandConfig.contact.address.pincode,
-      addressCountry: brandConfig.contact.address.country,
     },
   };
 

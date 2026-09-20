@@ -10,6 +10,7 @@ import { Stepper } from "@/components/ui/stepper";
 import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
 import { formatRupees, formatUnit } from "@/lib/format";
+import { getDisplayMrp } from "@/lib/pricing";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -98,19 +99,22 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
         <div className="mt-auto flex flex-col gap-0.5 pt-1">
           {product.price == null ? (
             <p className="text-xs text-muted">Ask for price</p>
-          ) : !product.is_discountable ? (
-            <>
-              <span className="text-xs text-muted">Special price</span>
-              <p className="tabular-nums text-base font-bold text-ink">
-                {formatRupees(product.price)}{" "}
-                <span className="text-xs font-normal text-muted">per {formatUnit(product.unit)}</span>
-              </p>
-            </>
           ) : (
-            <p className="tabular-nums text-base font-bold text-ink">
-              {formatRupees(product.price)}{" "}
+            <div className="flex flex-col gap-0.5">
+              {!product.is_discountable && <span className="text-[11px] font-medium text-muted">Special price</span>}
+              <div className="flex flex-wrap items-baseline gap-1.5">
+                <span className="text-xs text-muted line-through tabular-nums">
+                  {formatRupees(getDisplayMrp(product.price))}
+                </span>
+                <span className="tabular-nums text-base font-bold text-ink">
+                  {formatRupees(product.price)}
+                </span>
+                <span className="rounded-full bg-maroon-tint px-1.5 py-0.5 text-[10px] font-bold text-maroon-ink">
+                  95% OFF
+                </span>
+              </div>
               <span className="text-xs font-normal text-muted">per {formatUnit(product.unit)}</span>
-            </p>
+            </div>
           )}
         </div>
 

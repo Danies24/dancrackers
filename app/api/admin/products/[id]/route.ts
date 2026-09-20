@@ -27,6 +27,7 @@ const patchSchema = z
     status: z.enum(["active", "unavailable", "archived"]).optional(),
     is_bestseller: z.boolean().optional(),
     is_featured: z.boolean().optional(),
+    is_best: z.boolean().optional(),
     is_discountable: z.boolean().optional(),
     image_url: z.string().url().nullable().optional(),
     reason: z.string().max(200).optional(),
@@ -49,7 +50,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     );
   }
 
-  const { reason, ...fields } = parsed.data;
+  const { reason, is_best, ...rawFields } = parsed.data;
+  const fields = {
+    ...rawFields,
+    ...(is_best !== undefined ? { is_featured: is_best } : {}),
+  };
   const supabase = createAdminClient();
   const admin = await getCurrentAdminUser();
 

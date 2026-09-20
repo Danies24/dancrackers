@@ -1,41 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getCanonicalUrl, getPrimarySupplier } from "@/config/brandConfig";
+import { getCanonicalUrl } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "How to Order Crackers",
   description:
-    "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay supplier directly. Fast and transparent.",
+    "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay securely after confirmation. Fast and transparent.",
   alternates: {
     canonical: getCanonicalUrl("/how-it-works"),
   },
   openGraph: {
     title: "How to Order Crackers",
     description:
-      "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay supplier directly. Fast and transparent.",
+      "How Kolagalam works: browse Sivakasi crackers price list, submit enquiry, confirm order by phone, pay securely after confirmation. Fast and transparent.",
     url: getCanonicalUrl("/how-it-works"),
   },
 };
-
-const supplier = getPrimarySupplier();
 
 const steps = [
   { title: "Browse and add to cart", body: "Search or browse by category. Every price is on the site." },
   { title: "Submit your enquiry (no payment)", body: "Tell us your name, phone and address. No payment field exists anywhere on this site." },
   { title: "We call you within 2 hours to confirm", body: "Our team calls to confirm your items, address and the final amount." },
-  { title: "You pay the supplier directly", body: "By UPI or bank transfer, straight to the supplier — never to us." },
-  { title: "The supplier despatches to your address", body: `${supplier.name || "The supplier"} packs and sends your order.` },
+  { title: "Pay securely by UPI or bank transfer", body: "Pay securely by UPI or bank transfer after our confirmation call." },
+  { title: "Careful packing and despatch to your address", body: "Your order is packed carefully and despatched direct to your area." },
 ];
 
 const faqs = [
   {
     q: "Why can't I just pay online here?",
-    a: "Indian courts have directed that firecrackers cannot be sold through online checkouts. This site takes enquiries only — the actual sale and payment happen directly with the supplier, by phone.",
+    a: "Indian courts have directed that firecrackers cannot be sold through online checkouts. This site takes enquiries only — your order is confirmed with you directly over the phone.",
   },
   {
     q: "Is this a scam?",
-    a: "No. We are a booking facilitator for a licensed Sivakasi manufacturer. We never take your money — you pay the supplier directly, after a phone call confirms your order.",
+    a: "No. We connect you directly with genuine Sivakasi manufacturers. You pay securely after a real person calls to confirm every item and the total on your order.",
   },
   {
     q: "When will I get a call?",
@@ -47,7 +45,7 @@ const faqs = [
   },
   {
     q: "What if I'm outside Chennai?",
-    a: "We mainly deliver around Chennai. If your pincode is outside our usual area, we'll confirm whether we can reach you when we call.",
+    a: "We deliver across Tamil Nadu. We'll confirm delivery details to your specific area when we call.",
   },
 ];
 
@@ -74,8 +72,8 @@ export default function HowItWorksPage() {
         <h2 className="mb-1 font-semibold text-ink">Why is there no "Buy Now" button?</h2>
         <p>
           Online sale of firecrackers is not permitted under Indian law (Supreme Court order in{" "}
-          <em>Arjun Gopal v. Union of India</em>, 2018). This website collects enquiries only — the sale itself
-          happens between you and the supplier, after a phone call. See our{" "}
+          <em>Arjun Gopal v. Union of India</em>, 2018). This website collects enquiries only. After you submit
+          your order, our team calls to confirm every item and the final total before payment and dispatch. See our{" "}
           <Link href="/compliance" className="font-semibold text-maroon-ink">
             compliance page
           </Link>{" "}

@@ -376,7 +376,8 @@ export function ProductsTable({
               <th className="p-2">My commission</th>
               <th className="p-2">Commission %</th>
               <th className="p-2">Status</th>
-              <th className="p-2">★</th>
+              <th className="p-2" title="Best cracker">Best</th>
+              <th className="p-2" title="Bestseller">★</th>
             </tr>
           </thead>
           <tbody>
@@ -473,7 +474,16 @@ export function ProductsTable({
                       <option value="archived">archived</option>
                     </select>
                   </td>
-                  <td className="p-2">
+                  <td className="p-2 text-center">
+                    <input
+                      type="checkbox"
+                      defaultChecked={p.is_featured}
+                      onChange={(e) => patch(p.id, { is_featured: e.target.checked })}
+                      title="Best cracker"
+                      aria-label={`Best cracker toggle for ${p.name_en}`}
+                    />
+                  </td>
+                  <td className="p-2 text-center">
                     <input
                       type="checkbox"
                       defaultChecked={p.is_bestseller}

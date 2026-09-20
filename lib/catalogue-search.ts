@@ -1,4 +1,5 @@
 import type { ProductWithCategory } from "@/lib/data";
+import { rankProducts } from "@/lib/ranking";
 
 /** Case- and whitespace-insensitive substring match across name_en, name_ta, category, sku (§13.4). */
 function normalize(s: string): string {
@@ -25,6 +26,6 @@ export function sortProducts(products: ProductWithCategory[], sort: SortOption):
       return copy.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
     case "recommended":
     default:
-      return copy.sort((a, b) => a.display_order - b.display_order);
+      return rankProducts(copy);
   }
 }

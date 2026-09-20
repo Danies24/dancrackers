@@ -1,5 +1,6 @@
 import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
+import { rankProducts } from "@/lib/ranking";
 import { getComboVarietyBySlug, type ComboVarietyDetail } from "@/lib/combo-packs";
 import type { Database } from "@/types/database";
 
@@ -24,6 +25,7 @@ export interface ProductRow {
   status: string;
   is_bestseller: boolean;
   is_featured: boolean;
+  is_best?: boolean;
   min_qty: number;
   image_url: string | null;
   image_urls: string[];
@@ -72,7 +74,7 @@ export async function getCatalogue(): Promise<ProductWithCategory[]> {
     .order("display_order", { ascending: true });
 
   if (error) throw error;
-  return (data ?? []) as ProductWithCategory[];
+  return rankProducts((data ?? []) as ProductWithCategory[]);
 }
 
 export async function getCategoryWithCounts() {
@@ -185,12 +187,10 @@ export async function getRelatedProducts(
     .eq("category_id", categoryId)
     .eq("status", "active")
     .not("price", "is", null)
-    .neq("id", excludeProductId)
-    .order("display_order", { ascending: true })
-    .limit(limit);
+    .neq("id", excludeProductId);
 
   if (error) throw error;
-  return (data ?? []) as ProductWithCategory[];
+  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
 }
 
 export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]> {
@@ -200,12 +200,10 @@ export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]>
     .select("*")
     .eq("status", "active")
     .eq("is_bestseller", true)
-    .not("price", "is", null)
-    .order("display_order", { ascending: true })
-    .limit(limit);
+    .not("price", "is", null);
 
   if (error) throw error;
-  return (data ?? []) as ProductWithCategory[];
+  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
 }
 
 export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
@@ -215,12 +213,10 @@ export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
     .select("*")
     .eq("status", "active")
     .eq("is_featured", true)
-    .not("price", "is", null)
-    .order("display_order", { ascending: true })
-    .limit(limit);
+    .not("price", "is", null);
 
   if (error) throw error;
-  return (data ?? []) as ProductWithCategory[];
+  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
 }
 
 /**

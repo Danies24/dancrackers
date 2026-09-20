@@ -107,10 +107,10 @@ function SuccessContent() {
       <div className="mt-6 rounded-lg border border-border bg-surface p-4 text-left">
         <h2 className="mb-2 text-sm font-semibold text-ink">What happens next</h2>
         <ol className="list-decimal space-y-1 pl-5 text-sm text-ink-soft">
-          <li>We call to confirm your items and address</li>
-          <li>You pay the supplier directly by UPI or bank transfer</li>
-          <li>The supplier despatches your order</li>
-          <li>You receive your crackers</li>
+          <li>Call to confirm your order</li>
+          <li>Confirm items and total</li>
+          <li>Pay securely by UPI or bank transfer</li>
+          <li>Despatch to your area</li>
         </ol>
       </div>
 

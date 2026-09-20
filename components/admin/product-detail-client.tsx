@@ -199,7 +199,7 @@ export function ProductDetailClient({
                 defaultChecked={product.is_featured}
                 onChange={(e) => patch({ is_featured: e.target.checked })}
               />
-              Featured
+              Best cracker
             </label>
           </div>
         </div>

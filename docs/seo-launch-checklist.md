@@ -106,13 +106,13 @@ Use this copy to create or claim the Google Business Profile:
 - **Business Name**: `Kolagalam Sivakasi Crackers (கோலாகலம் பட்டாசு)`
 - **Primary Category**: `Fireworks store` or `Wholesale firework supplier`
 - **Secondary Category**: `Distribution service`
-- **Address**: `Avudiyapuram, Virudhunagar District, Tamil Nadu 626204`
+- **Address**: Service-area business (no public physical address shown)
 - **Service Areas**: Chennai, Coimbatore, Madurai, Salem, Tiruchirappalli, Tirunelveli, Erode, Vellore, Thanjavur, and all Tamil Nadu districts.
 - **Phone Number**: `+91 82483 65737`
 - **Website**: `https://kolagalam.in` (or `https://dancrackers.vercel.app`)
 
 ### Description (English)
-> Kolagalam (கோலாகலம்) is a trusted Diwali crackers order enquiry facilitator based in Virudhunagar district, Tamil Nadu. We connect families, bulk buyers, and businesses directly with authentic, quality-tested fireworks manufactured by licensed Sivakasi factories. Browse our 2026 price list online with photos and Tamil names, select your products to build your enquiry, and our team will call within 2 hours to confirm your order details and direct supplier dispatch. Enjoy honest prices, door delivery across Tamil Nadu, and dedicated customer support.
+> Kolagalam (கோலாகலம்) is a trusted Diwali crackers order enquiry service based near Sivakasi, Tamil Nadu. We connect families, bulk buyers, and businesses directly with authentic, quality-tested fireworks manufactured by licensed Sivakasi factories. Browse our 2026 price list online with photos and Tamil names, select your products to build your enquiry, and our team will call within 2 hours to confirm your order details and direct dispatch. Enjoy honest prices, door delivery across Tamil Nadu, and dedicated customer support.
 
 ### Description (Tamil)
 > கோலாகலம் (Kolagalam) — சிவகாசி பட்டாசு ஆர்டர் மற்றும் விலைப்பட்டியல் சேவை. சிவகாசியில் உள்ள உரிமம் பெற்ற முன்னணி தொழிற்சாலைகளிலிருந்து தரமான மற்றும் பாதுகாப்பான பட்டாசுகளை உங்கள் இல்லத்திற்கே நேரடியாகப் பெற உதவுகிறோம். எங்கள் இணையதளத்தில் தீபாவளி 2026-க்கான முழு விலைப்பட்டியலை புகைப்படங்களுடன் பார்த்து, உங்கள் பட்டாசுப் பட்டியலை எளிதாகத் தேர்ந்தெடுக்கலாம். கட்டணம் எதுவும் இணையதளத்தில் வசூலிக்கப்படுவதில்லை; உங்கள் பட்டியலை அனுப்பிய 2 மணி நேரத்தில் எங்கள் குழுவினர் உங்களை அழைத்து ஆர்டரை உறுதிசெய்வார்கள்.
@@ -138,8 +138,8 @@ Use this copy to create or claim the Google Business Profile:
 - **Bio**:
   ✨ Authentic Sivakasi Crackers direct to your doorstep.
   🧨 Diwali 2026 Price List & Enquiries.
-  📞 We call you to confirm • Direct supplier dispatch.
-  📍 Sivakasi / Virudhunagar • Delivery across TN.
+  📞 We call you to confirm • Direct dispatch.
+  📍 Sivakasi • Delivery across TN.
   👇 View Full Catalogue & Prices:
   [https://kolagalam.in]
 
@@ -162,10 +162,10 @@ Use this copy to create or claim the Google Business Profile:
 
 1. **Google Business Profile (Maps)**: Claim profile and add link to canonical homepage.
 2. **IndiaMART Listing**: Register as an enquiry facilitator / supplier for Sivakasi Crackers with website link.
-3. **TradeIndia Listing**: Create business listing under fireworks order facilitators in Virudhunagar / Sivakasi.
-4. **Justdial Listing**: List under Fireworks Retailers / Facilitators in Virudhunagar District with address and phone.
+3. **TradeIndia Listing**: Create business listing under fireworks order facilitators in Sivakasi.
+4. **Justdial Listing**: List under Fireworks Retailers / Facilitators in Tamil Nadu with phone and website.
 5. **Sulekha Business**: Submit listing in Tamil Nadu business directory under Diwali Crackers / Fireworks.
-6. **Virudhunagar & Sivakasi Business Directory**: Local district commerce listings and community business portals.
+6. **Sivakasi Business Directory**: Local commerce listings and community business portals.
 7. **WhatsApp Channel**: Create an official verified WhatsApp Channel "Kolagalam Crackers" with link in bio and updates.
 8. **YouTube Channel Bio & Video Links**: Add canonical website link in channel header and every video description.
 9. **Facebook Business Page**: Profile link, call-to-action button linking to `/products`.

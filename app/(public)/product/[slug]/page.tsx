@@ -10,6 +10,7 @@ import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
+import { getDisplayMrp } from "@/lib/pricing";
 import { getAllProductSlugs, getProductBySlug, getRelatedProducts } from "@/lib/data";
 import { getAllComboVarietySlugs } from "@/lib/combo-packs";
 import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
@@ -206,11 +207,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 ) : (
                   <div>
                     {!product.is_discountable && <p className="text-sm text-muted">Special price</p>}
-                    <p className="flex items-center gap-2 tabular-nums">
+                    <div className="flex flex-wrap items-baseline gap-2 tabular-nums">
+                      <span className="text-base text-muted line-through">
+                        {formatRupees(getDisplayMrp(product.price!))}
+                      </span>
                       <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
+                      <span className="rounded-full bg-maroon-tint px-2 py-0.5 text-xs font-bold text-maroon-ink">
+                        95% OFF
+                      </span>
                       <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
                       <SparklerIcon size={18} />
-                    </p>
+                    </div>
                   </div>
                 )}
               </div>

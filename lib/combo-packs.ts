@@ -87,34 +87,9 @@ export interface ComboVarietyDetail {
 }
 
 /**
- * UI price overrides for combo packs (presentation layer).
- * Keyed by combo variety slug or combo pack slug.
- */
-export const COMBO_UI_PRICE_OVERRIDES: Record<string, number> = {
-  "morning-blast-pack": 5000,
-  "morning-blast-pack-standard": 5000,
-  "night-pack": 6000,
-  "night-pack-standard": 6000,
-  "kids-special-pack": 9000,
-  "kids-special-pack-standard": 9000,
-  "family-pack": 3000,
-  "family-pack-mini": 3000,
-  "family-pack-small": 5000,
-  "family-pack-medium": 7000,
-  "family-pack-big": 10000,
-  "family-pack-large": 15000,
-  "family-pack-mega": 15000,
-};
-
-export function getComboUiPrice(slug: string, defaultPrice: number): number {
-  return COMBO_UI_PRICE_OVERRIDES[slug] ?? defaultPrice;
-}
-
-/**
- * The home showcase — one card per active combo pack, priced from its
- * cheapest variety ("From ₹X"). Combo packs get their own dedicated
- * showcase (§6.2) and are deliberately never mixed into getCatalogue()'s
- * regular grid.
+ * The home showcase — one card per active combo pack, ordered by starting
+ * price ascending (lowest active variety selling_price first). Fallback
+ * to display_order on ties (§2).
  */
 export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
   const supabase = createPublicClient();
@@ -134,29 +109,36 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
   return (packs ?? [])
     .map((pack) => {
       const packVarieties = varietiesByPack.get(pack.id) ?? [];
-      const cheapest = packVarieties[0];
-      if (!cheapest) return null;
-      const packVarietiesWithUiPrice = packVarieties.map((v) => ({
+      const defaultVariety = packVarieties[0];
+      if (!defaultVariety) return null;
+      const varietiesList = packVarieties.map((v) => ({
         id: v.id,
         slug: v.slug,
         tierLabel: v.tier_label,
-        sellingPrice: getComboUiPrice(v.slug, v.selling_price),
+        sellingPrice: v.selling_price,
         totalItems: v.total_items,
       }));
-      const fromPrice = Math.min(...packVarietiesWithUiPrice.map((v) => v.sellingPrice));
+      const fromPrice = Math.min(...varietiesList.map((v) => v.sellingPrice));
       return {
         id: pack.id,
         slug: pack.slug,
-        varietySlug: cheapest.slug,
+        varietySlug: defaultVariety.slug,
         name: pack.name,
         tagline: pack.tagline,
         heroImageUrl: pack.hero_image_url,
         badgeText: pack.badge_text,
         fromPrice,
-        varieties: packVarietiesWithUiPrice,
+        display_order: pack.display_order,
+        varieties: varietiesList,
       };
     })
-    .filter((p): p is ComboPackSummary => p !== null);
+    .filter((p): p is ComboPackSummary & { display_order: number } => p !== null)
+    .sort((a, b) => {
+      if (a.fromPrice !== b.fromPrice) {
+        return a.fromPrice - b.fromPrice;
+      }
+      return a.display_order - b.display_order;
+    });
 }
 
 /**
@@ -221,7 +203,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
     varietyId: variety.id,
     varietySlug: variety.slug,
     tierLabel: variety.tier_label,
-    sellingPrice: getComboUiPrice(variety.slug, variety.selling_price),
+    sellingPrice: variety.selling_price,
     totalItems: variety.total_items,
     comboPackId: pack.id,
     packName: pack.name,
@@ -233,7 +215,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
       id: v.id,
       slug: v.slug,
       tierLabel: v.tier_label,
-      sellingPrice: getComboUiPrice(v.slug, v.selling_price),
+      sellingPrice: v.selling_price,
       totalItems: v.total_items,
       itemGroups: [...(groupsByVariety.get(v.id) ?? new Map()).values()],
     })),

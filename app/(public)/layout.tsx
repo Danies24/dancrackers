@@ -2,7 +2,6 @@ import { CartProvider } from "@/components/cart/cart-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { StickyCartBar } from "@/components/cart/sticky-cart-bar";
-import { OrderCountdownBanner } from "@/components/marketing/order-countdown-banner";
 import { getCategoryWithCounts } from "@/lib/data";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -13,7 +12,6 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <CartProvider>
-      <OrderCountdownBanner />
       <Header categories={categories} />
       <main id="main-content" className="flex-1">
         {children}

@@ -31,13 +31,6 @@ export const brandConfig = {
   contact: {
     phones: [{ number: "8248365737", countryCode: "+91", label: "Sales", isWhatsApp: true, isPrimary: true }],
     emails: [{ address: "sdmdanies24@gmail.com", label: "General", isPrimary: true }],
-    address: {
-      line1: "Avudiyapuram",
-      district: "Virudhunagar District",
-      state: "Tamil Nadu",
-      pincode: "626204",
-      country: "India",
-    },
     responseTimeText: "A real person calls you within 2 hours",
     // TODO: confirm real business hours.
     businessHours: "TODO: e.g. Mon–Sat, 9am–8pm IST",
@@ -73,7 +66,7 @@ export const brandConfig = {
     // TODO(confirm): GSTIN — get in writing from the supplier before this appears on a live page.
     gstin: "TODO(confirm)" as string | null,
     complianceNotice:
-      "Online sale of firecrackers is not permitted. This website collects enquiries only. No payment is taken here. Payment is made directly to the supplier after confirmation.",
+      "Online sale of firecrackers is not permitted. This website collects enquiries only. No payment is taken here. Pay securely by UPI or bank transfer after our confirmation call.",
   },
 
   // No individual names surfaced anywhere on the site — kept as an empty,
@@ -85,13 +78,15 @@ export const brandConfig = {
     headline: "About Us",
     story: [
       "We are based near Sivakasi, close to the mills — so we can visit in person, check products, and photograph them ourselves, rather than relying on a photocopied price list. One part of the team handles the catalogue, technology, and the order desk; another handles field relationships and customer calls.",
-      "That is the whole reason this site exists: to replace a hard-to-read paper list with something you can actually see, search and trust.",
+      "Kolagalam brings crackers direct from Sivakasi to your area across Tamil Nadu, at factory-direct, wholesale prices. No extra travel charges. No extra commission. No worries.",
+      "Every order is handled by a real person. Once you send your order, we call you to confirm every item and the total, and we stay in touch until your crackers are on their way.",
     ],
     whyUs: [
       "We visit the mills ourselves and photograph real products — no photocopied price lists.",
       "Every price is clear upfront, discounted straight off the printed MRP.",
-      "A real person calls you within 2 hours to confirm your order.",
-      "You pay the licensed supplier directly — we never touch your money.",
+      "Direct from Sivakasi to your area across Tamil Nadu — wholesale prices, no extra travel charges.",
+      "A real person calls you to confirm every item and the total before dispatch.",
+      "Pay securely by UPI or bank transfer after our confirmation call.",
     ],
   },
 
@@ -246,11 +241,6 @@ export function getWhatsAppLink(message?: string, phone: Phone = getPrimaryPhone
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-export function getFormattedAddress(): string {
-  const { line1, district, state, pincode } = brandConfig.contact.address;
-  return `${line1}, ${district}, ${state} ${pincode}`;
-}
-
 /**
  * Single source of truth for the site URL across metadata, robots, sitemap, canonicals, Open Graph, and JSON-LD.
  *
@@ -315,7 +305,7 @@ export function getManufacturerFacilitatorNotice(): {
 } {
   const supplier = getPrimarySupplier();
   return {
-    facilitatedBy: `${brandConfig.legal.facilitator.role}: ${brandConfig.legal.facilitator.name}, ${getFormattedAddress()}`,
+    facilitatedBy: `${brandConfig.legal.facilitator.role}: ${brandConfig.legal.facilitator.name}`,
     // Never shown until a real value replaces the placeholder — a visible
     // "TODO(confirm)" on a live compliance notice would look broken, and
     // this repo's convention is to omit an unconfirmed legal fact entirely

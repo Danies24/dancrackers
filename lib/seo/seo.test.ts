@@ -155,17 +155,16 @@ describe("SEO Foundation: Structured Data (JSON-LD)", () => {
     expect((org.logo as string).startsWith("http")).toBe(true);
     expect(org.logo).not.toContain("[object");
 
-    // Contact point
+    // Contact point and email
     const cp = org.contactPoint as Record<string, unknown>;
     expect(cp["@type"]).toBe("ContactPoint");
     expect(cp.telephone).toMatch(/^\+\d+/);
     expect(cp.areaServed).toBe("IN");
+    expect(org.email).toBeDefined();
+    expect(typeof org.email).toBe("string");
 
-    // Address
-    const addr = org.address as Record<string, unknown>;
-    expect(addr["@type"]).toBe("PostalAddress");
-    expect(addr.addressLocality).toBeDefined();
-    expect(addr.postalCode).toBe("626204");
+    // Address must be undefined (enquiry facilitator, no physical address)
+    expect(org.address).toBeUndefined();
 
     // No TODOs
     expect(jsonStr).not.toContain("TODO");

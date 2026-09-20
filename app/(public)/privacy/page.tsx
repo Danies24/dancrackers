@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCanonicalUrl, getPhoneDisplay, getPrimaryEmail, getPrimarySupplier } from "@/config/brandConfig";
+import { getCanonicalUrl, getPhoneDisplay, getPrimaryEmail } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -18,7 +18,6 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   const email = getPrimaryEmail();
-  const supplier = getPrimarySupplier();
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -33,14 +32,14 @@ export default function PrivacyPage() {
         </Section>
         <Section title="Why we collect it">
           <p>
-            To call and confirm your order, to pass your delivery details to the supplier for despatch, to
+            To call and confirm your order, to arrange your delivery and despatch, to
             calculate captain commissions correctly, and to reach you again next season with relevant offers.
           </p>
         </Section>
         <Section title="Who we share it with">
           <p>
-            Your name, phone number and delivery address are shared with {supplier.name || "our supplier"} solely to
-            fulfil your order. We do not sell your data to anyone. Captains never see your phone number or
+            Your name, phone number and delivery address are used solely to
+            fulfil and despatch your order. We do not sell your data to anyone. Captains never see your phone number or
             full address — only your first name, order status and amount.
           </p>
         </Section>

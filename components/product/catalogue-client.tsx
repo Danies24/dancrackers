@@ -80,7 +80,7 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
   return (
     <div>
       {!lockedCategory && (
-        <div className="sticky top-14 z-20 -mx-4 border-b border-border bg-cream/95 px-4 py-3 backdrop-blur">
+        <div className="sticky top-16 z-20 -mx-4 border-b border-border bg-cream/95 px-4 py-3 backdrop-blur">
           <div className="relative mb-3">
             <Search
               size={18}

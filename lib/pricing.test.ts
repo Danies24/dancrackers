@@ -4,12 +4,29 @@ import {
   computePackagingCharge,
   computeProductPricing,
   computeTotals,
+  getDisplayMrp,
   isBelowMinimumOrder,
   isBelowMinimumOrderValue,
+  MRP_MULTIPLIER,
+  DISPLAY_DISCOUNT_PERCENT,
   round2,
   roundToRupee,
   shortfallToMinimum,
 } from "./pricing";
+
+describe("getDisplayMrp — 95% OFF display formula (§4)", () => {
+  it("computes mrp = price × 20 with 95% off", () => {
+    expect(MRP_MULTIPLIER).toBe(20);
+    expect(DISPLAY_DISCOUNT_PERCENT).toBe(95);
+    // Worked examples from prompt
+    expect(getDisplayMrp(20)).toBe(400);
+    expect(getDisplayMrp(3028)).toBe(60560);
+  });
+
+  it("rounds to the nearest whole rupee", () => {
+    expect(getDisplayMrp(15.4)).toBe(308);
+  });
+});
 
 describe("round2", () => {
   it("rounds half-up at the .005 boundary", () => {
