@@ -59,7 +59,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
           <Check size={11} aria-hidden strokeWidth={3} /> In Cart
         </span>
       )}
-      <Link href={`/product/${product.slug}`} className="relative block aspect-[16/10] overflow-hidden bg-cream">
+      <Link href={`/product/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-cream">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
@@ -77,9 +77,9 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col justify-between p-2.5 sm:p-3">
-        <Link href={`/product/${product.slug}`} className="block">
-          <h3 className="line-clamp-1 text-xs sm:text-sm font-semibold text-ink hover:text-maroon-ink transition-colors">
+      <div className="flex flex-1 flex-col justify-between p-3">
+        <Link href={`/product/${product.slug}`} className="block min-h-[2.25rem] sm:min-h-[2.5rem]">
+          <h3 className="line-clamp-2 text-xs sm:text-sm font-semibold leading-snug text-ink hover:text-maroon-ink transition-colors">
             {product.name_en}
           </h3>
           {product.name_ta && (
@@ -89,7 +89,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
           )}
         </Link>
 
-        <div className="mt-1.5 flex items-end justify-between gap-1 pt-1">
+        <div className="mt-2 flex items-end justify-between gap-1 pt-1">
           {product.price == null ? (
             <p className="text-xs text-muted">Ask for price</p>
           ) : (
