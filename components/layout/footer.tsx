@@ -102,7 +102,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
         <p>{notice.facilitatedBy}</p>
         <p className="mx-auto mt-2 max-w-2xl">{brandConfig.legal.complianceNotice}</p>
         <p className="mt-3 text-xs font-medium text-ink-soft">
-          &copy; 2026 Kolagalam. All Rights Reserved. Developed by Danies.
+          &copy; 2026 Kolagalam. All Rights Reserved. Developed by Kolagalam Team.
         </p>
       </div>
     </footer>
