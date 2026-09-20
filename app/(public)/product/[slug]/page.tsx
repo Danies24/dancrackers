@@ -10,12 +10,9 @@ import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
-import { getDisplayMrp } from "@/lib/pricing";
 import { getAllProductSlugs, getProductBySlug, getRelatedProducts } from "@/lib/data";
 import { getAllComboVarietySlugs } from "@/lib/combo-packs";
 import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
-
-const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
 export const revalidate = 300;
 // Every product/combo-variety slug not in the two lists below is dynamic — a
@@ -161,11 +158,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 {product.combo.badgeText}
               </span>
             )}
-            {product.is_discountable && product.discount_percent != null && (
-              <span className="rounded-full bg-maroon px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-on-fill">
-                {DISPLAY_DISCOUNT_LABEL}
-              </span>
-            )}
             {product.is_bestseller && <Badge variant="bestseller" />}
             {isUnavailable && <Badge variant="unavailable" />}
           </div>
@@ -208,13 +200,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <div>
                     {!product.is_discountable && <p className="text-sm text-muted">Special price</p>}
                     <div className="flex flex-wrap items-baseline gap-2 tabular-nums">
-                      <span className="text-base text-muted line-through">
-                        {formatRupees(getDisplayMrp(product.price!))}
-                      </span>
+                      {product.mrp != null && product.mrp > product.price! && (
+                        <span className="text-base text-muted line-through">
+                          {formatRupees(product.mrp)}
+                        </span>
+                      )}
                       <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
-                      <span className="rounded-full bg-maroon-tint px-2 py-0.5 text-xs font-bold text-maroon-ink">
-                        95% OFF
-                      </span>
                       <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
                       <SparklerIcon size={18} />
                     </div>

@@ -28,7 +28,7 @@ export const revalidate = 300;
 const TRUST_FEATURES = [
   { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Real Mill Photos", body: "Photographed at Sivakasi mills — no photocopied lists." },
   { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Direct to Your Area", body: "Delivered across Tamil Nadu at wholesale rates." },
-  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Wholesale Pricing", body: "Clear upfront prices, up to 95% off MRP." },
+  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Wholesale Pricing", body: "Clear upfront prices, discounted straight off the printed MRP." },
   { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Personal Confirmation", body: "We call you to confirm every item and total." },
 ];
 

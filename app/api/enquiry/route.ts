@@ -10,6 +10,7 @@ import { hashIp } from "@/lib/hash";
 import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { sendEnquiryNotifications } from "@/lib/notifications";
 import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
+import { getComboUiPrice } from "@/lib/combo-packs";
 
 const MIN_SUBMIT_SECONDS = 3;
 
@@ -157,7 +158,7 @@ export async function POST(request: Request) {
       for (const c of combos) {
         const pack = packById.get(c.combo_pack_id);
         if (!pack?.is_active) continue;
-        const effectivePrice = c.selling_price;
+        const effectivePrice = getComboUiPrice(c.slug, c.selling_price);
         byId.set(c.id, {
           id: c.id,
           sku: `COMBO-${c.slug.toUpperCase()}`,

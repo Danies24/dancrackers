@@ -10,14 +10,10 @@ import { Stepper } from "@/components/ui/stepper";
 import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
 import { formatRupees, formatUnit } from "@/lib/format";
-import { getDisplayMrp } from "@/lib/pricing";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { brandConfig } from "@/config/brandConfig";
 import type { ProductWithCategory } from "@/lib/data";
-
-const DISPLAY_DISCOUNT_LABEL = `${Math.round(brandConfig.marketingDiscountPercent)}% OFF`;
 
 /**
  * The one product card component, used on /products, category pages, home
@@ -76,11 +72,6 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
           <PlaceholderImage name={product.name_en} />
         )}
         <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {product.is_discountable && product.discount_percent != null && (
-            <span className="rounded-full bg-maroon px-2 py-0.5 text-[10px] font-bold text-on-fill">
-              {DISPLAY_DISCOUNT_LABEL}
-            </span>
-          )}
           {product.is_bestseller && <Badge variant="bestseller" />}
           {isUnavailable && <Badge variant="unavailable" />}
         </div>
@@ -103,14 +94,13 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
             <div className="flex flex-col gap-0.5">
               {!product.is_discountable && <span className="text-[11px] font-medium text-muted">Special price</span>}
               <div className="flex flex-wrap items-baseline gap-1.5">
-                <span className="text-xs text-muted line-through tabular-nums">
-                  {formatRupees(getDisplayMrp(product.price))}
-                </span>
+                {product.mrp != null && product.mrp > product.price && (
+                  <span className="text-xs text-muted line-through tabular-nums">
+                    {formatRupees(product.mrp)}
+                  </span>
+                )}
                 <span className="tabular-nums text-base font-bold text-ink">
                   {formatRupees(product.price)}
-                </span>
-                <span className="rounded-full bg-maroon-tint px-1.5 py-0.5 text-[10px] font-bold text-maroon-ink">
-                  95% OFF
                 </span>
               </div>
               <span className="text-xs font-normal text-muted">per {formatUnit(product.unit)}</span>

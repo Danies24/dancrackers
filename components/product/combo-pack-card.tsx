@@ -11,7 +11,6 @@ import { useToast } from "@/components/ui/toast";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { formatRupees } from "@/lib/format";
-import { getDisplayMrp } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import type { ComboPackSummary } from "@/lib/combo-packs";
 
@@ -124,14 +123,8 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
 
           <div className="mt-auto flex flex-wrap items-baseline gap-1.5 pt-2">
             {hasMultipleVarieties && <span className="text-xs text-ink-soft">From</span>}
-            <span className="text-xs text-muted line-through tabular-nums">
-              {formatRupees(getDisplayMrp(selected.sellingPrice))}
-            </span>
             <span className="tabular-nums text-base font-bold text-ink">
               {formatRupees(selected.sellingPrice)}
-            </span>
-            <span className="rounded-full bg-maroon-tint px-1.5 py-0.5 text-[10px] font-bold text-maroon-ink">
-              95% OFF
             </span>
             <span className="text-xs font-normal text-muted">({selected.totalItems} items)</span>
           </div>

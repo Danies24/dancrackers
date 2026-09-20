@@ -87,6 +87,34 @@ export interface ComboVarietyDetail {
 }
 
 /**
+ * UI price overrides for combo packs (presentation layer).
+ * Keyed by combo variety slug or combo pack slug.
+ *   - Family Pack: Mini 3k, Small 5k, Medium 7k, Big 10k, Mega 15k
+ *   - Morning Blast Pack: 5k
+ *   - Night Pack: 6k
+ *   - Kids Special Pack: 9k
+ */
+export const COMBO_UI_PRICE_OVERRIDES: Record<string, number> = {
+  "morning-blast-pack": 5000,
+  "morning-blast-pack-standard": 5000,
+  "night-pack": 6000,
+  "night-pack-standard": 6000,
+  "kids-special-pack": 9000,
+  "kids-special-pack-standard": 9000,
+  "family-pack": 3000,
+  "family-pack-mini": 3000,
+  "family-pack-small": 5000,
+  "family-pack-medium": 7000,
+  "family-pack-big": 10000,
+  "family-pack-large": 15000,
+  "family-pack-mega": 15000,
+};
+
+export function getComboUiPrice(slug: string, defaultPrice: number): number {
+  return COMBO_UI_PRICE_OVERRIDES[slug] ?? defaultPrice;
+}
+
+/**
  * The home showcase — one card per active combo pack, ordered by starting
  * price ascending (lowest active variety selling_price first). Fallback
  * to display_order on ties (§2).
@@ -115,7 +143,7 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
         id: v.id,
         slug: v.slug,
         tierLabel: v.tier_label,
-        sellingPrice: v.selling_price,
+        sellingPrice: getComboUiPrice(v.slug, v.selling_price),
         totalItems: v.total_items,
       }));
       const fromPrice = Math.min(...varietiesList.map((v) => v.sellingPrice));
@@ -203,7 +231,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
     varietyId: variety.id,
     varietySlug: variety.slug,
     tierLabel: variety.tier_label,
-    sellingPrice: variety.selling_price,
+    sellingPrice: getComboUiPrice(variety.slug, variety.selling_price),
     totalItems: variety.total_items,
     comboPackId: pack.id,
     packName: pack.name,
@@ -215,7 +243,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
       id: v.id,
       slug: v.slug,
       tierLabel: v.tier_label,
-      sellingPrice: v.selling_price,
+      sellingPrice: getComboUiPrice(v.slug, v.selling_price),
       totalItems: v.total_items,
       itemGroups: [...(groupsByVariety.get(v.id) ?? new Map()).values()],
     })),

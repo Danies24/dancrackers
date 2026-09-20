@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { formatRupees, formatUnit } from "@/lib/format";
-import { getDisplayMrp } from "@/lib/pricing";
 import type { ComboVarietyOption } from "@/lib/combo-packs";
 
 interface Props {
@@ -58,13 +57,7 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
 
       <div className="mt-4">
         <div className="flex flex-wrap items-baseline gap-2 tabular-nums">
-          <span className="text-base text-muted line-through">
-            {formatRupees(getDisplayMrp(selected.sellingPrice))}
-          </span>
           <span className="text-3xl font-bold text-ink">{formatRupees(selected.sellingPrice)}</span>{" "}
-          <span className="rounded-full bg-maroon-tint px-2 py-0.5 text-xs font-bold text-maroon-ink">
-            95% OFF
-          </span>
           <span className="text-sm text-muted">per {formatUnit(unit)}</span>
           <SparklerIcon size={18} />
         </div>
