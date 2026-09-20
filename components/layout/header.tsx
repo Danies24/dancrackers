@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { ChevronRight, Menu, Search, ShoppingCart, X } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { DiyaIcon } from "@/components/marketing/diya-icon";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -16,6 +16,19 @@ const NAV_LINKS = [
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
+];
+
+const MOBILE_DRAWER_LINKS = [
+  { href: "/products", label: "Products" },
+  { href: "/shipping", label: "Shipping & Delivery" },
+  { href: "/about", label: "About us" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/contact", label: "Contact" },
+  { href: "/safety", label: "Safety" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/terms", label: "Terms & Conditions" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/compliance", label: "Compliance" },
 ];
 
 /** Sticky nav — transparent over the hero, blurred white with a border once scrolled. */
@@ -147,7 +160,13 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
           )}
         >
           <div className="mb-4 flex items-center justify-between pt-10">
-            <span className="font-display text-lg font-bold text-ink">{brandConfig.brand.name}</span>
+            <Link
+              href="/"
+              onClick={() => setDrawerOpen(false)}
+              className="font-display text-lg font-bold text-ink"
+            >
+              <span className="text-gradient-festival">{brandConfig.brand.name}</span>
+            </Link>
             <button
               type="button"
               aria-label="Close menu"
@@ -158,32 +177,38 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
             </button>
           </div>
           <nav className="flex flex-1 flex-col gap-1">
-            {[{ href: "/", label: "Home" }, { href: "/products", label: "All Products" }, ...NAV_LINKS.filter((l) => l.href !== "/products")].map(
-              (link, i) => (
-                <DrawerLink
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setDrawerOpen(false)}
-                  delay={i}
-                  open={drawerOpen}
-                  active={pathname === link.href}
-                >
-                  {link.label}
-                </DrawerLink>
-              ),
+            {MOBILE_DRAWER_LINKS.map((link, i) => (
+              <DrawerLink
+                key={link.href}
+                href={link.href}
+                onClick={() => setDrawerOpen(false)}
+                delay={i}
+                open={drawerOpen}
+                active={pathname === link.href}
+              >
+                {link.label}
+              </DrawerLink>
+            ))}
+            {categories.length > 0 && (
+              <>
+                <div className="my-2 border-t border-border" />
+                <div className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-ink-soft/70">
+                  Categories
+                </div>
+              </>
             )}
-            {categories.length > 0 && <div className="my-2 border-t border-border" />}
             {categories.map((cat, i) => (
               <DrawerLink
                 key={cat.id}
                 href={`/products/${cat.slug}`}
                 onClick={() => setDrawerOpen(false)}
-                className="pl-6 text-sm"
-                delay={i + 5}
+                className="flex items-center justify-between pl-4 text-sm"
+                delay={MOBILE_DRAWER_LINKS.length + i}
                 open={drawerOpen}
                 active={pathname === `/products/${cat.slug}`}
               >
-                {cat.name_en}
+                <span>{cat.name_en}</span>
+                <ChevronRight size={15} className="text-ink-soft/40" aria-hidden />
               </DrawerLink>
             ))}
           </nav>
@@ -231,7 +256,7 @@ function DrawerLink({
       href={href}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      style={{ transitionDelay: open ? `${delay * 35}ms` : "0ms" }}
+      style={{ transitionDelay: open ? `${Math.min(delay, 10) * 25}ms` : "0ms" }}
       className={cn(
         "min-h-11 rounded-xl px-3 py-2.5 transition-all duration-200 hover:bg-maroon-tint hover:text-ink",
         active ? "bg-maroon-tint font-semibold text-maroon-ink" : "text-ink-soft",
