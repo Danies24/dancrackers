@@ -62,7 +62,11 @@ export default async function HomePage() {
             <span className="text-gradient-festival">Straight to You.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            Direct from Sivakasi to your area across Tamil Nadu. Wholesale prices, no extra charges. Build your order and we&apos;ll call you to confirm.
+            Direct from Sivakasi to your area across Tamil Nadu. Wholesale prices, upto{" "}
+            <span className="inline-block whitespace-nowrap rounded-md border border-amber/30 bg-gold-tint px-1.5 py-0.5 font-bold text-maroon-ink">
+              95% off
+            </span>
+            . Build your order and we&apos;ll call you to confirm.
           </p>
           <OrderCountdownHero />
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
