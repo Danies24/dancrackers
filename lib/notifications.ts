@@ -28,7 +28,7 @@ export async function sendEnquiryNotifications(order: NotificationOrder): Promis
 
 async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const primary = process.env.NOTIFY_EMAIL_PRIMARY;
+  const primary = "kolagalam.contact@gmail.com";
   const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !from || (!primary && !secondary)) {
@@ -129,7 +129,7 @@ export interface DigestInput {
  */
 export async function sendDigestEmail(input: DigestInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const primary = process.env.NOTIFY_EMAIL_PRIMARY;
+  const primary = "kolagalam.contact@gmail.com";
   const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !from || (!primary && !secondary)) {

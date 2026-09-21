@@ -87,7 +87,7 @@ function SuccessContent() {
       <p className="mt-4 text-ink-soft">
         We have your order.{" "}
         <strong>
-          Our team will call you {order?.phone ? `on ${order.phone} ` : ""}within 2 hours.
+          Our team will call you from {getPhoneDisplay()} within 2 hours.
         </strong>
       </p>
 
