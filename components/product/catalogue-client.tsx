@@ -42,6 +42,11 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
     } catch {}
   };
 
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 250);
@@ -138,13 +143,13 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
             </div>
           </div>
           <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1">
-            <CategoryChip label="All" active={category === ""} onClick={() => setCategory("")} />
+            <CategoryChip label="All" active={category === ""} onClick={() => handleCategoryChange("")} />
             {categories.map((c) => (
               <CategoryChip
                 key={c.id}
                 label={c.name_en}
                 active={category === c.slug}
-                onClick={() => setCategory(c.slug)}
+                onClick={() => handleCategoryChange(c.slug)}
               />
             ))}
           </div>
