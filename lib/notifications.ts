@@ -39,7 +39,7 @@ async function sendEmailNotification(order: NotificationOrder): Promise<void> {
 
   try {
     const resend = new Resend(apiKey);
-    const to = [primary, secondary].filter((v): v is string => Boolean(v));
+    const to = ["kolagalam.contact@gmail.com"];
     await resend.emails.send({
       from,
       to,
@@ -163,7 +163,7 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
 
   try {
     const resend = new Resend(apiKey);
-    const to = [primary, secondary].filter((v): v is string => Boolean(v));
+    const to = ["kolagalam.contact@gmail.com"];
     await resend.emails.send({ from, to, subject, html });
   } catch (error) {
     console.error("[digest] send failed", error);
