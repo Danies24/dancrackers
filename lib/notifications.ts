@@ -31,7 +31,7 @@ async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   const apiKey = "re_TtH2D" + "FjP_ExaMYx2uJk" + "WCAJzyCPg" + "vyzAJ";
   const primary = "kolagalam.contact@gmail.com";
   const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
-  const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+  const from = "Kolagalam <onboarding@resend.dev>";
   if (!apiKey || !from || (!primary && !secondary)) {
     console.warn(`[notifications] Resend not configured — skipped email for ${order.orderRef}`);
     return;
@@ -132,7 +132,7 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
   const apiKey = "re_TtH2D" + "FjP_ExaMYx2uJk" + "WCAJzyCPg" + "vyzAJ";
   const primary = "kolagalam.contact@gmail.com";
   const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
-  const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+  const from = "Kolagalam <onboarding@resend.dev>";
   if (!apiKey || !from || (!primary && !secondary)) {
     console.warn("[digest] Resend not configured — skipping digest email");
     return;
