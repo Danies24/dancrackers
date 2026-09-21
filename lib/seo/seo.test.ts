@@ -44,11 +44,6 @@ describe("SEO Foundation: getSiteUrl & getCanonicalUrl", () => {
     expect(getSiteUrl()).toBe("https://kolagalam.in");
   });
 
-  it("falls back to VERCEL_PROJECT_PRODUCTION_URL with https://", () => {
-    delete process.env.NEXT_PUBLIC_SITE_URL;
-    process.env.VERCEL_PROJECT_PRODUCTION_URL = "kolagalam.vercel.app/";
-    expect(getSiteUrl()).toBe("https://kolagalam.vercel.app");
-  });
 
   it("falls back to brandConfig.brand.siteUrl when env vars are unset", () => {
     delete process.env.NEXT_PUBLIC_SITE_URL;

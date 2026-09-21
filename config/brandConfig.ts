@@ -168,7 +168,7 @@ export const brandConfig = {
     titleTemplate: "%s | Kolagalam",
     defaultTitle: "Kolagalam (கோலாகலம்) — Best Sivakasi Crackers Online",
     defaultDescription:
-      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Best place to buy wholesale Diwali crackers online.",
+      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Best place to buy wholesale crackers online.",
     keywords: [
       "Kolagalam",
       "Kolagalam crackers",
@@ -264,9 +264,6 @@ export function getSiteUrl(): string {
 
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     resolved = process.env.NEXT_PUBLIC_SITE_URL.trim();
-  } else if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    const v = process.env.VERCEL_PROJECT_PRODUCTION_URL.trim();
-    resolved = v.startsWith("http://") || v.startsWith("https://") ? v : `https://${v}`;
   } else {
     resolved = brandConfig.brand.siteUrl;
   }
