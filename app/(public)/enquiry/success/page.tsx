@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatRupees } from "@/lib/format";
-import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getPhoneE164, getPhoneDisplay } from "@/config/brandConfig";
 import { trackEvent } from "@/lib/analytics";
 
 interface LastOrder {
