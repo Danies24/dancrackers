@@ -262,11 +262,7 @@ export function getWhatsAppLink(message?: string, phone: Phone = getPrimaryPhone
 export function getSiteUrl(): string {
   let resolved: string | undefined;
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    resolved = process.env.NEXT_PUBLIC_SITE_URL.trim();
-  } else {
-    resolved = brandConfig.brand.siteUrl;
-  }
+  resolved = brandConfig.brand.siteUrl;
 
   // Strip trailing slash
   resolved = resolved.replace(/\/+$/, "");

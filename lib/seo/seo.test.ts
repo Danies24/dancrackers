@@ -39,10 +39,6 @@ describe("SEO Foundation: getSiteUrl & getCanonicalUrl", () => {
     process.env = originalEnv;
   });
 
-  it("prioritizes NEXT_PUBLIC_SITE_URL and strips trailing slash", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://kolagalam.in/";
-    expect(getSiteUrl()).toBe("https://kolagalam.in");
-  });
 
 
   it("falls back to brandConfig.brand.siteUrl when env vars are unset", () => {
