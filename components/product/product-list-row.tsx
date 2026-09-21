@@ -52,19 +52,19 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-3 overflow-hidden rounded-xl border p-3 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-3",
+        "group relative flex items-center gap-2 overflow-hidden rounded-xl border p-2 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-2",
         inCart
           ? "border-teal bg-teal-tint shadow-sm"
           : "border-border bg-surface shadow-sm hover:border-maroon-ink/50",
       )}
     >
-      <Link href={`/product/${product.slug}`} className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-white">
+      <Link href={`/product/${product.slug}`} className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
             alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
             fill
-            sizes="80px"
+            sizes="56px"
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
         ) : (
@@ -73,7 +73,7 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
       </Link>
 
       <div className="flex flex-1 flex-col justify-center min-w-0 py-0.5">
-        <Link href={`/product/${product.slug}`} className="block w-full mb-2">
+        <Link href={`/product/${product.slug}`} className="block w-full mb-1">
           <div className="flex items-start gap-1.5">
             <h3 className="text-sm font-semibold text-ink hover:text-maroon-ink transition-colors leading-tight">
               {product.name_en}
@@ -85,7 +85,7 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
             )}
           </div>
           {product.name_ta && (
-            <p lang="ta" className="text-xs text-muted mt-1 leading-tight">
+            <p lang="ta" className="text-xs text-muted mt-0.5 leading-tight">
               {product.name_ta}
             </p>
           )}
@@ -110,7 +110,7 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
         )}
       </div>
 
-      <div className="shrink-0 w-[84px]">
+      <div className="shrink-0 w-[76px]">
         {product.price && !isUnavailable && (
           cartItem ? (
             <Stepper
