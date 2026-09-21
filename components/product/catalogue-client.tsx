@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, X, LayoutGrid, List as ListIcon } from "lucide-react";
+import { Search, X, LayoutGrid, List as ListIcon, ArrowDownUp } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductListRow } from "@/components/product/product-list-row";
 import { ProductCardSkeleton } from "@/components/ui/skeleton";
@@ -173,16 +173,25 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
               <ListIcon size={18} />
             </button>
           </div>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            aria-label="Sort products"
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm"
+          <div
+            className={`relative flex items-center rounded-md border border-border transition-colors ${
+              sort !== "recommended" ? "bg-maroon-tint text-maroon-ink" : "bg-surface text-muted hover:bg-surface-hover"
+            }`}
           >
-            <option value="recommended">Recommended</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-          </select>
+            <div className="p-1.5 pointer-events-none" aria-hidden>
+              <ArrowDownUp size={18} />
+            </div>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortOption)}
+              aria-label="Sort products"
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            >
+              <option value="recommended">Recommended</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
       </div>
 
