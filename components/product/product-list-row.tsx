@@ -52,19 +52,19 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-2 overflow-hidden rounded-xl border p-2 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-2",
+        "group relative flex items-center gap-3 overflow-hidden rounded-xl border p-3 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:glow-orange mb-3",
         inCart
           ? "border-teal bg-teal-tint shadow-sm"
           : "border-border bg-surface shadow-sm hover:border-maroon-ink/50",
       )}
     >
-      <Link href={`/product/${product.slug}`} className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white">
+      <Link href={`/product/${product.slug}`} className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
             alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
             fill
-            sizes="56px"
+            sizes="80px"
             className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
         ) : (
@@ -72,49 +72,45 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col justify-center min-w-0">
-        <Link href={`/product/${product.slug}`} className="block w-full">
-          <div className="flex items-center gap-1.5">
-            <h3 className="truncate text-sm font-semibold text-ink hover:text-maroon-ink transition-colors">
+      <div className="flex flex-1 flex-col justify-center min-w-0 py-0.5">
+        <Link href={`/product/${product.slug}`} className="block w-full mb-2">
+          <div className="flex items-start gap-1.5">
+            <h3 className="text-sm font-semibold text-ink hover:text-maroon-ink transition-colors leading-tight">
               {product.name_en}
             </h3>
             {inCart && (
-              <span className="shrink-0 flex items-center gap-0.5 rounded-full bg-teal px-1.5 py-0.5 text-[9px] font-semibold text-on-fill">
+              <span className="shrink-0 flex items-center gap-0.5 rounded-full bg-teal px-1.5 py-0.5 text-[9px] font-semibold text-on-fill mt-0.5">
                 <Check size={9} aria-hidden strokeWidth={3} />
               </span>
             )}
           </div>
           {product.name_ta && (
-            <p lang="ta" className="truncate text-xs text-muted mt-0.5">
+            <p lang="ta" className="text-xs text-muted mt-1 leading-tight">
               {product.name_ta}
             </p>
           )}
         </Link>
-      </div>
 
-      <div className="flex shrink-0 flex-col items-end justify-center pr-1">
         {product.price == null ? (
           <p className="text-xs text-muted">Ask for price</p>
         ) : (
-          <div className="flex flex-col items-end gap-0.5">
-            <div className="flex items-center gap-1.5">
-              {product.mrp != null && product.mrp > product.price && (
-                <span className="text-xs text-muted line-through tabular-nums">
-                  {formatRupees(product.mrp)}
-                </span>
-              )}
-              <span className="tabular-nums text-[15px] font-bold text-ink">
-                {formatRupees(product.price)}
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="tabular-nums text-[15px] font-bold text-ink">
+              {formatRupees(product.price)}
+            </span>
+            {product.mrp != null && product.mrp > product.price && (
+              <span className="text-xs text-muted line-through tabular-nums">
+                {formatRupees(product.mrp)}
               </span>
-            </div>
-            <span className="text-[10px] font-normal text-muted">
+            )}
+            <span className="text-[10px] font-normal text-muted ml-0.5">
               per {formatUnit(product.unit)}
             </span>
           </div>
         )}
       </div>
 
-      <div className="shrink-0 w-[76px]">
+      <div className="shrink-0 w-[84px]">
         {product.price && !isUnavailable && (
           cartItem ? (
             <Stepper
