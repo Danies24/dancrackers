@@ -13,6 +13,7 @@ export interface NotificationOrder {
   orderRef: string;
   name: string;
   phone: string;
+  address: string;
   city: string;
   pincode: string;
   grandTotal: number;
@@ -55,7 +56,7 @@ function buildEmailHtml(order: NotificationOrder): string {
     <div style="font-family: sans-serif; max-width: 480px;">
       <h2>New enquiry ${order.orderRef}</h2>
       <p><strong>${order.name}</strong> — <a href="tel:+91${order.phone}">${order.phone}</a></p>
-      <p>${order.city} ${order.pincode}</p>
+      <p>${order.address}<br/>${order.city} ${order.pincode}</p>
       <p>${order.itemLines.join("<br/>")}</p>
       <p><strong>Total: ${formatRupees(order.grandTotal)}</strong></p>
       <p>Captain: ${order.captainCode ?? "DIRECT"}</p>

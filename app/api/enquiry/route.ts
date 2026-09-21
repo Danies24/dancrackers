@@ -423,6 +423,7 @@ export async function POST(request: Request) {
     orderRef: order.order_ref,
     name: input.customer.name,
     phone,
+    address: input.customer.address,
     city: input.customer.city,
     pincode: input.customer.pincode,
     grandTotal: totals.grandTotal,
