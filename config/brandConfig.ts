@@ -117,7 +117,9 @@ export const brandConfig = {
   // Cutoff date for season bookings (§23 / feature: Order By Countdown).
   // Single source of truth — never hardcode dates or deadline copy in components.
   orderDeadline: {
-    enabled: true,
+    // Site-wide kill switch for the countdown UI. Defaults to hidden;
+    // set NEXT_PUBLIC_SHOW_COUNTDOWN=true to bring it back unchanged.
+    enabled: process.env.NEXT_PUBLIC_SHOW_COUNTDOWN === "true",
     iso: "2026-10-25T23:59:59+05:30", // Cutoff: 25 Oct 2026 23:59:59 IST
     blockAfterDeadline: false, // when true, the enquiry APIs reject submissions after the deadline
     labels: {

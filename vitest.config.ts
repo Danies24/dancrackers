@@ -14,5 +14,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**", "**/.next/**"],
+    // The countdown UI ships hidden by default (NEXT_PUBLIC_SHOW_COUNTDOWN);
+    // its own unit tests still exercise the component with it enabled.
+    env: {
+      NEXT_PUBLIC_SHOW_COUNTDOWN: "true",
+    },
   },
 });
