@@ -64,20 +64,6 @@ describe("buildShopPlpSections", () => {
     expect(under199 && "products" in under199 ? under199.products.map((p) => p.sku) : []).toEqual(["cheap"]);
   });
 
-  it("buckets min-70%-off at or above the threshold", () => {
-    const p69 = product({ id: "p69", category_id: "cat-sparklers", discount_percent: 69 });
-    const p70 = product({ id: "p70", category_id: "cat-sparklers", discount_percent: 70 });
-    const sections = buildShopPlpSections([p69, p70], [sparklers]);
-    const min70 = sections.find((s) => s.kind === "min-70-off");
-    expect(min70 && "products" in min70 ? min70.products.map((p) => p.sku) : []).toEqual(["p70"]);
-  });
-
-  it("never flags a net_markup shop's null discount_percent as a 70%-off badge", () => {
-    const p = product({ id: "p1", category_id: "cat-sparklers", discount_percent: null });
-    const sections = buildShopPlpSections([p], [sparklers]);
-    expect(sections.some((s) => s.kind === "min-70-off")).toBe(false);
-  });
-
   it("includes a combos section only when combos are passed, never with empty products", () => {
     const combos = [{ packId: "c1" } as unknown as ComboPackSummary];
     const sections = buildShopPlpSections([], [], combos);

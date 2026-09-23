@@ -2,7 +2,7 @@ import type { ProductWithCategory } from "@/lib/data";
 import type { ComboPackSummary } from "@/lib/combo-packs";
 
 export interface ShopPlpFlatSection {
-  kind: "top-picks" | "recommended" | "under-199" | "min-70-off";
+  kind: "top-picks" | "recommended" | "under-199";
   products: ProductWithCategory[];
 }
 
@@ -31,13 +31,12 @@ export interface ShopPlpCategoryInput {
 }
 
 const UNDER_199_THRESHOLD = 199;
-const MIN_DISCOUNT_PERCENT = 70;
 
 /**
  * Buckets one shop's already-fetched catalogue (already `rankProducts()`-
  * tiered by `getShopCatalogue()`) into the PLP's sections — Top Picks /
- * Recommended / Under-₹199 / Min-70%-off / Combos first, then one "category"
- * section per active category in the shop's own display_order. Pure and
+ * Recommended / Under-₹199 / Combos first, then one "category" section per
+ * active category in the shop's own display_order. Pure and
  * framework-agnostic (no "server-only"), mirroring lib/cross-shop-sort.ts's
  * split between pure bucketing logic and the server-side fetch that calls
  * it (lib/shops.ts's getShopPlpSections()) — one getShopCatalogue() fetch
@@ -63,9 +62,6 @@ export function buildShopPlpSections(
 
   const under199 = products.filter((p) => p.price !== null && p.price < UNDER_199_THRESHOLD);
   if (under199.length > 0) sections.push({ kind: "under-199", products: under199 });
-
-  const min70Off = products.filter((p) => (p.discount_percent ?? 0) >= MIN_DISCOUNT_PERCENT);
-  if (min70Off.length > 0) sections.push({ kind: "min-70-off", products: min70Off });
 
   if (combos.length > 0) sections.push({ kind: "combos", combos });
 

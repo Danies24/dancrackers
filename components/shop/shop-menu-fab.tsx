@@ -12,11 +12,16 @@ export interface ShopMenuSection {
 
 /**
  * The floating MENU button + its jump-to-section sheet (Swiggy-redesign
- * plan) — built on the shared Sheet primitive. The inner wrapper repeats
- * the panel's own rounded-t-3xl/md:rounded-3xl radius (plus overflow-hidden)
- * rather than relying on Sheet's panel to clip it — Sheet uses
- * overflow-y-auto, not overflow-hidden, so a full-bleed child background
- * would otherwise show square corners under the rounded top edge.
+ * plan) — built on the shared Sheet primitive. The list itself must be the
+ * thing that scrolls (there are ~20 sections, far more than fit in one
+ * screen) — Sheet's own panel already clips a full-bleed child to its
+ * rounded corners on its own (setting only overflow-y leaves overflow-x at
+ * its default "visible", which the CSS spec resolves to "auto" too the
+ * moment any other axis is non-visible, so the panel effectively clips
+ * both axes already). An earlier version wrapped the content in its own
+ * `overflow-hidden` div to "fix" the corners — that was never needed and
+ * silently clipped ~280px of real content that the list's own scroll could
+ * never reach; removed.
  */
 export function ShopMenuFab({
   sections,
@@ -58,7 +63,7 @@ export function ShopMenuFab({
         ariaLabel="Jump to a section"
         maxHeight="70vh"
       >
-        <div className="overflow-hidden rounded-t-3xl bg-menu-sheet-bg p-4 text-white md:rounded-3xl">
+        <div className="rounded-t-3xl bg-menu-sheet-bg p-4 text-white md:rounded-3xl">
           <h2 className="mb-3 font-display text-sm font-bold">Jump to a section</h2>
           <div className="flex flex-col">
             {sections.map((s) => (
