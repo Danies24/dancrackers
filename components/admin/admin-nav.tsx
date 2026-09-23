@@ -13,6 +13,7 @@ const links = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/combopacks", label: "Combo Packs" },
   { href: "/admin/captains", label: "Captains" },
+  { href: "/admin/shops", label: "Shops" },
 ];
 
 export function AdminNav({ userName }: { userName: string }) {
