@@ -30,12 +30,6 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-// Slides 2 and 3 have no photography yet (see the image prompts handed to
-// the user alongside this change) — they render on the same
-// --gradient-festival placeholder the rest of the site already uses for an
-// unphotographed accent, never a fabricated stock image. Swap in a real
-// `imageUrl` (under public/images/hero/) as soon as one exists; nothing
-// else about the slide needs to change.
 const HERO_SLIDES: HeroBannerSlide[] = [
   {
     id: "brand",
@@ -44,11 +38,12 @@ const HERO_SLIDES: HeroBannerSlide[] = [
   },
   {
     id: "all-shops-one-place",
+    imageUrl: "/images/hero/sivakasi-shops-market.webp",
     headline: "Sivakasi's own shops, all in one place.",
-    headlineTa: "சிவகாசியின் கடைகள் இப்போது ஒரே இடத்தில். கடை வாரியாக ஒப்பிட்டு, உங்கள் ஆர்டரை உருவாக்குங்கள் — நாங்கள் அழைத்து உறுதி செய்கிறோம்.",
   },
   {
     id: "straight-from-sivakasi",
+    imageUrl: "/images/hero/straight-from-sivakasi-sparkler.webp",
     headline: "Straight From Sivakasi. Straight to You.",
   },
 ];
