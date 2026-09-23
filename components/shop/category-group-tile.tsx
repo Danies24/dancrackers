@@ -6,7 +6,7 @@ import type { CategoryGroupRow } from "@/lib/category-groups";
 export function CategoryGroupTile({ group }: { group: CategoryGroupRow }) {
   return (
     <Link
-      href={`/products/${group.slug}`}
+      href={`/category/${group.slug}`}
       className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center"
     >
       <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-border bg-gold-tint">

@@ -39,7 +39,7 @@ export function Footer({ topCategories = [] }: { topCategories?: CategoryRow[] }
           <ul className="space-y-2 text-sm text-ink-soft">
             {topCategories.slice(0, 6).map((cat) => (
               <li key={cat.id}>
-                <Link href={`/products/${cat.slug}`}>{cat.name_en}</Link>
+                <Link href={`/category/${cat.slug}`}>{cat.name_en}</Link>
               </li>
             ))}
             {topCategories.length === 0 && (

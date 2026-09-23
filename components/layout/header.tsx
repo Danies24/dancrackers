@@ -200,12 +200,12 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
             {categories.map((cat, i) => (
               <DrawerLink
                 key={cat.id}
-                href={`/products/${cat.slug}`}
+                href={`/category/${cat.slug}`}
                 onClick={() => setDrawerOpen(false)}
                 className="flex items-center justify-between pl-4 text-sm"
                 delay={MOBILE_DRAWER_LINKS.length + i}
                 open={drawerOpen}
-                active={pathname === `/products/${cat.slug}`}
+                active={pathname === `/category/${cat.slug}`}
               >
                 <span>{cat.name_en}</span>
                 <ChevronRight size={15} className="text-ink-soft/40" aria-hidden />

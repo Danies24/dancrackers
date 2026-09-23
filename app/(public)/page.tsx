@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
+import { HomeSearchBar } from "@/components/marketing/home-search-bar";
 import { ShopCard } from "@/components/shop/shop-card";
 import { CategoryGroupTile } from "@/components/shop/category-group-tile";
+import { ProductCard } from "@/components/product/product-card";
 import { getCategoryWithCounts } from "@/lib/data";
 import { getShopsForHomeRail } from "@/lib/shops";
 import { getFeaturedCategoryGroups } from "@/lib/category-groups";
-import type { Metadata } from "next";
+import { getCrossShopProducts } from "@/lib/cross-shop";
 import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
+import { formatRupees } from "@/lib/format";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
@@ -35,13 +39,27 @@ const TRUST_FEATURES = [
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
 export default async function HomePage() {
-  const [categories, shops, featuredCategoryGroups] = await Promise.all([
+  const [categories, shops, featuredCategoryGroups, crossShopProducts] = await Promise.all([
     getCategoryWithCounts(),
     getShopsForHomeRail(),
     getFeaturedCategoryGroups(),
+    getCrossShopProducts({}),
   ]);
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
+
+  // Real, currently-active figures only (multi-shop spec's existing
+  // discipline for getMaxActiveDiscountPercent, extended cross-shop) — never
+  // a stored/stale headline number.
+  const maxDiscountPercent = crossShopProducts.reduce((max, p) => Math.max(max, p.discount_percent ?? 0), 0);
+  const topOffers = [...crossShopProducts]
+    .filter((p) => (p.discount_percent ?? 0) > 0)
+    .sort((a, b) => (b.discount_percent ?? 0) - (a.discount_percent ?? 0))
+    .slice(0, 10);
+  const under199 = crossShopProducts
+    .filter((p) => p.price !== null && p.price < 199)
+    .sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
+    .slice(0, 10);
 
   return (
     <div>
@@ -67,6 +85,27 @@ export default async function HomePage() {
             </span>
           </p>
           <OrderCountdownHero />
+          <div className="mt-6">
+            <HomeSearchBar />
+          </div>
+
+          {(maxDiscountPercent > 0 || brandConfig.cartCharges.deliveryChargeWaiverThreshold) && (
+            <div className="mx-auto mt-4 flex max-w-md gap-3">
+              {maxDiscountPercent > 0 && (
+                <div className="flex-1 rounded-2xl bg-gradient-festival px-4 py-3 text-left text-on-fill shadow-soft">
+                  <p className="font-display text-lg font-extrabold">Upto {maxDiscountPercent}% OFF</p>
+                  <p className="text-[11px] font-semibold opacity-90">across every shop</p>
+                </div>
+              )}
+              <div className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-left shadow-soft">
+                <p className="font-display text-lg font-extrabold text-ink">FREE Delivery</p>
+                <p className="text-[11px] font-semibold text-ink-soft">
+                  on orders {formatRupees(brandConfig.cartCharges.deliveryChargeWaiverThreshold)}+
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/products">
               <Button variant="secondary">
@@ -114,6 +153,39 @@ export default async function HomePage() {
               </span>
               <span className="text-xs font-medium text-ink">எல்லாம் / View all</span>
             </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Top Offers — real, currently-active discounts across every shop
+          (never fabricated). */}
+      {topOffers.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">🔥 Top Offers</h2>
+          </div>
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
+            {topOffers.map((p) => (
+              <div key={p.id} className="w-36 shrink-0 snap-start md:w-auto">
+                <ProductCard product={p} shopName={p.shop.name_en} showShopChip />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ₹199 Store — real, price-sorted, across every shop. */}
+      {under199.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">₹199 Store</h2>
+          </div>
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
+            {under199.map((p) => (
+              <div key={p.id} className="w-36 shrink-0 snap-start md:w-auto">
+                <ProductCard product={p} shopName={p.shop.name_en} showShopChip />
+              </div>
+            ))}
           </div>
         </section>
       )}
