@@ -17,6 +17,17 @@ interface SheetProps {
   ariaLabel: string;
   /** Defaults to true for variant="bottom", false for "center-only". */
   dragToClose?: boolean;
+  /**
+   * Fires once the sheet has fully unmounted and its body-scroll lock is
+   * released — not at the moment `onClose` is called. A consumer that needs
+   * to do something to the page behind the sheet as a result of closing it
+   * (scrollIntoView, navigation) must defer that action to here: doing it
+   * synchronously inside the row's own click handler runs while `rendered`
+   * is still true and body scroll is still locked, so a `scrollIntoView`
+   * call there is silently a no-op (a real bug hit building the shop PLP's
+   * MENU sheet — see components/shop/shop-menu-fab.tsx).
+   */
+  onExited?: () => void;
 }
 
 /**
@@ -34,6 +45,7 @@ export function Sheet({
   maxHeight = "85vh",
   ariaLabel,
   dragToClose = variant === "bottom",
+  onExited,
 }: SheetProps) {
   const [prevOpen, setPrevOpen] = useState(open);
   const [rendered, setRendered] = useState(open);
@@ -63,8 +75,10 @@ export function Sheet({
     const t = setTimeout(() => {
       setRendered(false);
       setClosing(false);
+      onExited?.();
     }, EXIT_DURATION_MS);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closing]);
 
   // Body scroll lock, compensated for the scrollbar's own width so desktop

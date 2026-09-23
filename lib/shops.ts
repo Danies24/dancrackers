@@ -243,6 +243,68 @@ export async function getShopPlpSections(shopId: string): Promise<ShopPlpSection
   return buildShopPlpSections(products, categories ?? [], combos);
 }
 
+export interface ShopMerchandising {
+  specialties: string[];
+  heroImages: string[];
+  locationLabel: string | null;
+  dispatchLabel: string | null;
+  isFeatured: boolean;
+}
+
+/**
+ * Reads the Swiggy-redesign shop columns (supabase/migrations/
+ * 20260924000001) defensively — `ShopRow`'s generated type won't include
+ * them until that migration is applied to production and `npm run db:types`
+ * regenerated, so every field here falls back to an empty/neutral value in
+ * the meantime rather than the PLP erroring or showing `undefined`.
+ */
+export function getShopMerchandising(shop: ShopRow): ShopMerchandising {
+  const raw = shop as ShopRow &
+    Partial<{
+      specialties: string[];
+      hero_images: string[];
+      location_label: string | null;
+      dispatch_label: string | null;
+      is_featured: boolean;
+    }>;
+  return {
+    specialties: raw.specialties ?? [],
+    heroImages: raw.hero_images ?? [],
+    locationLabel: raw.location_label ?? null,
+    dispatchLabel: raw.dispatch_label ?? null,
+    isFeatured: raw.is_featured ?? false,
+  };
+}
+
+export interface ShopOffer {
+  id: string;
+  label: string;
+  displayOrder: number;
+}
+
+/**
+ * The offer pager's rotating marketing copy. Returns [] (never throws) when
+ * the `shop_offers` table doesn't exist yet (pre-migration) or is simply
+ * empty (no admin UI writes to it yet) — the pager itself just doesn't
+ * render rather than the whole PLP erroring either way. The `as any` cast
+ * is scoped to this one query and goes away once `npm run db:types` is
+ * regenerated after the migration lands.
+ */
+export async function getShopOffers(shopId: string): Promise<ShopOffer[]> {
+  const supabase = createPublicClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- "shop_offers" isn't in the generated Database type until db:types is regenerated post-migration.
+  const { data, error } = await (supabase.from as any)("shop_offers")
+    .select("*")
+    .eq("shop_id", shopId)
+    .order("display_order", { ascending: true });
+  if (error || !data) return [];
+  return (data as Array<{ id: string; label: string; display_order: number }>).map((o) => ({
+    id: o.id,
+    label: o.label,
+    displayOrder: o.display_order,
+  }));
+}
+
 /**
  * Per-shop generalization of lib/data.ts's getMaxActiveDiscountPercent() —
  * the real, currently-active highest discount for one shop, never a stored/
