@@ -15,3 +15,11 @@ export async function getFeaturedCategoryGroups(): Promise<CategoryGroupRow[]> {
   if (error) throw error;
   return data ?? [];
 }
+
+/** Every category group, featured or not — feeds the category page's switcher row. */
+export async function getAllCategoryGroups(): Promise<CategoryGroupRow[]> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.from("category_groups").select("*").order("display_order", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}

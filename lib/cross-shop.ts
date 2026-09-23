@@ -1,6 +1,9 @@
 import "server-only";
 import { createPublicClient } from "@/lib/supabase/public";
 import { sortCrossShopProducts, type CrossShopSortOption } from "@/lib/cross-shop-sort";
+import { buildCategoryPageGroups, type CategoryPageGroup, type CategoryPageShopMeta, type CategorySortOption } from "@/lib/category-page-sections";
+import { getShopMerchandising, getShopMaxActiveDiscountPercent } from "@/lib/shops";
+import { getAllCategoryGroups } from "@/lib/category-groups";
 import type { Database } from "@/types/database";
 import type { ProductWithCategory } from "@/lib/data";
 import type { ShopRow } from "@/lib/shops";
@@ -84,4 +87,54 @@ export async function getCrossShopProducts(opts: {
   }));
 
   return sortCrossShopProducts(withShop, opts.sort ?? "recommended");
+}
+
+export interface CategoryPageData {
+  group: CategoryGroupRow;
+  groups: CategoryPageGroup[];
+  otherGroups: CategoryGroupRow[];
+}
+
+/**
+ * The "Shop by Category" page's one server fetch (Kolagalam_Shop_By_
+ * Category_Prompt_v1.0) — a single getCrossShopProducts({groupId}) query,
+ * bucketed by shop via the pure buildCategoryPageGroups(). Each shop's
+ * `bestOfferLabel` is computed live via getShopMaxActiveDiscountPercent —
+ * never stored — so it can never overstate what's actually on offer (same
+ * discipline as lib/data.ts's getMaxActiveDiscountPercent).
+ */
+export async function getCategoryPageData(groupSlug: string, sort: CategorySortOption = "recommended"): Promise<CategoryPageData | null> {
+  const group = await getCategoryGroupBySlug(groupSlug);
+  if (!group) return null;
+
+  const supabase = createPublicClient();
+  const [shops, products, otherGroups, { data: groupCategories, error: catError }] = await Promise.all([
+    getBrowsableShops(),
+    getCrossShopProducts({ groupId: group.id }),
+    getAllCategoryGroups(),
+    supabase.from("categories").select("shop_id, slug").eq("group_id", group.id),
+  ]);
+  if (catError) throw catError;
+  const ownCategorySlugByShopId = new Map((groupCategories ?? []).map((c) => [c.shop_id, c.slug]));
+
+  const shopMetaById = new Map<string, CategoryPageShopMeta>();
+  await Promise.all(
+    shops.map(async (shop) => {
+      const merch = getShopMerchandising(shop);
+      const discount = await getShopMaxActiveDiscountPercent(shop.id);
+      shopMetaById.set(shop.id, {
+        id: shop.id,
+        slug: shop.slug,
+        nameEn: shop.name_en,
+        nameTa: shop.name_ta,
+        locationLabel: merch.locationLabel,
+        dispatchLabel: merch.dispatchLabel,
+        isFeatured: merch.isFeatured,
+        bestOfferLabel: discount > 0 ? `Upto ${discount}% off` : null,
+        ownCategorySlug: ownCategorySlugByShopId.get(shop.id) ?? null,
+      });
+    }),
+  );
+
+  return { group, groups: buildCategoryPageGroups(products, shopMetaById, sort), otherGroups };
 }

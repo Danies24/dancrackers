@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const groupEntries: MetadataRoute.Sitemap = (featuredGroups ?? [])
     .filter((g) => Boolean(g.slug))
     .map((g) => ({
-      url: getCanonicalUrl(`/products/${g.slug}`),
+      url: getCanonicalUrl(`/category/${g.slug}`),
     }));
 
   const productEntries: MetadataRoute.Sitemap = products
