@@ -173,10 +173,29 @@ export async function getShopProductSlugs(shopId: string): Promise<string[]> {
   return (data ?? []).map((p) => p.slug as string);
 }
 
-/** All active shops, for the home page's shops rail (multi-shop spec §5.2) — `hidden` shops never appear here. */
-export async function getActiveAndComingSoonShops(): Promise<ShopRow[]> {
+/**
+ * The home page's "Our Shops" rail (multi-shop spec §5.2) — `hidden` shops
+ * never appear here at all (RLS already restricts the public client to
+ * `status != 'hidden'`, so this needs no extra filtering), each with its
+ * live active-product count for the card's meta line.
+ */
+export async function getShopsForHomeRail(): Promise<Array<ShopRow & { productCount: number }>> {
   const supabase = createPublicClient();
-  const { data, error } = await supabase.from("shops").select("*").order("display_order", { ascending: true });
+  const { data: shops, error } = await supabase.from("shops").select("*").order("display_order", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+
+  const counts = await Promise.all(
+    (shops ?? []).map(async (shop) => {
+      const { count } = await supabase
+        .from("public_products")
+        .select("*", { count: "exact", head: true })
+        .eq("shop_id", shop.id)
+        .eq("status", "active")
+        .not("price", "is", null);
+      return [shop.id, count ?? 0] as const;
+    }),
+  );
+  const countById = new Map(counts);
+
+  return (shops ?? []).map((shop) => ({ ...shop, productCount: countById.get(shop.id) ?? 0 }));
 }

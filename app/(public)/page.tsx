@@ -2,15 +2,15 @@ import Link from "next/link";
 import { ShieldCheck, Tag, Truck, Headphones, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparkField } from "@/components/marketing/spark-field";
-import { ExploreCrackers } from "@/components/marketing/explore-crackers";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
-import { ComboPackCard } from "@/components/product/combo-pack-card";
-import { getCatalogue, getCategoryWithCounts, getMaxActiveDiscountPercent } from "@/lib/data";
-import { rankProducts } from "@/lib/ranking";
+import { ShopCard } from "@/components/shop/shop-card";
+import { CategoryGroupTile } from "@/components/shop/category-group-tile";
+import { getCategoryWithCounts } from "@/lib/data";
+import { getShopsForHomeRail } from "@/lib/shops";
+import { getFeaturedCategoryGroups } from "@/lib/category-groups";
 import type { Metadata } from "next";
-import { getActiveComboPacks } from "@/lib/combo-packs";
-import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: {
@@ -35,14 +35,11 @@ const TRUST_FEATURES = [
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
 export default async function HomePage() {
-  const [categories, products, maxDiscountPercent, comboPacks] = await Promise.all([
+  const [categories, shops, featuredCategoryGroups] = await Promise.all([
     getCategoryWithCounts(),
-    getCatalogue(),
-    getMaxActiveDiscountPercent(),
-    getActiveComboPacks(),
+    getShopsForHomeRail(),
+    getFeaturedCategoryGroups(),
   ]);
-  const catalogueEmpty = categories.every((c) => c.productCount === 0);
-  const showcaseProducts = rankProducts(products);
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
 
@@ -62,11 +59,12 @@ export default async function HomePage() {
             <span className="text-gradient-festival">Straight to You.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            Direct from Sivakasi to your area across Tamil Nadu. Wholesale prices, upto{" "}
-            <span className="inline-block whitespace-nowrap rounded-md border border-amber/30 bg-gold-tint px-1.5 py-0.5 font-bold text-maroon-ink">
-              95% off
+            <span lang="ta" className="block">
+              சிவகாசியின் கடைகள் இப்போது ஒரே இடத்தில். கடை வாரியாக ஒப்பிட்டு, உங்கள் ஆர்டரை உருவாக்குங்கள் — நாங்கள் அழைத்து உறுதி செய்கிறோம்.
             </span>
-            . Build your order and we&apos;ll call you to confirm.
+            <span className="mt-1 block">
+              Sivakasi&apos;s own shops, all in one place. Compare shop by shop, build your order, and we&apos;ll call you to confirm.
+            </span>
           </p>
           <OrderCountdownHero />
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -79,46 +77,44 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Combo Packs — the primary showcase, immediately below the hero and
-          above the regular category rails (§6.2 MUST). */}
-      {comboPacks.length > 0 && (
+      {/* Our Shops — the primary showcase, immediately below the hero
+          (multi-shop spec §5.2, replaces the old Combo Packs rail; combo
+          packs still exist, just inside Sri Ram's own shop page now). */}
+      {shops.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10 pt-6">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">Curated for you</p>
-              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Combo Packs</h2>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
+              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
             </div>
           </div>
           <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
-            {comboPacks.map((combo) => (
-              <ComboPackCard key={combo.id} combo={combo} />
+            {shops.map((shop) => (
+              <ShopCard key={shop.id} shop={shop} />
             ))}
           </div>
         </section>
       )}
 
-      <>
-      {catalogueEmpty ? (
-        <section className="mx-auto max-w-6xl px-4 py-16 text-center">
-          <p className="text-ink-soft">
-            Our catalogue is being updated. Call us on{" "}
-            <a href={`tel:+${getPhoneE164()}`} className="font-semibold text-maroon-ink">
-              {getPhoneDisplay()}
-            </a>
-            .
-          </p>
-        </section>
-      ) : (
-        <section className="mx-auto max-w-6xl px-4 py-14">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-xs font-semibold tracking-wide text-muted">OUR PRODUCTS</p>
-              <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
-                Explore Our <span className="text-gradient-festival">Crackers</span> Range
-              </h2>
-            </div>
+      {/* Shop by category — links into the cross-shop category view
+          (multi-shop spec §5.2, §5.5). */}
+      {featuredCategoryGroups.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">வகைகள்</p>
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Shop by category</h2>
           </div>
-          <ExploreCrackers products={showcaseProducts} categories={categories} />
+          <div className="-mx-4 grid auto-cols-[5rem] grid-flow-col grid-rows-2 gap-x-3 gap-y-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+            {featuredCategoryGroups.map((group) => (
+              <CategoryGroupTile key={group.id} group={group} />
+            ))}
+            <Link href="/products" className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center">
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-secondary-bg text-xs font-semibold text-ink-soft">
+                View all
+              </span>
+              <span className="text-xs font-medium text-ink">எல்லாம் / View all</span>
+            </Link>
+          </div>
         </section>
       )}
 
@@ -192,7 +188,6 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-      </>
     </div>
   );
 }
