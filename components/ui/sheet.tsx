@@ -28,6 +28,14 @@ interface SheetProps {
    * MENU sheet — see components/shop/shop-menu-fab.tsx).
    */
   onExited?: () => void;
+  /**
+   * When false, Sheet skips its own pushState/popstate handling entirely —
+   * for a consumer that drives open/close from its own URL state (e.g.
+   * ProductQuickViewSheet's `?item=slug` deep link), so opening/closing
+   * pushes exactly one history entry instead of two competing ones.
+   * Defaults to true (Sheet manages its own back-button close).
+   */
+  manageHistory?: boolean;
 }
 
 /**
@@ -46,6 +54,7 @@ export function Sheet({
   ariaLabel,
   dragToClose = variant === "bottom",
   onExited,
+  manageHistory = true,
 }: SheetProps) {
   const [prevOpen, setPrevOpen] = useState(open);
   const [rendered, setRendered] = useState(open);
@@ -111,7 +120,7 @@ export function Sheet({
   // history.back() from inside the popstate handler itself — that's what
   // causes the classic double-pop bug.
   useEffect(() => {
-    if (!open) return;
+    if (!open || !manageHistory) return;
     window.history.pushState({ kgSheet: true }, "");
     function onPopState() {
       onClose();
@@ -119,7 +128,7 @@ export function Sheet({
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, manageHistory]);
 
   function handlePointerMove(e: PointerEvent) {
     const drag = dragRef.current;

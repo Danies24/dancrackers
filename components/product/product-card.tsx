@@ -31,11 +31,14 @@ export function ProductCard({
   rail,
   shopName,
   showShopChip = false,
+  onQuickView,
 }: {
   product: ProductWithCategory;
   rail?: string;
   shopName: string;
   showShopChip?: boolean;
+  /** When provided, tapping the image/name opens the quick-view sheet with this product instead of navigating to its full page (Swiggy-redesign plan) — omit to keep the card's plain navigate-on-tap behavior. */
+  onQuickView?: (product: ProductWithCategory) => void;
 }) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
@@ -46,6 +49,12 @@ export function ProductCard({
   const ariaLabel = showShopChip
     ? `${product.name_en} — ${product.category?.name_en ?? ""} — ${shopName}`
     : undefined;
+
+  function handleTapCard(e: React.MouseEvent) {
+    if (!onQuickView) return;
+    e.preventDefault();
+    onQuickView(product);
+  }
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -84,7 +93,7 @@ export function ProductCard({
           <Check size={11} aria-hidden strokeWidth={3} /> In Cart
         </span>
       )}
-      <Link href={href} aria-label={ariaLabel} className="relative block aspect-square overflow-hidden bg-white">
+      <Link href={href} aria-label={ariaLabel} onClick={handleTapCard} className="relative block aspect-square overflow-hidden bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
@@ -104,7 +113,7 @@ export function ProductCard({
 
       <div className="flex flex-1 flex-col gap-2 p-3">
         {showShopChip && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
-        <Link href={href} aria-label={ariaLabel} className="block">
+        <Link href={href} aria-label={ariaLabel} onClick={handleTapCard} className="block">
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-maroon-ink transition-colors">
             {product.name_en}
           </h3>

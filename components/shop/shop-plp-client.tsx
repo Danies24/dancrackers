@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
+import { ProductQuickViewSheet } from "@/components/product/product-quick-view-sheet";
 import { CartProgressBar } from "@/components/cart/cart-progress-bar";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
 import { FilterChipRow, type ShopFilterChip } from "@/components/shop/filter-chip-row";
@@ -62,6 +64,32 @@ export function ShopPlpClient({
 }) {
   const [filter, setFilter] = useState<ShopFilterChip>("all");
   const { totals } = useValidatedCart();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Every product across every section, flattened once for the quick-view
+  // sheet's "resolve by slug from what's already loaded, never fetch" rule
+  // — a product can appear in more than one bucket, so later entries simply
+  // overwrite earlier (identical) ones in the map.
+  const productsBySlug = useMemo(() => {
+    const map = new Map<string, ProductWithCategory>();
+    for (const s of sections) {
+      if (s.kind === "combos") continue;
+      for (const p of s.products) map.set(p.slug, p);
+    }
+    return map;
+  }, [sections]);
+
+  const quickViewSlug = searchParams.get("item");
+  const quickViewProduct = quickViewSlug ? (productsBySlug.get(quickViewSlug) ?? null) : null;
+
+  function openQuickView(product: ProductWithCategory) {
+    router.push(`${pathname}?item=${product.slug}`, { scroll: false });
+  }
+  function closeQuickView() {
+    router.back();
+  }
 
   const categorySections = sections.filter((s) => s.kind === "category");
 
@@ -132,7 +160,7 @@ export function ShopPlpClient({
                 <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
                   {section.products.map((p) => (
                     <div key={p.id} className="w-36 shrink-0 snap-start">
-                      <ProductCard product={p} shopName={shopName} />
+                      <ProductCard product={p} shopName={shopName} onQuickView={openQuickView} />
                     </div>
                   ))}
                 </div>
@@ -156,7 +184,7 @@ export function ShopPlpClient({
                 <CollapsibleSection storageKey={`${shopSlug}-${section.categorySlug}`} title={section.nameEn} subtitle={`(${section.products.length})`}>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {section.products.map((p) => (
-                      <ProductCard key={p.id} product={p} shopName={shopName} />
+                      <ProductCard key={p.id} product={p} shopName={shopName} onQuickView={openQuickView} />
                     ))}
                   </div>
                 </CollapsibleSection>
@@ -167,6 +195,13 @@ export function ShopPlpClient({
       </div>
 
       <ShopMenuFab sections={menuSections} activeAnchorId={activeAnchorId} onSelect={scrollToAnchor} />
+
+      <ProductQuickViewSheet
+        product={quickViewProduct}
+        shopName={shopName}
+        subtotal={totals.subtotal}
+        onClose={closeQuickView}
+      />
     </div>
   );
 }
