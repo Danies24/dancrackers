@@ -5,6 +5,7 @@ import { SparkField } from "@/components/marketing/spark-field";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
 import { HomeSearchBar } from "@/components/marketing/home-search-bar";
+import { HeroBannerCarousel, type HeroBannerSlide } from "@/components/marketing/hero-banner-carousel";
 import { ShopCard } from "@/components/shop/shop-card";
 import { CategoryGroupTile } from "@/components/shop/category-group-tile";
 import { ProductCard } from "@/components/product/product-card";
@@ -28,6 +29,29 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 300;
+
+// Slides 2 and 3 have no photography yet (see the image prompts handed to
+// the user alongside this change) — they render on the same
+// --gradient-festival placeholder the rest of the site already uses for an
+// unphotographed accent, never a fabricated stock image. Swap in a real
+// `imageUrl` (under public/images/hero/) as soon as one exists; nothing
+// else about the slide needs to change.
+const HERO_SLIDES: HeroBannerSlide[] = [
+  {
+    id: "brand",
+    imageUrl: "/images/hero/kolagalam-brand.webp",
+    eyebrow: "DIWALI 2026",
+  },
+  {
+    id: "straight-from-sivakasi",
+    headline: "Straight From Sivakasi. Straight to You.",
+  },
+  {
+    id: "all-shops-one-place",
+    headline: "Sivakasi's own shops, all in one place.",
+    headlineTa: "சிவகாசியின் கடைகள் இப்போது ஒரே இடத்தில். கடை வாரியாக ஒப்பிட்டு, உங்கள் ஆர்டரை உருவாக்குங்கள் — நாங்கள் அழைத்து உறுதி செய்கிறோம்.",
+  },
+];
 
 const TRUST_FEATURES = [
   { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Real Mill Photos", body: "Photographed at Sivakasi mills — no photocopied lists." },
@@ -66,24 +90,17 @@ export default async function HomePage() {
       <JsonLd data={orgJsonLd} />
       <JsonLd data={websiteJsonLd} />
       {/* Hero */}
-      <section className="relative overflow-hidden bg-cream px-4 pb-8 pt-10 text-center md:pb-12 md:pt-14">
-        <SparkField />
+      <section className="relative overflow-hidden bg-cream px-4 pb-8 pt-6 text-center md:pb-12 md:pt-8">
+        {/* The carousel's own slide headings are h2s (rotating, not a fixed
+            page title) — this sr-only h1 keeps exactly one real page title
+            in the accessibility tree/SEO structure without visually
+            duplicating whichever slide happens to be showing. */}
+        <h1 className="sr-only">Kolagalam — Sivakasi Crackers, Every Shop in One Place</h1>
         <div className="relative mx-auto max-w-3xl">
-          <span className="inline-block rounded-full border border-border bg-gold-tint px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-ink shadow-soft">
-            DIWALI 2026
-          </span>
-          <h1 className="mx-auto mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.1] text-ink md:text-5xl">
-            Straight From Sivakasi. <br />
-            <span className="text-gradient-festival">Straight to You.</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">
-            <span lang="ta" className="block">
-              சிவகாசியின் கடைகள் இப்போது ஒரே இடத்தில். கடை வாரியாக ஒப்பிட்டு, உங்கள் ஆர்டரை உருவாக்குங்கள் — நாங்கள் அழைத்து உறுதி செய்கிறோம்.
-            </span>
-            <span className="mt-1 block">
-              Sivakasi&apos;s own shops, all in one place. Compare shop by shop, build your order, and we&apos;ll call you to confirm.
-            </span>
-          </p>
+          <HeroBannerCarousel slides={HERO_SLIDES} />
+        </div>
+        <div className="relative mx-auto mt-6 max-w-3xl">
+          <SparkField />
           <OrderCountdownHero />
           <div className="mt-6">
             <HomeSearchBar />
