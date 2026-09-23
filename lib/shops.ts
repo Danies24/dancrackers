@@ -219,6 +219,58 @@ export async function getShopsForHomeRail(): Promise<Array<ShopRow & { productCo
 }
 
 /**
+ * Home page priority order (Swiggy-redesign follow-up) — Gurusamy, then Sri
+ * Ram, then whatever else by the DB's own display_order. A slug-keyed
+ * priority list instead of an admin-editable field: no admin UI exists yet
+ * to reorder shops, and this ordering was requested as a one-off business
+ * decision, not a general reordering capability worth building right now.
+ */
+const HOME_SHOWCASE_PRIORITY_SLUGS = ["gurusamy-fireworks", "sri-ram-crackers"];
+
+export interface ShopShowcaseCard {
+  shop: ShopRow;
+  productCount: number;
+  maxDiscountPercent: number;
+  topProducts: ProductWithCategory[];
+}
+
+/**
+ * Home page "Our Shops" showcase (Swiggy-redesign follow-up) — each card's
+ * own top-5 products (by rankProducts() tiering, same as the shop PLP), not
+ * just a count, so the home page can show a live product carousel per shop
+ * instead of a single static image.
+ */
+export async function getShopsForHomeShowcase(): Promise<ShopShowcaseCard[]> {
+  const shops = await getShopsForHomeRail();
+
+  const sorted = [...shops].sort((a, b) => {
+    const aPriority = HOME_SHOWCASE_PRIORITY_SLUGS.indexOf(a.slug);
+    const bPriority = HOME_SHOWCASE_PRIORITY_SLUGS.indexOf(b.slug);
+    if (aPriority !== -1 || bPriority !== -1) {
+      return (aPriority === -1 ? Infinity : aPriority) - (bPriority === -1 ? Infinity : bPriority);
+    }
+    return a.display_order - b.display_order;
+  });
+
+  const cards = await Promise.all(
+    sorted.map(async (shop) => {
+      const [catalogue, maxDiscountPercent] = await Promise.all([
+        getShopCatalogue(shop.id),
+        getShopMaxActiveDiscountPercent(shop.id),
+      ]);
+      return {
+        shop,
+        productCount: shop.productCount,
+        maxDiscountPercent,
+        topProducts: catalogue.slice(0, 5),
+      };
+    }),
+  );
+
+  return cards;
+}
+
+/**
  * The shop PLP's bucketed section list (Swiggy-redesign plan) — one
  * getShopCatalogue() fetch feeds every section via buildShopPlpSections()'s
  * pure bucketing, rather than one query per section. Combo packs are still

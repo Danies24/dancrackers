@@ -1,16 +1,15 @@
 import Link from "next/link";
-import { ShieldCheck, Tag, Truck, Headphones, PlayCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShieldCheck, Tag, Truck, Headphones } from "lucide-react";
 import { SparkField } from "@/components/marketing/spark-field";
 import { GeneralEnquiryForm } from "@/components/marketing/general-enquiry-form";
 import { OrderCountdownHero } from "@/components/marketing/order-countdown-hero";
 import { HomeSearchBar } from "@/components/marketing/home-search-bar";
 import { HeroBannerCarousel, type HeroBannerSlide } from "@/components/marketing/hero-banner-carousel";
-import { ShopCard } from "@/components/shop/shop-card";
+import { ShopShowcaseCard } from "@/components/shop/shop-showcase-card";
 import { CategoryGroupTile } from "@/components/shop/category-group-tile";
 import { ProductCard } from "@/components/product/product-card";
 import { getCategoryWithCounts } from "@/lib/data";
-import { getShopsForHomeRail } from "@/lib/shops";
+import { getShopsForHomeShowcase } from "@/lib/shops";
 import { getFeaturedCategoryGroups } from "@/lib/category-groups";
 import { getCrossShopProducts } from "@/lib/cross-shop";
 import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
@@ -58,9 +57,9 @@ const TRUST_FEATURES = [
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
 export default async function HomePage() {
-  const [categories, shops, featuredCategoryGroups, crossShopProducts] = await Promise.all([
+  const [categories, shopCards, featuredCategoryGroups, crossShopProducts] = await Promise.all([
     getCategoryWithCounts(),
-    getShopsForHomeRail(),
+    getShopsForHomeShowcase(),
     getFeaturedCategoryGroups(),
     getCrossShopProducts({}),
   ]);
@@ -84,25 +83,16 @@ export default async function HomePage() {
     <div>
       <JsonLd data={orgJsonLd} />
       <JsonLd data={websiteJsonLd} />
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-cream px-4 pb-8 pt-6 text-center md:pb-12 md:pt-8">
-        {/* The carousel's own slide headings are h2s (rotating, not a fixed
-            page title) — this sr-only h1 keeps exactly one real page title
-            in the accessibility tree/SEO structure without visually
-            duplicating whichever slide happens to be showing. */}
-        <h1 className="sr-only">Kolagalam — Sivakasi Crackers, Every Shop in One Place</h1>
-        <div className="relative mx-auto max-w-3xl">
-          <HeroBannerCarousel slides={HERO_SLIDES} />
-        </div>
-        <div className="relative mx-auto mt-6 max-w-3xl">
-          <SparkField />
-          <OrderCountdownHero />
-          <div className="mt-6">
-            <HomeSearchBar />
-          </div>
+
+      {/* Search + the two headline offer tiles — the page's first visible
+          section below the global nav, per the confirmed home layout. */}
+      <section className="relative overflow-hidden bg-cream px-4 pb-6 pt-8 text-center">
+        <SparkField />
+        <div className="relative mx-auto max-w-md">
+          <HomeSearchBar />
 
           {(maxDiscountPercent > 0 || brandConfig.cartCharges.deliveryChargeWaiverThreshold) && (
-            <div className="mx-auto mt-4 flex max-w-md gap-3">
+            <div className="mt-4 flex gap-3">
               {maxDiscountPercent > 0 && (
                 <div className="flex-1 rounded-2xl bg-gradient-festival px-4 py-3 text-left text-on-fill shadow-soft">
                   <p className="font-display text-lg font-extrabold">Upto {maxDiscountPercent}% OFF</p>
@@ -117,60 +107,34 @@ export default async function HomePage() {
               </div>
             </div>
           )}
-
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/products">
-              <Button variant="secondary">
-                View Products <PlayCircle size={16} aria-hidden />
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Our Shops — the primary showcase, immediately below the hero
-          (multi-shop spec §5.2, replaces the old Combo Packs rail; combo
-          packs still exist, just inside Sri Ram's own shop page now). */}
-      {shops.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
-              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {shops.map((shop, i) => {
-              // No horizontal scroll — a fixed 2-column grid at every
-              // breakpoint. An odd shop count's last card spans both
-              // columns and is centered at one column's width, rather
-              // than stretching full-width or sitting off to one side.
-              const isLastOdd = shops.length % 2 === 1 && i === shops.length - 1;
-              return (
-                <div key={shop.id} className={isLastOdd ? "col-span-2 flex justify-center" : ""}>
-                  <div className={isLastOdd ? "w-[calc(50%-0.5rem)] min-w-[160px]" : ""}>
-                    <ShopCard shop={shop} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      {/* The quote — replaces the old "View Products" CTA button. The
+          page's one real, always-visible h1 (not the rotating carousel
+          below, which is supplementary and moved further down the page). */}
+      <section className="px-4 pb-6 text-center">
+        <h1 className="mx-auto max-w-xl font-display text-2xl font-bold leading-[1.15] text-ink md:text-4xl">
+          Straight From Sivakasi. <span className="text-gradient-festival">Straight to You.</span>
+        </h1>
+        <div className="mx-auto mt-4 max-w-xl">
+          <OrderCountdownHero />
+        </div>
+      </section>
 
-      {/* Shop by category — links into the cross-shop category view
-          (multi-shop spec §5.2, §5.5). */}
+      {/* Shop by category — 4 columns, every row filled, no horizontal
+          scroll (per the confirmed home layout). */}
       {featuredCategoryGroups.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">வகைகள்</p>
             <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Shop by category</h2>
           </div>
-          <div className="-mx-4 grid auto-cols-[5rem] grid-flow-col grid-rows-2 gap-x-3 gap-y-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-5">
             {featuredCategoryGroups.map((group) => (
               <CategoryGroupTile key={group.id} group={group} />
             ))}
-            <Link href="/products" className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center">
+            <Link href="/products" className="flex flex-col items-center gap-1.5 text-center">
               <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-secondary-bg text-xs font-semibold text-ink-soft">
                 View all
               </span>
@@ -179,6 +143,31 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Our Shops — Gurusamy, then Sri Ram, then any others
+          (lib/shops.ts's getShopsForHomeShowcase), each card showing its
+          own top 5 products, the whole card tapping through to that shop. */}
+      {shopCards.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
+          </div>
+          <div className="flex flex-col gap-4">
+            {shopCards.map((card) => (
+              <ShopShowcaseCard key={card.shop.id} card={card} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Hero banner carousel — moved below the shops showcase per the
+          confirmed home layout (was the page's top section). */}
+      <section className="px-4 pb-10">
+        <div className="mx-auto max-w-3xl">
+          <HeroBannerCarousel slides={HERO_SLIDES} />
+        </div>
+      </section>
 
       {/* Top Offers — real, currently-active discounts across every shop
           (never fabricated). */}

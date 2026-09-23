@@ -2,12 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import type { CategoryGroupRow } from "@/lib/category-groups";
 
-/** Home page "Shop by category" strip tile (multi-shop spec §5.2). */
+/**
+ * Home page "Shop by category" grid tile — w-full (not a fixed width) since
+ * it always sits in a CSS grid cell (4 columns, no horizontal scroll) now,
+ * never a horizontal scroller.
+ */
 export function CategoryGroupTile({ group }: { group: CategoryGroupRow }) {
   return (
     <Link
       href={`/category/${group.slug}`}
-      className="flex w-20 shrink-0 flex-col items-center gap-1.5 text-center"
+      className="flex w-full flex-col items-center gap-1.5 text-center"
     >
       <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-border bg-gold-tint">
         {group.icon_url ? (
