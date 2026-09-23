@@ -363,12 +363,12 @@ function CategoryShopGroup({
       </div>
 
       <div
-        className="scrollbar-none mt-3.5 flex snap-x snap-mandatory gap-3 overflow-x-auto pr-5"
+        className="scrollbar-none mt-3.5 flex snap-x snap-mandatory gap-2 overflow-x-auto pr-5"
         onScroll={() => trackEvent("category_group_carousel_swipe", { shop: group.shop.slug, category: categorySlug })}
         style={{ touchAction: "pan-x pan-y", overscrollBehaviorX: "contain" }}
       >
         {visible.map((p) => (
-          <div key={p.id} className="w-[78%] min-w-[220px] shrink-0 snap-start sm:w-44">
+          <div key={p.id} className="w-28 shrink-0 snap-start sm:w-32">
             <ProductCard product={p} shopName={p.shop.name_en} showShopChip={false} onQuickView={() => onQuickView(p)} />
           </div>
         ))}
@@ -376,7 +376,7 @@ function CategoryShopGroup({
           <Link
             href={shopHref}
             onClick={() => trackEvent("category_view_all_card", { shop: group.shop.slug, category: categorySlug })}
-            className="flex w-24 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border text-center"
+            className="flex w-28 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border text-center sm:w-32"
           >
             <span className="text-sm font-bold text-maroon-ink">
               View all
