@@ -8,6 +8,7 @@ import { slugify } from "@/lib/slugify";
 const bodySchema = z.object({
   csv: z.string().min(1),
   confirmMissing: z.boolean().optional(),
+  shopSlug: z.string().min(1).optional(),
 });
 
 /**
@@ -15,6 +16,13 @@ const bodySchema = z.object({
  * diff and changes nothing. Without it, commits: upsert on sku, write
  * price_history for every change, never delete — missing products are only
  * marked 'unavailable' if the caller explicitly confirms (§33 case 29).
+ *
+ * `shopSlug` picks which shop the file belongs to (defaults to Sri Ram, the
+ * only shop this importer originally supported) — required now that a
+ * second supplier's catalogue (e.g. Gurusamy) needs its own import: shop_id
+ * is required on every row, and products/categories are unique per
+ * (shop_id, sku|slug), not globally, so an unscoped lookup could otherwise
+ * silently match a different shop's row of the same sku.
  */
 export async function POST(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -29,12 +37,12 @@ export async function POST(request: Request) {
   const { rows, errors } = parseCatalogueCsv(parsed.data.csv);
   const supabase = createAdminClient();
 
-  // This importer has no shop picker yet (multi-shop spec §9 is future
-  // admin work) — every import today is Sri Ram's, and shop_id is required:
-  // products/categories are unique per (shop_id, sku|slug), not globally, so
-  // an unscoped lookup here could silently match another shop's row.
-  const { data: sriRamShop } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").single();
-  const shopId = sriRamShop!.id;
+  const shopSlug = parsed.data.shopSlug ?? "sri-ram-crackers";
+  const { data: shop } = await supabase.from("shops").select("id").eq("slug", shopSlug).maybeSingle();
+  if (!shop) {
+    return NextResponse.json({ error: { code: "unknown_shop", message: `No shop with slug "${shopSlug}".` } }, { status: 400 });
+  }
+  const shopId = shop.id;
 
   const { data: existingProducts } = await supabase.from("products").select("sku, price").eq("shop_id", shopId);
   const diff = diffImport(rows, errors, existingProducts ?? []);

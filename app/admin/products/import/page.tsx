@@ -1,16 +1,31 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { ImportDiff } from "@/lib/csv-import";
 
+interface ShopOption {
+  id: string;
+  slug: string;
+  name_en: string;
+}
+
 export default function ImportPage() {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [shops, setShops] = useState<ShopOption[]>([]);
+  const [shopSlug, setShopSlug] = useState("sri-ram-crackers");
   const [csv, setCsv] = useState<string | null>(null);
   const [diff, setDiff] = useState<ImportDiff | null>(null);
   const [committing, setCommitting] = useState(false);
   const [result, setResult] = useState<{ created: number; updated: number; markedUnavailable: number } | null>(null);
   const [confirmMissing, setConfirmMissing] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/shops")
+      .then((r) => r.json())
+      .then((data) => setShops(data.shops ?? []))
+      .catch(() => {});
+  }, []);
 
   async function handleFile(file: File) {
     const text = await file.text();
@@ -19,7 +34,7 @@ export default function ImportPage() {
     const res = await fetch("/api/admin/products/import?dryRun=true", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ csv: text }),
+      body: JSON.stringify({ csv: text, shopSlug }),
     });
     setDiff(await res.json());
   }
@@ -31,7 +46,7 @@ export default function ImportPage() {
       const res = await fetch("/api/admin/products/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ csv, confirmMissing }),
+        body: JSON.stringify({ csv, confirmMissing, shopSlug }),
       });
       setResult(await res.json());
       setDiff(null);
@@ -46,6 +61,29 @@ export default function ImportPage() {
       <p className="mb-4 text-sm text-muted">
         Columns: sku, name_en, name_ta, category, price, unit, is_discountable, display_order (§14.5).
       </p>
+
+      <label className="mb-3 flex flex-col gap-1 text-sm">
+        <span className="font-semibold text-ink">Shop</span>
+        <select
+          value={shopSlug}
+          onChange={(e) => {
+            setShopSlug(e.target.value);
+            setDiff(null);
+            setCsv(null);
+          }}
+          className="h-10 w-full max-w-xs rounded-md border border-border bg-surface px-3 text-sm"
+        >
+          {shops.length === 0 ? (
+            <option value="sri-ram-crackers">Sri Ram Crackers</option>
+          ) : (
+            shops.map((s) => (
+              <option key={s.id} value={s.slug}>
+                {s.name_en}
+              </option>
+            ))
+          )}
+        </select>
+      </label>
 
       <input
         ref={fileRef}
