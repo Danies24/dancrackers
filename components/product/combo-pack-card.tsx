@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
-import { findItem } from "@/lib/cart";
+import { findItem, SRI_RAM_SHOP } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { formatRupees } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -38,12 +38,14 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
 
   const hasMultipleVarieties = combo.varieties.length > 1;
   const selected = combo.varieties[selectedIndex] ?? combo.varieties[0];
-  const cartItem = findItem({ v: 1, updatedAt: 0, items }, selected.id);
+  const cartItem = findItem({ v: 1, updatedAt: 0, shopId: null, shopSlug: null, shopName: null, items }, selected.id);
   const inCart = !!cartItem;
 
   function handleAdd() {
     const sku = `COMBO-${selected.slug.toUpperCase()}`;
-    add({ productId: selected.id, sku, price: selected.sellingPrice }, 1);
+    // Combo packs are Sri Ram-only for now (multi-shop spec §5.6).
+    const result = add({ productId: selected.id, sku, price: selected.sellingPrice }, 1, SRI_RAM_SHOP);
+    if (result === "pending") return;
     trackEvent("add_to_cart", {
       product_id: selected.id,
       name: `${combo.name} — ${selected.tierLabel}`,

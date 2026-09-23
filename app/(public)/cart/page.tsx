@@ -33,7 +33,7 @@ function CartLineSkeleton() {
 }
 
 export default function CartPage() {
-  const { items, setQty, remove } = useCart();
+  const { items, setQty, remove, shopSlug, shopName } = useCart();
   const { loading, activeLines, unavailableLines, totals, belowMinimum } = useValidatedCart();
 
   useEffect(() => {
@@ -60,6 +60,11 @@ export default function CartPage() {
       <h1 className="font-display text-2xl font-semibold text-ink">
         Your Order <span className="text-base font-normal text-muted">({items.length} items)</span>
       </h1>
+      {shopSlug && shopName && (
+        <Link href={`/s/${shopSlug}`} className="mt-1 inline-block text-sm font-medium text-maroon-ink hover:underline">
+          from {shopName} →
+        </Link>
+      )}
 
       {loading ? (
         <div className="mt-6 divide-y divide-border rounded-lg border border-border bg-surface">

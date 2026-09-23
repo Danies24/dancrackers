@@ -16,9 +16,11 @@ interface CatalogueClientProps {
   products: ProductWithCategory[];
   categories: CategoryRow[];
   lockedCategory?: string;
+  /** Every product here belongs to the same shop (this is only ever used on that shop's own pages) — needed for the cart's one-shop-per-cart check, never rendered as a chip here (§5.4: redundant on a shop's own page). */
+  shopName: string;
 }
 
-export function CatalogueClient({ products, categories, lockedCategory }: CatalogueClientProps) {
+export function CatalogueClient({ products, categories, lockedCategory, shopName }: CatalogueClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -207,7 +209,7 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
           {viewMode === "grid" ? (
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {visible.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} shopName={shopName} />
               ))}
             </div>
           ) : (
@@ -215,7 +217,7 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
               {category ? (
                 // Single category selected, just list them
                 visible.map((p) => (
-                  <ProductListRow key={p.id} product={p} />
+                  <ProductListRow key={p.id} product={p} shopName={shopName} />
                 ))
               ) : (
                 // Grouped by category when "All" is selected
@@ -226,7 +228,7 @@ export function CatalogueClient({ products, categories, lockedCategory }: Catalo
                     </h2>
                     <div className="flex flex-col">
                       {group.products.map(p => (
-                        <ProductListRow key={p.id} product={p} />
+                        <ProductListRow key={p.id} product={p} shopName={shopName} />
                       ))}
                     </div>
                   </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { formatRupees, formatUnit } from "@/lib/format";
+import { SRI_RAM_SHOP } from "@/lib/cart";
 import type { ComboVarietyOption } from "@/lib/combo-packs";
 
 interface Props {
@@ -70,6 +71,7 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
           sku={`COMBO-${selected.slug.toUpperCase()}`}
           price={selected.sellingPrice}
           name={`${packName} — ${selected.tierLabel}`}
+          shop={SRI_RAM_SHOP}
         />
       </div>
 

@@ -86,7 +86,7 @@ export default async function ShopCategoryPage({ params }: RouteParams) {
       {category.description && <p className="mt-2 text-sm text-ink-soft">{category.description}</p>}
 
       <Suspense fallback={<CatalogueLoadingSkeleton />}>
-        <CatalogueClient products={products} categories={categories} lockedCategory={category.slug} />
+        <CatalogueClient products={products} categories={categories} lockedCategory={category.slug} shopName={shop.name_en} />
       </Suspense>
     </div>
   );

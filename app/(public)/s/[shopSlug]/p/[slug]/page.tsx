@@ -208,7 +208,7 @@ export default async function ShopProductPage({ params }: RouteParams) {
               ) : (
                 !isCallForRate && (
                   <div className="mt-6">
-                    <ProductDetailActions productId={product.id} sku={product.sku} price={product.price!} name={product.name_en} />
+                    <ProductDetailActions productId={product.id} sku={product.sku} price={product.price!} name={product.name_en} shop={{ id: shop.id, slug: shop.slug, name: shop.name_en }} />
                   </div>
                 )
               )}
@@ -228,7 +228,7 @@ export default async function ShopProductPage({ params }: RouteParams) {
 
       {!product.combo && product.category_id && (
         <Suspense fallback={null}>
-          <RelatedProducts categoryId={product.category_id} excludeProductId={product.id} shopSlug={shop.slug} />
+          <RelatedProducts categoryId={product.category_id} excludeProductId={product.id} shopName={shop.name_en} />
         </Suspense>
       )}
     </div>
@@ -238,10 +238,11 @@ export default async function ShopProductPage({ params }: RouteParams) {
 async function RelatedProducts({
   categoryId,
   excludeProductId,
+  shopName,
 }: {
   categoryId: string;
   excludeProductId: string;
-  shopSlug: string;
+  shopName: string;
 }) {
   // categoryId is a uuid unique across shops (never shared between shops),
   // so this is already shop-scoped without needing an extra filter — see
@@ -254,7 +255,7 @@ async function RelatedProducts({
       <h2 className="mb-4 font-display text-xl font-semibold text-ink">You may also like</h2>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         {related.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard key={p.id} product={p} shopName={shopName} />
         ))}
       </div>
     </div>

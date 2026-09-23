@@ -5,7 +5,7 @@ import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
-import { findItem } from "@/lib/cart";
+import { findItem, type CartShop } from "@/lib/cart";
 import { formatRupees } from "@/lib/format";
 
 interface Props {
@@ -13,22 +13,23 @@ interface Props {
   sku: string;
   price: number;
   name: string;
+  shop: CartShop;
 }
 
 /** §12.4 section 5. Sticky footer on mobile once scrolled past the fold. */
-export function ProductDetailActions({ productId, sku, price, name }: Props) {
+export function ProductDetailActions({ productId, sku, price, name, shop }: Props) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
   const [qty, setLocalQty] = useState(1);
-  const cartItem = findItem({ v: 1, updatedAt: 0, items }, productId);
+  const cartItem = findItem({ v: 1, updatedAt: 0, shopId: null, shopSlug: null, shopName: null, items }, productId);
 
   function handleAdd() {
     if (cartItem) {
       setQty(productId, cartItem.qty + qty);
       show(`Updated ${name} in cart`);
     } else {
-      add({ productId, sku, price }, qty);
-      show(`Added ${name} to cart`);
+      const result = add({ productId, sku, price }, qty, shop);
+      if (result === "added") show(`Added ${name} to cart`);
     }
   }
 

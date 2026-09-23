@@ -19,34 +19,43 @@ import type { ProductWithCategory } from "@/lib/data";
 /**
  * The one product card component, used on /products, category pages, home
  * rails and related-products (§13.2). Tapping the image/name navigates;
- * tapping the stepper/Add never does. `shopName` renders the always-visible
- * shop chip (multi-shop spec §5.4) — pass it only where products from more
- * than one shop can appear side by side; omit it on a shop's own page,
- * where the shop is already named in the header/sticky bar.
+ * tapping the stepper/Add never does. `shopName` is always required (the
+ * "start a new cart?" sheet needs a real shop name, not just a slug, no
+ * matter where the card is used); `showShopChip` separately controls the
+ * always-visible shop-name pill (multi-shop spec §5.4) — true only where
+ * products from more than one shop can appear side by side, false on a
+ * shop's own page where the shop is already named in the header/sticky bar.
  */
 export function ProductCard({
   product,
   rail,
   shopName,
+  showShopChip = false,
 }: {
   product: ProductWithCategory;
   rail?: string;
-  shopName?: string;
+  shopName: string;
+  showShopChip?: boolean;
 }) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
   const [justAdded, setJustAdded] = useState(false);
-  const cartItem = findItem({ v: 1, updatedAt: 0, items }, product.id);
+  const cartItem = findItem({ v: 1, updatedAt: 0, shopId: null, shopSlug: null, shopName: null, items }, product.id);
   const isUnavailable = product.status === "unavailable";
   const href = `/s/${product.shop_slug}/p/${product.slug}`;
-  const ariaLabel = shopName
+  const ariaLabel = showShopChip
     ? `${product.name_en} — ${product.category?.name_en ?? ""} — ${shopName}`
     : undefined;
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     if (!product.price) return;
-    add({ productId: product.id, sku: product.sku, price: product.price }, 1);
+    const result = add(
+      { productId: product.id, sku: product.sku, price: product.price },
+      1,
+      { id: product.shop_id, slug: product.shop_slug, name: shopName },
+    );
+    if (result === "pending") return;
     trackEvent("add_to_cart", {
       product_id: product.id,
       name: product.name_en,
@@ -94,7 +103,7 @@ export function ProductCard({
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        {shopName && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
+        {showShopChip && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
         <Link href={href} aria-label={ariaLabel} className="block">
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-maroon-ink transition-colors">
             {product.name_en}

@@ -25,18 +25,31 @@ function PlaceholderImage({ name }: { name: string }) {
   );
 }
 
-export function ProductListRow({ product, shopName }: { product: ProductWithCategory; shopName?: string }) {
+export function ProductListRow({
+  product,
+  shopName,
+  showShopChip = false,
+}: {
+  product: ProductWithCategory;
+  shopName: string;
+  showShopChip?: boolean;
+}) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
   const [justAdded, setJustAdded] = useState(false);
-  const cartItem = findItem({ v: 1, updatedAt: 0, items }, product.id);
+  const cartItem = findItem({ v: 1, updatedAt: 0, shopId: null, shopSlug: null, shopName: null, items }, product.id);
   const isUnavailable = product.status === "unavailable";
   const href = `/s/${product.shop_slug}/p/${product.slug}`;
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     if (!product.price) return;
-    add({ productId: product.id, sku: product.sku, price: product.price }, 1);
+    const result = add(
+      { productId: product.id, sku: product.sku, price: product.price },
+      1,
+      { id: product.shop_id, slug: product.shop_slug, name: shopName },
+    );
+    if (result === "pending") return;
     trackEvent("add_to_cart", {
       product_id: product.id,
       name: product.name_en,
@@ -75,7 +88,7 @@ export function ProductListRow({ product, shopName }: { product: ProductWithCate
       </Link>
 
       <div className="flex flex-1 flex-col justify-center min-w-0 py-0.5">
-        {shopName && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
+        {showShopChip && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
         <Link href={href} className="block w-full mb-1">
           <div className="flex items-start gap-1.5">
             <h3 className="text-sm font-semibold text-ink hover:text-maroon-ink transition-colors leading-tight">

@@ -87,7 +87,7 @@ export default async function ShopHomePage({ params }: RouteParams) {
           <p className="py-16 text-center text-ink-soft">Our catalogue for this shop is being updated.</p>
         ) : (
           <Suspense fallback={<CatalogueLoadingSkeleton />}>
-            <CatalogueClient products={products} categories={activeCategories} />
+            <CatalogueClient products={products} categories={activeCategories} shopName={shop.name_en} />
           </Suspense>
         )}
       </section>

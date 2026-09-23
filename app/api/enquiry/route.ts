@@ -11,6 +11,8 @@ import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { sendEnquiryNotifications } from "@/lib/notifications";
 import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
 import { getComboUiPrice } from "@/lib/combo-packs";
+import { isShopOrderable } from "@/lib/shops";
+import { SRI_RAM_SHOP } from "@/lib/cart";
 
 const MIN_SUBMIT_SECONDS = 3;
 
@@ -71,14 +73,6 @@ export async function POST(request: Request) {
   const supabase = createAdminClient();
   const phone = input.customer.phone; // already normalized by phoneSchema
 
-  // The cart has no shop concept yet (multi-shop spec §6 — Phase 6), so
-  // every enquiry today is Sri Ram's, the only shop actually reachable via
-  // the storefront's unscoped routes (see lib/data.ts#getSriRamShopId).
-  // orders.shop_id is NOT NULL with no default — this lookup is required,
-  // not optional, or the insert below fails outright.
-  const { data: sriRamShop } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").single();
-  const shopId = sriRamShop!.id;
-
   // ── Idempotency: same phone + same cart within 10 minutes → return the original ref ──
   const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
   const { data: recentOrders } = await supabase
@@ -126,24 +120,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: { code: "internal_error", message: "Could not process your enquiry." } },
       { status: 500 },
-    );
-  }
-
-  // The cart has no shop concept yet (see the shopId note above) — reject
-  // outright, rather than silently dropping the item, if anything in it
-  // belongs to a shop that isn't Sri Ram. Otherwise a customer browsing a
-  // second shop that's visible-but-not-orderable-yet (multi-shop spec §6 —
-  // one-shop-per-cart isn't built) could submit and have part of their
-  // order vanish with no explanation.
-  if ((rawProducts ?? []).some((p) => p.shop_id !== shopId)) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "shop_not_orderable",
-          message: "One of the items in your cart isn't available for enquiry yet. Please remove it and try again.",
-        },
-      },
-      { status: 400 },
     );
   }
   const products = rawProducts ?? [];
@@ -201,6 +177,41 @@ export async function POST(request: Request) {
         });
         comboPricingById.set(c.id, { supplierPrice: c.supplier_cost, commission: effectivePrice - c.supplier_cost });
       }
+    }
+  }
+
+  // ── Resolve and validate the order's shop (multi-shop spec §6) ──
+  // The client's cart already enforces one-shop-per-cart, but the server
+  // never trusts that — it derives the shop independently from whichever
+  // products/combos actually matched (combo packs are always Sri Ram's —
+  // see lib/combo-packs.ts), and rejects rather than silently dropping
+  // items if the cart was somehow tampered with to mix two shops.
+  const distinctShopIds = new Set(products.map((p) => p.shop_id));
+  if (comboPricingById.size > 0) distinctShopIds.add(SRI_RAM_SHOP.id);
+  if (distinctShopIds.size > 1) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "mixed_shop_cart",
+          message: "Your cart has items from more than one shop, which isn't supported. Please start a new cart.",
+        },
+      },
+      { status: 400 },
+    );
+  }
+  const shopId = [...distinctShopIds][0] ?? null;
+  if (shopId) {
+    const { data: shop } = await supabase.from("shops").select("slug").eq("id", shopId).maybeSingle();
+    if (!shop || !isShopOrderable(shop.slug)) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "shop_not_orderable",
+            message: "This shop isn't available for enquiry yet. Please remove its items and try again.",
+          },
+        },
+        { status: 400 },
+      );
     }
   }
 

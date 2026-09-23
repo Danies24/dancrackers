@@ -144,7 +144,7 @@ export function CrossShopCatalogueClient({ products, shops, emptyContextLabel }:
         <>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {visible.map((p) => (
-              <ProductCard key={p.id} product={p} shopName={p.shop.name_en} />
+              <ProductCard key={p.id} product={p} shopName={p.shop.name_en} showShopChip />
             ))}
           </div>
           {hasMore && (

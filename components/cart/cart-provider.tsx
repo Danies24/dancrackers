@@ -12,8 +12,10 @@ import {
 } from "react";
 import {
   type CartItem,
+  type CartShop,
   type CartState,
   addItem,
+  cartShopConflicts,
   clearCart,
   decrementItem,
   emptyCart,
@@ -23,15 +25,26 @@ import {
   serializeCart,
   setItemQty,
 } from "@/lib/cart";
+import { StartNewCartSheet } from "@/components/cart/start-new-cart-sheet";
 
 const STORAGE_KEY = "dc_cart";
+
+export interface PendingShopSwitch {
+  item: { productId: string; sku: string; price: number };
+  qty: number;
+  shop: CartShop;
+}
 
 interface CartContextValue {
   items: CartItem[];
   itemCount: number;
+  shopId: string | null;
+  shopSlug: string | null;
+  shopName: string | null;
   storageAvailable: boolean;
   hydrated: boolean;
-  add: (item: { productId: string; sku: string; price: number }, qty?: number) => void;
+  /** Returns "added" when the item went straight in, or "pending" when a different shop's items were already in the cart — the confirm sheet is now showing and nothing was added yet. */
+  add: (item: { productId: string; sku: string; price: number }, qty: number | undefined, shop: CartShop) => "added" | "pending";
   increment: (productId: string) => void;
   decrement: (productId: string) => void;
   setQty: (productId: string, qty: number) => void;
@@ -43,9 +56,18 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CartState>(() => emptyCart());
+  // Mirrors `state` for `add()` to read synchronously without needing
+  // `state` itself in its dependency array — updated in an effect (never
+  // during render, which React disallows mutating a ref in).
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
   const [hydrated, setHydrated] = useState(false);
   const storageAvailableRef = useRef(true);
   const [storageAvailable, setStorageAvailableState] = useState(true);
+  const [pending, setPending] = useState<PendingShopSwitch | null>(null);
+  const scrollYRef = useRef(0);
 
   const setStorageAvailable = useCallback((v: boolean) => {
     storageAvailableRef.current = v;
@@ -82,10 +104,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [setStorageAvailable]);
 
   const add = useCallback(
-    (item: { productId: string; sku: string; price: number }, qty = 1) =>
-      apply((prev) => addItem(prev, item, qty)),
+    (item: { productId: string; sku: string; price: number }, qty = 1, shop: CartShop): "added" | "pending" => {
+      if (cartShopConflicts(stateRef.current, shop.id)) {
+        // Multi-shop spec §6: "Keep current cart" must leave the page
+        // scrolled where it was — remembered here since the sheet itself
+        // causes no navigation, only this pending state.
+        scrollYRef.current = window.scrollY;
+        setPending({ item, qty, shop });
+        return "pending";
+      }
+      apply((prev) => addItem(prev, item, qty, shop));
+      return "added";
+    },
     [apply],
   );
+
+  const confirmShopSwitch = useCallback(() => {
+    if (!pending) return;
+    apply(() => addItem(emptyCart(), pending.item, pending.qty, pending.shop));
+    setPending(null);
+  }, [pending, apply]);
+
+  const cancelShopSwitch = useCallback(() => {
+    setPending(null);
+    // Restore the scroll position the sheet interrupted (§6 MUST).
+    requestAnimationFrame(() => window.scrollTo({ top: scrollYRef.current }));
+  }, []);
+
   const increment = useCallback(
     (productId: string) => apply((prev) => incrementItem(prev, productId)),
     [apply],
@@ -113,6 +158,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => ({
       items: hydrated ? state.items : [],
       itemCount,
+      shopId: hydrated ? state.shopId : null,
+      shopSlug: hydrated ? state.shopSlug : null,
+      shopName: hydrated ? state.shopName : null,
       storageAvailable,
       hydrated,
       add,
@@ -122,10 +170,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       remove,
       clear,
     }),
-    [state.items, hydrated, itemCount, storageAvailable, add, increment, decrement, setQty, remove, clear],
+    [state, hydrated, itemCount, storageAvailable, add, increment, decrement, setQty, remove, clear],
   );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <StartNewCartSheet
+        open={pending !== null}
+        currentShopName={state.shopName}
+        newShopName={pending?.shop.name ?? ""}
+        onKeepCurrent={cancelShopSwitch}
+        onClearAndAdd={confirmShopSwitch}
+      />
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {
