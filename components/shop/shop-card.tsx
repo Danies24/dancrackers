@@ -9,13 +9,15 @@ export interface ShopCardData extends ShopRow {
 }
 
 /**
- * Home page "Our Shops" rail card (multi-shop spec §5.2) — deliberately the
- * same shell/border/gradient language as ComboPackCard (see
- * components/product/combo-pack-card.tsx), since a shop card is its direct
- * structural analog: a horizontally-scrolling showcase card with an image,
- * a title, a meta line and one CTA. Unlike a combo pack, a shop isn't
- * cart-addable — its only action is navigating to /s/[shopSlug], so there's
- * no cart-integration logic here at all, only the visual shell.
+ * Home page "Our Shops" grid card — deliberately the same shell/border/
+ * gradient language as ComboPackCard (see components/product/combo-pack-
+ * card.tsx), since a shop card is its direct structural analog: a showcase
+ * card with an image, a title, a meta line and one CTA. Always sized by its
+ * parent grid cell (w-full throughout — no fixed px widths), since it's
+ * only ever placed in the fixed 2-column grid on the home page, never a
+ * horizontal scroller. Unlike a combo pack, a shop isn't cart-addable — its
+ * only action is navigating to /s/[shopSlug], so there's no cart-
+ * integration logic here at all, only the visual shell.
  */
 export function ShopCard({ shop }: { shop: ShopCardData }) {
   const isComingSoon = shop.status === "coming_soon";
@@ -28,10 +30,10 @@ export function ShopCard({ shop }: { shop: ShopCardData }) {
 
   const card = (
     <div
-      className="group flex shrink-0 snap-start flex-col overflow-hidden rounded-[22px] p-[2px] transition-transform duration-300 ease-out sm:w-[280px] md:w-full"
+      className="group flex w-full flex-col overflow-hidden rounded-[22px] p-[2px] transition-transform duration-300 ease-out"
       style={{ background: "var(--combo-highlight-border)" }}
     >
-      <div className="flex w-[250px] flex-1 flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg sm:w-[280px] md:w-full">
+      <div className="flex w-full flex-1 flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg">
         <div className={`relative aspect-square overflow-hidden bg-cream ${isComingSoon ? "opacity-50 grayscale" : ""}`}>
           {shop.logo_url || shop.banner_url ? (
             <Image

@@ -139,10 +139,21 @@ export default async function HomePage() {
               <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
             </div>
           </div>
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
-            {shops.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} />
-            ))}
+          <div className="grid grid-cols-2 gap-4">
+            {shops.map((shop, i) => {
+              // No horizontal scroll — a fixed 2-column grid at every
+              // breakpoint. An odd shop count's last card spans both
+              // columns and is centered at one column's width, rather
+              // than stretching full-width or sitting off to one side.
+              const isLastOdd = shops.length % 2 === 1 && i === shops.length - 1;
+              return (
+                <div key={shop.id} className={isLastOdd ? "col-span-2 flex justify-center" : ""}>
+                  <div className={isLastOdd ? "w-[calc(50%-0.5rem)] min-w-[160px]" : ""}>
+                    <ShopCard shop={shop} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
