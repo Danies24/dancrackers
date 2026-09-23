@@ -3,7 +3,9 @@ import { headers } from "next/headers";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rankProducts } from "@/lib/ranking";
-import { getComboVarietyBySlug } from "@/lib/combo-packs";
+import { getActiveComboPacks, getComboVarietyBySlug } from "@/lib/combo-packs";
+import { SRI_RAM_SHOP } from "@/lib/cart";
+import { buildShopPlpSections, type ShopPlpSection } from "@/lib/shop-plp-sections";
 import type { Database } from "@/types/database";
 import type { CategoryRow, ProductWithCategory } from "@/lib/data";
 
@@ -214,4 +216,54 @@ export async function getShopsForHomeRail(): Promise<Array<ShopRow & { productCo
   const countById = new Map(counts);
 
   return (shops ?? []).map((shop) => ({ ...shop, productCount: countById.get(shop.id) ?? 0 }));
+}
+
+/**
+ * The shop PLP's bucketed section list (Swiggy-redesign plan) — one
+ * getShopCatalogue() fetch feeds every section via buildShopPlpSections()'s
+ * pure bucketing, rather than one query per section. Combo packs are still
+ * Sri Ram-only at the data layer (combo_packs has no shop_id column yet —
+ * see lib/combo-packs.ts) — gated here so another shop's PLP never asks for
+ * them at all.
+ */
+export async function getShopPlpSections(shopId: string): Promise<ShopPlpSection[]> {
+  const supabase = createPublicClient();
+  const [products, { data: categories, error }, combos] = await Promise.all([
+    getShopCatalogue(shopId),
+    supabase
+      .from("categories")
+      .select("*")
+      .eq("shop_id", shopId)
+      .eq("is_active", true)
+      .order("display_order", { ascending: true }),
+    shopId === SRI_RAM_SHOP.id ? getActiveComboPacks() : Promise.resolve([]),
+  ]);
+  if (error) throw error;
+
+  return buildShopPlpSections(products, categories ?? [], combos);
+}
+
+/**
+ * Per-shop generalization of lib/data.ts's getMaxActiveDiscountPercent() —
+ * the real, currently-active highest discount for one shop, never a stored/
+ * stale value. Always 0 for a net_markup shop (Bullet): discount_percent is
+ * null-by-trigger for every net_markup product (see
+ * compute_product_customer_price() in supabase/migrations/20260922000001),
+ * so a caller must treat 0 as "hide the discount badge," never render it as
+ * a literal "0% OFF".
+ */
+export async function getShopMaxActiveDiscountPercent(shopId: string): Promise<number> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("public_products")
+    .select("discount_percent")
+    .eq("shop_id", shopId)
+    .eq("status", "active")
+    .not("discount_percent", "is", null)
+    .order("discount_percent", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return 0;
+  return Number(data.discount_percent ?? 0);
 }

@@ -1,12 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Sheet } from "@/components/ui/sheet";
 
 /**
  * The one-shop-per-cart confirm sheet (multi-shop spec §6) — shown when
  * adding an item would clear an existing cart from a different shop.
- * "Keep current cart" is the default (closing does nothing destructive);
+ * "Keep current cart" is the default (closing via backdrop/ESC/back-button
+ * does nothing destructive — same as an explicit "Keep current cart" tap);
  * "Clear and add" empties the cart and adds the new item from the new shop.
+ * First refactor onto the shared Sheet primitive (components/ui/sheet.tsx).
  */
 export function StartNewCartSheet({
   open,
@@ -21,17 +24,10 @@ export function StartNewCartSheet({
   onKeepCurrent: () => void;
   onClearAndAdd: () => void;
 }) {
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 md:items-center" role="presentation">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="start-new-cart-title"
-        className="w-full max-w-md rounded-t-3xl border border-border bg-surface p-6 shadow-lg md:rounded-3xl"
-      >
-        <h2 id="start-new-cart-title" className="font-display text-lg font-semibold text-ink">
+    <Sheet open={open} onClose={onKeepCurrent} ariaLabel="Start a new cart?">
+      <div className="p-6">
+        <h2 className="font-display text-lg font-semibold text-ink">
           புதிய கடையிலிருந்து ஆர்டர் செய்யவா? / Start a new cart?
         </h2>
         <p className="mt-3 text-sm text-ink-soft">
@@ -43,7 +39,7 @@ export function StartNewCartSheet({
           start a cart from <strong>{newShopName}</strong>.
         </p>
         <div className="mt-6 flex flex-col gap-2">
-          <Button size="full" variant="secondary" onClick={onKeepCurrent} autoFocus>
+          <Button size="full" variant="secondary" onClick={onKeepCurrent}>
             Keep current cart
           </Button>
           <Button size="full" variant="ghost" onClick={onClearAndAdd}>
@@ -51,6 +47,6 @@ export function StartNewCartSheet({
           </Button>
         </div>
       </div>
-    </div>
+    </Sheet>
   );
 }

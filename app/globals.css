@@ -68,6 +68,16 @@
   --combo-highlight-bg: var(--gold-tint);
   --combo-badge-bg: #ffc857;
   --combo-badge-text: #171b2e;
+
+  /* Swiggy-redesign surfaces — each a light/dark pair, same verified-AA
+     discipline as --combo-highlight-* above. */
+  --price-tag-bg: rgba(255, 200, 87, 0.18);
+  --price-tag-fg: var(--gold-ink);
+  --shop-header-bg: #171b2e; /* dark hero header on the shop PLP — deliberately dark in BOTH themes */
+  --offer-strip-bg: rgba(255, 107, 26, 0.1);
+  --store-band-bg: rgba(255, 200, 87, 0.16);
+  --menu-sheet-bg: #171b2e; /* MENU fab's sheet — same intentionally-dark surface as --shop-header-bg */
+  --quickview-close-bg: var(--secondary-bg);
 }
 
 /* Dark mode — toggled via [data-theme="dark"] on <html> (components/layout/
@@ -103,6 +113,16 @@
   --combo-highlight-bg: #242a4a;
   --combo-badge-bg: #7a5410;
   --combo-badge-text: #fff8ec;
+
+  /* Brighter/more-opaque than the light pair for the same reason
+     --combo-highlight-bg is: a flat tint reads muddy on a dark ground. */
+  --price-tag-bg: #3a2f12;
+  --price-tag-fg: var(--gold-ink);
+  --shop-header-bg: #20264a; /* elevated above --surface (#1c2038) so the header still reads as its own layer */
+  --offer-strip-bg: rgba(255, 107, 26, 0.18);
+  --store-band-bg: rgba(255, 200, 87, 0.2);
+  --menu-sheet-bg: #20264a;
+  --quickview-close-bg: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
@@ -150,6 +170,14 @@
   --color-combo-highlight-bg: var(--combo-highlight-bg);
   --color-combo-badge-bg: var(--combo-badge-bg);
   --color-combo-badge-text: var(--combo-badge-text);
+
+  --color-price-tag-bg: var(--price-tag-bg);
+  --color-price-tag-fg: var(--price-tag-fg);
+  --color-shop-header-bg: var(--shop-header-bg);
+  --color-offer-strip-bg: var(--offer-strip-bg);
+  --color-store-band-bg: var(--store-band-bg);
+  --color-menu-sheet-bg: var(--menu-sheet-bg);
+  --color-quickview-close-bg: var(--quickview-close-bg);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -438,4 +466,87 @@ input[type="radio"] {
 
 .animate-blast-ring {
   animation: blast-ring 700ms ease-out both;
+}
+
+/* components/ui/sheet.tsx's shared motion — slides up from the bottom on
+   mobile, fades/scales in as a centered modal from 768px up (matching the
+   component's own bottom/desktop breakpoint). Collapses to ~1ms under
+   prefers-reduced-motion via the global rule above. */
+@keyframes sheet-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-slide-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-fade-scale-in {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-fade-scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sheet-enter {
+  animation: sheet-slide-up 340ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.sheet-exit {
+  animation: sheet-slide-down 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.sheet-backdrop-enter {
+  animation: sheet-backdrop-fade-in 340ms ease-out both;
+}
+
+.sheet-backdrop-exit {
+  animation: sheet-backdrop-fade-in 260ms ease-out both reverse;
+}
+
+@media (min-width: 768px) {
+  .sheet-enter {
+    animation-name: sheet-fade-scale-in;
+  }
+
+  .sheet-exit {
+    animation-name: sheet-fade-scale-out;
+  }
 }

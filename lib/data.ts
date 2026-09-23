@@ -53,6 +53,17 @@ export interface ProductRow {
   is_bestseller: boolean;
   is_featured: boolean;
   is_best?: boolean;
+  /**
+   * Swiggy-redesign merchandising flags (supabase/migrations/20260924000001)
+   * — optional until that migration is applied to production and
+   * `npm run db:types` regenerated: undefined behaves as "not flagged"
+   * everywhere these are read, so the app keeps working against the old
+   * schema in the meantime.
+   */
+  is_top_pick?: boolean;
+  is_recommended?: boolean;
+  noise_type?: "sound" | "no_sound" | null;
+  kids_safe?: boolean;
   min_qty: number;
   image_url: string | null;
   image_urls: string[];
