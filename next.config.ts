@@ -4,6 +4,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    // Client-side Router Cache TTLs (Swiggy-redesign plan's performance
+    // practices) — a shop PLP/category page tapped again within 30s (e.g.
+    // via back-navigation from a product) reuses the cached RSC payload
+    // instead of a fresh fetch; static/ISR pages get a longer window since
+    // their own `revalidate` already governs server-side freshness.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
   images: {
     // Product photos rarely change once uploaded (each upload gets a new
     // timestamped path) — cache Vercel's optimized copies for a long time

@@ -338,7 +338,7 @@ function CategoryShopGroup({
   const shopHref = group.shop.ownCategorySlug ? `/s/${group.shop.slug}#cat-${group.shop.ownCategorySlug}` : `/s/${group.shop.slug}`;
 
   return (
-    <div className="rounded-[28px] bg-surface py-5 pl-5">
+    <div className="cv-auto rounded-[28px] bg-surface py-5 pl-5">
       <div className="flex items-start justify-between pr-5">
         <div>
           <div className="font-display text-lg font-bold text-ink">{group.shop.nameEn}</div>

@@ -289,6 +289,15 @@ input[type="radio"] {
   display: none;
 }
 
+/* Skips layout/paint for off-screen grid items on long lists (a shop's
+   full category grid, a category page's shop groups) until they're near
+   the viewport — the intrinsic-size estimate keeps scrollbar height
+   roughly stable before each item's first real render. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 320px;
+}
+
 /* Page-load fade-in-up, staggered via inline animation-delay */
 @keyframes fade-in-up {
   from {

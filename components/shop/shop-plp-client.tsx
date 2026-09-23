@@ -184,7 +184,9 @@ export function ShopPlpClient({
                 <CollapsibleSection storageKey={`${shopSlug}-${section.categorySlug}`} title={section.nameEn} subtitle={`(${section.products.length})`}>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {section.products.map((p) => (
-                      <ProductCard key={p.id} product={p} shopName={shopName} onQuickView={openQuickView} />
+                      <div key={p.id} className="cv-auto">
+                        <ProductCard product={p} shopName={shopName} onQuickView={openQuickView} />
+                      </div>
                     ))}
                   </div>
                 </CollapsibleSection>
