@@ -117,10 +117,9 @@ export async function POST(request: Request) {
 
   // ── Step 4: re-fetch current prices server-side. Client-supplied prices are ignored entirely. ──
   const productIds = input.items.map((i) => i.productId);
-  const { data: products, error: productsError } = await supabase
+  const { data: rawProducts, error: productsError } = await supabase
     .from("products")
-    .select("id, sku, name_en, name_ta, unit, price, mrp, is_discountable, discount_percent, net_markup_percent, status")
-    .eq("shop_id", shopId)
+    .select("id, sku, name_en, name_ta, unit, price, mrp, is_discountable, discount_percent, net_markup_percent, status, shop_id")
     .in("id", productIds);
 
   if (productsError) {
@@ -129,6 +128,25 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  // The cart has no shop concept yet (see the shopId note above) — reject
+  // outright, rather than silently dropping the item, if anything in it
+  // belongs to a shop that isn't Sri Ram. Otherwise a customer browsing a
+  // second shop that's visible-but-not-orderable-yet (multi-shop spec §6 —
+  // one-shop-per-cart isn't built) could submit and have part of their
+  // order vanish with no explanation.
+  if ((rawProducts ?? []).some((p) => p.shop_id !== shopId)) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "shop_not_orderable",
+          message: "One of the items in your cart isn't available for enquiry yet. Please remove it and try again.",
+        },
+      },
+      { status: 400 },
+    );
+  }
+  const products = rawProducts ?? [];
 
   const pricingSettings = await getPricingSettings();
 

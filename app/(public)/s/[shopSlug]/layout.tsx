@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { getShopForCurrentRequest } from "@/lib/shops";
+import { getShopForCurrentRequest, isShopOrderable } from "@/lib/shops";
 import { ShopStickyBar } from "@/components/shop/shop-sticky-bar";
 import { ShopPreviewBanner } from "@/components/shop/shop-preview-banner";
+import { ShopNotOrderableBanner } from "@/components/shop/shop-not-orderable-banner";
 
 export default async function ShopLayout({
   children,
@@ -18,6 +19,7 @@ export default async function ShopLayout({
   return (
     <div>
       {isPreview && <ShopPreviewBanner />}
+      {!isShopOrderable(shop.slug) && <ShopNotOrderableBanner />}
       <ShopStickyBar shop={shop} />
       {children}
     </div>

@@ -11,6 +11,20 @@ export type ShopRow = Database["public"]["Tables"]["shops"]["Row"];
 
 const PREVIEW_TOKEN_PATTERN = /^[0-9a-f]{16}$/;
 
+/**
+ * Cart and enquiry submission are still single-shop and hardcoded to Sri
+ * Ram (multi-shop spec §6/§8 — one-shop-per-cart and shop agents aren't
+ * built yet). A shop can be made publicly visible (`status = 'active'`)
+ * before that work lands, to let it be browsed/shown to the shop owner —
+ * this is the single place that decides whether it can actually be
+ * checked out yet, so the shop page's "not open yet" notice and the
+ * enquiry route's rejection can never drift apart.
+ */
+const ORDERABLE_SHOP_SLUGS = new Set(["sri-ram-crackers"]);
+export function isShopOrderable(shopSlug: string): boolean {
+  return ORDERABLE_SHOP_SLUGS.has(shopSlug);
+}
+
 export interface ShopRouteResult {
   shop: ShopRow;
   /** True only when this shop is `hidden` and was unlocked by a matching `?preview=` token. */
