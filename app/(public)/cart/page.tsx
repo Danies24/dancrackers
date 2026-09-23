@@ -74,7 +74,7 @@ export default function CartPage() {
             const priceChanged = v.price !== line.priceAtAdd;
             return (
               <div key={line.productId} className="flex gap-3 p-3">
-                <Link href={`/product/${v.slug}`} className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-cream">
+                <Link href={`/s/${v.shopSlug}/p/${v.slug}`} className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-cream">
                   {v.image_url ? (
                     <Image src={v.image_url} alt={v.name_en ?? ""} fill className="object-cover" />
                   ) : (
@@ -84,7 +84,7 @@ export default function CartPage() {
                   )}
                 </Link>
                 <div className="flex-1">
-                  <Link href={`/product/${v.slug}`} className="group block">
+                  <Link href={`/s/${v.shopSlug}/p/${v.slug}`} className="group block">
                     <p className="text-sm font-semibold text-ink transition-colors group-hover:text-maroon-ink">{v.name_en}</p>
                     {v.name_ta && (
                       <p lang="ta" className="text-xs text-muted">

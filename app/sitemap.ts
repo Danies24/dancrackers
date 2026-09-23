@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getActiveCategories, getCatalogue } from "@/lib/data";
+import { getBrowsableShops, getCrossShopProducts } from "@/lib/cross-shop";
+import { createPublicClient } from "@/lib/supabase/public";
 import { getCanonicalUrl } from "@/config/brandConfig";
 
 const STATIC_PATHS = [
@@ -17,33 +18,46 @@ const STATIC_PATHS = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, products] = await Promise.all([
-    getActiveCategories().catch(() => []),
-    getCatalogue().catch(() => []),
+  const [shops, products] = await Promise.all([
+    getBrowsableShops().catch(() => []),
+    getCrossShopProducts({}).catch(() => []),
   ]);
+
+  const supabase = createPublicClient();
+  const { data: featuredGroups } = await supabase
+    .from("category_groups")
+    .select("slug")
+    .eq("is_featured", true)
+    .order("display_order", { ascending: true });
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
     url: getCanonicalUrl(path),
   }));
 
-  const categoryEntries: MetadataRoute.Sitemap = categories
-    .filter((c) => Boolean(c.slug))
-    .map((c) => ({
-      url: getCanonicalUrl(`/products/${c.slug}`),
-      ...(c.created_at ? { lastModified: new Date(c.created_at) } : {}),
+  const shopEntries: MetadataRoute.Sitemap = shops
+    .filter((s) => Boolean(s.slug))
+    .map((s) => ({
+      url: getCanonicalUrl(`/s/${s.slug}`),
+      ...(s.updated_at ? { lastModified: new Date(s.updated_at) } : {}),
+    }));
+
+  const groupEntries: MetadataRoute.Sitemap = (featuredGroups ?? [])
+    .filter((g) => Boolean(g.slug))
+    .map((g) => ({
+      url: getCanonicalUrl(`/products/${g.slug}`),
     }));
 
   const productEntries: MetadataRoute.Sitemap = products
-    .filter((p) => Boolean(p.slug) && p.status === "active")
+    .filter((p) => Boolean(p.slug) && Boolean(p.shop_slug) && p.status === "active")
     .map((p) => ({
-      url: getCanonicalUrl(`/product/${p.slug}`),
+      url: getCanonicalUrl(`/s/${p.shop_slug}/p/${p.slug}`),
     }));
 
   // Deduplicate and return clean array of absolute URLs
   const seen = new Set<string>();
   const allEntries: MetadataRoute.Sitemap = [];
 
-  for (const entry of [...staticEntries, ...categoryEntries, ...productEntries]) {
+  for (const entry of [...staticEntries, ...shopEntries, ...groupEntries, ...productEntries]) {
     if (!seen.has(entry.url)) {
       seen.add(entry.url);
       allEntries.push(entry);

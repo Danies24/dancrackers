@@ -13,6 +13,7 @@ import { formatRupees, formatUnit } from "@/lib/format";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { ProductShopChip } from "@/components/shop/product-shop-chip";
 import type { ProductWithCategory } from "@/lib/data";
 
 function PlaceholderImage({ name }: { name: string }) {
@@ -24,12 +25,13 @@ function PlaceholderImage({ name }: { name: string }) {
   );
 }
 
-export function ProductListRow({ product }: { product: ProductWithCategory }) {
+export function ProductListRow({ product, shopName }: { product: ProductWithCategory; shopName?: string }) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
   const [justAdded, setJustAdded] = useState(false);
   const cartItem = findItem({ v: 1, updatedAt: 0, items }, product.id);
   const isUnavailable = product.status === "unavailable";
+  const href = `/s/${product.shop_slug}/p/${product.slug}`;
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -58,7 +60,7 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
           : "border-border bg-surface shadow-sm hover:border-maroon-ink/50",
       )}
     >
-      <Link href={`/product/${product.slug}`} className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white">
+      <Link href={href} className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
@@ -73,7 +75,8 @@ export function ProductListRow({ product }: { product: ProductWithCategory }) {
       </Link>
 
       <div className="flex flex-1 flex-col justify-center min-w-0 py-0.5">
-        <Link href={`/product/${product.slug}`} className="block w-full mb-1">
+        {shopName && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
+        <Link href={href} className="block w-full mb-1">
           <div className="flex items-start gap-1.5">
             <h3 className="text-sm font-semibold text-ink hover:text-maroon-ink transition-colors leading-tight">
               {product.name_en}

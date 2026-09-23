@@ -13,19 +13,35 @@ import { formatRupees, formatUnit } from "@/lib/format";
 import { findItem } from "@/lib/cart";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { ProductShopChip } from "@/components/shop/product-shop-chip";
 import type { ProductWithCategory } from "@/lib/data";
 
 /**
  * The one product card component, used on /products, category pages, home
  * rails and related-products (§13.2). Tapping the image/name navigates;
- * tapping the stepper/Add never does.
+ * tapping the stepper/Add never does. `shopName` renders the always-visible
+ * shop chip (multi-shop spec §5.4) — pass it only where products from more
+ * than one shop can appear side by side; omit it on a shop's own page,
+ * where the shop is already named in the header/sticky bar.
  */
-export function ProductCard({ product, rail }: { product: ProductWithCategory; rail?: string }) {
+export function ProductCard({
+  product,
+  rail,
+  shopName,
+}: {
+  product: ProductWithCategory;
+  rail?: string;
+  shopName?: string;
+}) {
   const { items, add, setQty } = useCart();
   const { show } = useToast();
   const [justAdded, setJustAdded] = useState(false);
   const cartItem = findItem({ v: 1, updatedAt: 0, items }, product.id);
   const isUnavailable = product.status === "unavailable";
+  const href = `/s/${product.shop_slug}/p/${product.slug}`;
+  const ariaLabel = shopName
+    ? `${product.name_en} — ${product.category?.name_en ?? ""} — ${shopName}`
+    : undefined;
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -59,7 +75,7 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
           <Check size={11} aria-hidden strokeWidth={3} /> In Cart
         </span>
       )}
-      <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-white">
+      <Link href={href} aria-label={ariaLabel} className="relative block aspect-square overflow-hidden bg-white">
         {product.image_url ? (
           <ImageWithSkeleton
             src={product.image_url}
@@ -78,7 +94,8 @@ export function ProductCard({ product, rail }: { product: ProductWithCategory; r
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <Link href={`/product/${product.slug}`} className="block">
+        {shopName && <ProductShopChip shopSlug={product.shop_slug} shopName={shopName} />}
+        <Link href={href} aria-label={ariaLabel} className="block">
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-maroon-ink transition-colors">
             {product.name_en}
           </h3>

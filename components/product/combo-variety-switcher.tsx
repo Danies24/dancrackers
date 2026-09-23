@@ -27,7 +27,7 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
   function selectVariety(v: ComboVarietyOption) {
     if (v.id === selectedId) return;
     setSelectedId(v.id);
-    window.history.replaceState(null, "", `/product/${v.slug}`);
+    window.history.replaceState(null, "", `/s/sri-ram-crackers/p/${v.slug}`);
   }
 
   return (

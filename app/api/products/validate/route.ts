@@ -22,6 +22,7 @@ export interface ValidateResultItem {
   image_url: string | null;
   sku: string | null;
   slug: string | null;
+  shopSlug: string | null;
 }
 
 /**
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("public_products")
-    .select("id, status, price, mrp, discount_percent, is_discountable, name_en, name_ta, unit, image_url, sku, slug")
+    .select("id, status, price, mrp, discount_percent, is_discountable, name_en, name_ta, unit, image_url, sku, slug, shop_slug")
     .in("id", productIds);
 
   if (error) {
@@ -95,6 +96,7 @@ export async function POST(request: Request) {
           image_url: pack?.hero_image_url ?? null,
           sku: `COMBO-${c.slug.toUpperCase()}`,
           slug: c.slug,
+          shop_slug: "sri-ram-crackers", // combo packs are Sri Ram-only for now (multi-shop spec §5.6)
         });
       }
     }
@@ -117,6 +119,7 @@ export async function POST(request: Request) {
         image_url: null,
         sku: null,
         slug: null,
+        shopSlug: null,
       };
     return {
       productId: id,
@@ -132,6 +135,7 @@ export async function POST(request: Request) {
       image_url: p.image_url,
       sku: p.sku,
       slug: p.slug,
+      shopSlug: p.shop_slug,
     };
   });
 

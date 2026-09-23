@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const { shopSlug, slug } = await params;
   const result = await getShopForCurrentRequest(shopSlug);
   if (!result) return {};
-  const product = await getShopProductBySlug(result.shop.id, slug);
+  const product = await getShopProductBySlug(result.shop, slug);
   if (!product) return {};
 
   const canonicalUrl = getCanonicalUrl(`/s/${result.shop.slug}/p/${product.slug}`);
@@ -54,7 +54,7 @@ export default async function ShopProductPage({ params }: RouteParams) {
   if (!result) notFound();
   const { shop } = result;
 
-  const product = await getShopProductBySlug(shop.id, slug);
+  const product = await getShopProductBySlug(shop, slug);
   if (!product) notFound();
 
   const images = product.image_url ? [product.image_url, ...(product.image_urls ?? [])] : [];

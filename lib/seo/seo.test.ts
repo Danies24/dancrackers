@@ -14,6 +14,25 @@ vi.mock("@/lib/data", () => ({
 vi.mock("@/lib/combo-packs", () => ({
   getActiveComboPacks: vi.fn().mockResolvedValue([]),
 }));
+vi.mock("@/lib/cross-shop", () => ({
+  getBrowsableShops: vi.fn().mockResolvedValue([
+    { id: "s1", slug: "sri-ram-crackers", name_en: "Sri Ram Crackers", updated_at: "2026-01-01" },
+  ]),
+  getCrossShopProducts: vi.fn().mockResolvedValue([
+    { id: "p1", name_en: "10cm Sparklers", slug: "10cm-sparklers", shop_slug: "sri-ram-crackers", status: "active" },
+  ]),
+}));
+vi.mock("@/lib/supabase/public", () => ({
+  createPublicClient: vi.fn(() => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          order: vi.fn().mockResolvedValue({ data: [{ slug: "sparklers" }] }),
+        }),
+      }),
+    }),
+  })),
+}));
 
 import fs from "fs";
 import path from "path";

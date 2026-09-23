@@ -62,7 +62,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
       style={{ background: "var(--combo-highlight-border)" }}
     >
       <div className="flex w-[250px] flex-1 flex-col overflow-hidden rounded-[20px] bg-combo-highlight-bg sm:w-[280px] md:w-full">
-        <Link href={`/product/${selected.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
+        <Link href={`/s/sri-ram-crackers/p/${selected.slug}`} className="relative block aspect-square overflow-hidden bg-cream">
           {combo.heroImageUrl ? (
             <Image
               src={combo.heroImageUrl}
@@ -87,7 +87,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
         </Link>
 
         <div className="flex flex-1 flex-col gap-1 p-3">
-          <Link href={`/product/${selected.slug}`}>
+          <Link href={`/s/sri-ram-crackers/p/${selected.slug}`}>
             <h3 className="line-clamp-1 text-sm font-semibold text-ink">{combo.name}</h3>
             {combo.tagline && <p className="line-clamp-2 text-xs text-ink-soft">{combo.tagline}</p>}
           </Link>

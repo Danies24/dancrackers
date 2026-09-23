@@ -133,12 +133,12 @@ export async function getShopCategoryBySlug(shopId: string, categorySlug: string
  * shopId check on the combo result is what keeps a combo slug from
  * resolving on another shop's product page once other shops get combos too.
  */
-export async function getShopProductBySlug(shopId: string, slug: string): Promise<ProductWithCategory | null> {
+export async function getShopProductBySlug(shop: ShopRow, slug: string): Promise<ProductWithCategory | null> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("public_products")
     .select("*")
-    .eq("shop_id", shopId)
+    .eq("shop_id", shop.id)
     .eq("slug", slug)
     .maybeSingle();
 
@@ -146,7 +146,7 @@ export async function getShopProductBySlug(shopId: string, slug: string): Promis
   if (data) return data as unknown as ProductWithCategory;
 
   const combo = await getComboVarietyBySlug(slug);
-  if (!combo || combo.shopId !== shopId) return null;
+  if (!combo || combo.shopId !== shop.id) return null;
 
   return {
     id: combo.varietyId,
@@ -156,6 +156,8 @@ export async function getShopProductBySlug(shopId: string, slug: string): Promis
     name_ta: null,
     category_id: "",
     category: { id: "", slug: "", name_en: "Combo Pack", name_ta: null },
+    shop_id: shop.id,
+    shop_slug: shop.slug,
     pack: null,
     unit: "pack",
     status: "active",

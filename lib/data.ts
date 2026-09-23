@@ -44,6 +44,8 @@ export interface ProductRow {
   name_en: string;
   name_ta: string | null;
   category_id: string;
+  shop_id: string;
+  shop_slug: string;
   /** e.g. "10 Pcs" — set on shops using net_markup pricing (multi-shop spec §2.1); null for Sri Ram. */
   pack: string | null;
   unit: string;
@@ -173,6 +175,8 @@ export async function getProductBySlug(slug: string): Promise<ProductWithCategor
     name_ta: null,
     category_id: "",
     category: { id: "", slug: "", name_en: "Combo Pack", name_ta: null },
+    shop_id: combo.shopId,
+    shop_slug: "sri-ram-crackers",
     pack: null,
     unit: "pack",
     status: "active",
