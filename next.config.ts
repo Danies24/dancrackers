@@ -21,14 +21,27 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
+    // Product detail pages moved under /s/[shopSlug]/p/[slug] (multi-shop
+    // spec §5.1) — every slug that existed before this move belongs to Sri
+    // Ram (the only shop with a catalogue until this release), so a flat
+    // rewrite to its equivalent is always correct, no DB lookup needed.
+    const redirects = [
+      {
+        source: "/product/:slug",
+        destination: "/s/sri-ram-crackers/p/:slug",
+        permanent: true,
+      },
+    ];
+
     const canonicalHost = process.env.NEXT_PUBLIC_CANONICAL_HOST?.trim();
     if (!canonicalHost) {
-      return [];
+      return redirects;
     }
 
     // Permanent (308) redirect from non-canonical hosts to canonical host
     const escapedCanonical = canonicalHost.replace(/\./g, "\\.");
     return [
+      ...redirects,
       {
         source: "/:path*",
         has: [

@@ -58,9 +58,15 @@ export async function POST(request: Request) {
   const slug = input.slug ? slugify(input.slug) : slugify(input.name);
 
   const supabase = createAdminClient();
+
+  // Combo packs are Sri Ram-only for now (multi-shop spec §5.6) — no admin
+  // UI to pick a shop exists yet, and combo_packs.shop_id is NOT NULL.
+  const { data: sriRamShop } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").single();
+
   const { data: pack, error } = await supabase
     .from("combo_packs")
     .insert({
+      shop_id: sriRamShop!.id,
       name: input.name,
       slug,
       tagline: input.tagline || null,

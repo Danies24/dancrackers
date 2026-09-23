@@ -71,6 +71,14 @@ export async function POST(request: Request) {
   const supabase = createAdminClient();
   const phone = input.customer.phone; // already normalized by phoneSchema
 
+  // The cart has no shop concept yet (multi-shop spec §6 — Phase 6), so
+  // every enquiry today is Sri Ram's, the only shop actually reachable via
+  // the storefront's unscoped routes (see lib/data.ts#getSriRamShopId).
+  // orders.shop_id is NOT NULL with no default — this lookup is required,
+  // not optional, or the insert below fails outright.
+  const { data: sriRamShop } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").single();
+  const shopId = sriRamShop!.id;
+
   // ── Idempotency: same phone + same cart within 10 minutes → return the original ref ──
   const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
   const { data: recentOrders } = await supabase
@@ -112,6 +120,7 @@ export async function POST(request: Request) {
   const { data: products, error: productsError } = await supabase
     .from("products")
     .select("id, sku, name_en, name_ta, unit, price, mrp, is_discountable, discount_percent, net_markup_percent, status")
+    .eq("shop_id", shopId)
     .in("id", productIds);
 
   if (productsError) {
@@ -314,6 +323,7 @@ export async function POST(request: Request) {
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
+      shop_id: shopId,
       customer_id: customerId,
       captain_id: captainId,
       captain_code: captainCode,

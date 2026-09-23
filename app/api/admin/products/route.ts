@@ -55,9 +55,21 @@ export async function POST(request: Request) {
   const supabase = createAdminClient();
   const slug = slugify(parsed.data.name_en);
 
+  // No shop-picker in the admin UI yet (multi-shop spec §9 is future admin
+  // work) — a product always belongs to its category's shop, so that's
+  // where shop_id comes from (products.shop_id is NOT NULL, no default).
+  const { data: category, error: categoryError } = await supabase
+    .from("categories")
+    .select("shop_id")
+    .eq("id", parsed.data.category_id)
+    .single();
+  if (categoryError || !category) {
+    return NextResponse.json({ error: { code: "invalid_body", message: "Unknown category." } }, { status: 400 });
+  }
+
   const { data: inserted, error } = await supabase
     .from("products")
-    .insert({ ...parsed.data, slug })
+    .insert({ ...parsed.data, slug, shop_id: category.shop_id })
     .select("*, category:categories(id, slug, name_en)")
     .single();
 

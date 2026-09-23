@@ -1,10 +1,33 @@
 import "server-only";
+import { cache } from "react";
 import { createPublicClient } from "@/lib/supabase/public";
 import { rankProducts } from "@/lib/ranking";
 import { getComboVarietyBySlug, type ComboVarietyDetail } from "@/lib/combo-packs";
 import type { Database } from "@/types/database";
 
 export type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
+
+/**
+ * Every function below predates the multi-shop schema and reads/writes no
+ * `shop_id` at all — which used to be fine when Sri Ram was the only shop
+ * with any data. Now that Bullet (and eventually Gurusamy) share the same
+ * `products`/`categories` tables, an unscoped query here would silently
+ * surface another shop's catalogue on these routes (`/`, `/products`,
+ * `/products/[category]`, `/product/[slug]`) that don't yet know shops
+ * exist. Until those routes are rebuilt as shop-aware (multi-shop spec
+ * §5.1/§5.5), every one of them is pinned to Sri Ram's shop_id — this is
+ * exactly a no-op for Sri Ram today (100% of currently-active data is
+ * already Sri Ram's) and is what keeps these old routes "byte-identical"
+ * while actually excluding other shops, rather than relying on flipping
+ * another shop's product/category status as a stand-in for real scoping.
+ */
+export const getSriRamShopId = cache(async (): Promise<string> => {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Shop not found: sri-ram-crackers");
+  return data.id;
+});
 
 /**
  * The generated type for the `public_products` VIEW marks every column
@@ -21,6 +44,8 @@ export interface ProductRow {
   name_en: string;
   name_ta: string | null;
   category_id: string;
+  /** e.g. "10 Pcs" — set on shops using net_markup pricing (multi-shop spec §2.1); null for Sri Ram. */
+  pack: string | null;
   unit: string;
   status: string;
   is_bestseller: boolean;
@@ -69,18 +94,24 @@ export async function getCatalogue(): Promise<ProductWithCategory[]> {
   const { data, error } = await supabase
     .from("public_products")
     .select("*")
+    .eq("shop_id", await getSriRamShopId())
     .eq("status", "active")
     .not("price", "is", null)
     .order("display_order", { ascending: true });
 
   if (error) throw error;
-  return rankProducts((data ?? []) as ProductWithCategory[]);
+  return rankProducts((data ?? []) as unknown as ProductWithCategory[]);
 }
 
 export async function getCategoryWithCounts() {
   const supabase = createPublicClient();
   const [{ data: categories, error }, products] = await Promise.all([
-    supabase.from("categories").select("*").eq("is_active", true).order("display_order", { ascending: true }),
+    supabase
+      .from("categories")
+      .select("*")
+      .eq("shop_id", await getSriRamShopId())
+      .eq("is_active", true)
+      .order("display_order", { ascending: true }),
     getCatalogue(),
   ]);
   if (error) throw error;
@@ -119,17 +150,20 @@ export async function getProductBySlug(slug: string): Promise<ProductWithCategor
   const { data, error } = await supabase
     .from("public_products")
     .select("*")
+    .eq("shop_id", await getSriRamShopId())
     .eq("slug", slug)
     .maybeSingle();
 
   if (error) throw error;
-  if (data) return data as ProductWithCategory;
+  if (data) return data as unknown as ProductWithCategory;
 
   // Not a regular catalogue product — try resolving it as a combo pack
   // variety, independently addressable at this same /product/[slug] route
-  // (see supabase/migrations/20260918000001_combo_packs.sql).
+  // (see supabase/migrations/20260918000001_combo_packs.sql). Combo packs
+  // are Sri Ram-only for now (multi-shop spec §5.6), so no extra shop check
+  // is needed here — but guard anyway in case that ever changes.
   const combo = await getComboVarietyBySlug(slug);
-  if (!combo) return null;
+  if (!combo || combo.shopId !== (await getSriRamShopId())) return null;
 
   return {
     id: combo.varietyId,
@@ -139,6 +173,7 @@ export async function getProductBySlug(slug: string): Promise<ProductWithCategor
     name_ta: null,
     category_id: "",
     category: { id: "", slug: "", name_en: "Combo Pack", name_ta: null },
+    pack: null,
     unit: "pack",
     status: "active",
     is_bestseller: false,
@@ -169,6 +204,7 @@ export async function getAllProductSlugs(): Promise<string[]> {
   const { data, error } = await supabase
     .from("public_products")
     .select("slug")
+    .eq("shop_id", await getSriRamShopId())
     .eq("status", "active")
     .not("price", "is", null);
   if (error) throw error;
@@ -190,7 +226,7 @@ export async function getRelatedProducts(
     .neq("id", excludeProductId);
 
   if (error) throw error;
-  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
+  return rankProducts((data ?? []) as unknown as ProductWithCategory[]).slice(0, limit);
 }
 
 export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]> {
@@ -198,12 +234,13 @@ export async function getBestsellers(limit = 12): Promise<ProductWithCategory[]>
   const { data, error } = await supabase
     .from("public_products")
     .select("*")
+    .eq("shop_id", await getSriRamShopId())
     .eq("status", "active")
     .eq("is_bestseller", true)
     .not("price", "is", null);
 
   if (error) throw error;
-  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
+  return rankProducts((data ?? []) as unknown as ProductWithCategory[]).slice(0, limit);
 }
 
 export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
@@ -211,12 +248,13 @@ export async function getFeatured(limit = 12): Promise<ProductWithCategory[]> {
   const { data, error } = await supabase
     .from("public_products")
     .select("*")
+    .eq("shop_id", await getSriRamShopId())
     .eq("status", "active")
     .eq("is_featured", true)
     .not("price", "is", null);
 
   if (error) throw error;
-  return rankProducts((data ?? []) as ProductWithCategory[]).slice(0, limit);
+  return rankProducts((data ?? []) as unknown as ProductWithCategory[]).slice(0, limit);
 }
 
 /**
@@ -229,6 +267,7 @@ export async function getMaxActiveDiscountPercent(): Promise<number> {
   const { data, error } = await supabase
     .from("public_products")
     .select("discount_percent")
+    .eq("shop_id", await getSriRamShopId())
     .eq("status", "active")
     .not("discount_percent", "is", null)
     .order("discount_percent", { ascending: false })

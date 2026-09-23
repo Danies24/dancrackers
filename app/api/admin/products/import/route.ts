@@ -29,7 +29,14 @@ export async function POST(request: Request) {
   const { rows, errors } = parseCatalogueCsv(parsed.data.csv);
   const supabase = createAdminClient();
 
-  const { data: existingProducts } = await supabase.from("products").select("sku, price");
+  // This importer has no shop picker yet (multi-shop spec §9 is future
+  // admin work) — every import today is Sri Ram's, and shop_id is required:
+  // products/categories are unique per (shop_id, sku|slug), not globally, so
+  // an unscoped lookup here could silently match another shop's row.
+  const { data: sriRamShop } = await supabase.from("shops").select("id").eq("slug", "sri-ram-crackers").single();
+  const shopId = sriRamShop!.id;
+
+  const { data: existingProducts } = await supabase.from("products").select("sku, price").eq("shop_id", shopId);
   const diff = diffImport(rows, errors, existingProducts ?? []);
 
   if (dryRun) {
@@ -38,7 +45,7 @@ export async function POST(request: Request) {
 
   // ── Commit ──
   const admin = await getCurrentAdminUser();
-  const { data: categories } = await supabase.from("categories").select("id, slug, name_en");
+  const { data: categories } = await supabase.from("categories").select("id, slug, name_en").eq("shop_id", shopId);
   const categoryByName = new Map((categories ?? []).map((c) => [c.name_en.toLowerCase(), c.id]));
 
   let created = 0;
@@ -51,7 +58,7 @@ export async function POST(request: Request) {
       const slug = slugify(row.category);
       const { data: newCategory, error: catError } = await supabase
         .from("categories")
-        .insert({ slug, name_en: row.category, display_order: categoryByName.size + 1 })
+        .insert({ shop_id: shopId, slug, name_en: row.category, display_order: categoryByName.size + 1 })
         .select("id")
         .single();
       if (catError || !newCategory) {
@@ -70,6 +77,7 @@ export async function POST(request: Request) {
       .from("products")
       .upsert(
         {
+          shop_id: shopId,
           sku: row.sku,
           slug,
           name_en: row.name_en,
@@ -80,7 +88,7 @@ export async function POST(request: Request) {
           is_discountable: row.is_discountable,
           display_order: row.display_order,
         },
-        { onConflict: "sku" },
+        { onConflict: "shop_id,sku" },
       )
       .select("id")
       .single();
@@ -104,7 +112,7 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.confirmMissing && diff.missingSkus.length > 0) {
-    await supabase.from("products").update({ status: "unavailable" }).in("sku", diff.missingSkus);
+    await supabase.from("products").update({ status: "unavailable" }).eq("shop_id", shopId).in("sku", diff.missingSkus);
   }
 
   return NextResponse.json({

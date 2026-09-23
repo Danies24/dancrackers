@@ -10,69 +10,51 @@ import { ProductViewTracker } from "@/components/product/product-view-tracker";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
-import { getAllProductSlugs, getProductBySlug, getRelatedProducts } from "@/lib/data";
-import { getAllComboVarietySlugs } from "@/lib/combo-packs";
-import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { getShopForCurrentRequest, getShopProductBySlug } from "@/lib/shops";
+import { getRelatedProducts } from "@/lib/data";
+import { getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
+import { JsonLd, buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonld";
 
-export const revalidate = 300;
-// Every product/combo-variety slug not in the two lists below is dynamic — a
-// product added since the last deploy still opens fine, just via an
-// on-demand ISR render the first time (same as before this fix).
-export const dynamicParams = true;
+type RouteParams = { params: Promise<{ shopSlug: string; slug: string }> };
 
-/**
- * Pre-renders every product/combo-variety page at build/deploy time. Without
- * this, each of the ~200 pages paid a cold on-demand-ISR render (two
- * sequential Supabase round trips, plus a serverless invocation) on its
- * first click after every 300s revalidate window — the actual cause of
- * "clicking a product card takes a long time to open the page". With the
- * catalogue this small, pre-rendering all of them is cheap and eliminates
- * that cold path almost entirely.
- */
-export async function generateStaticParams() {
-  const [productSlugs, comboSlugs] = await Promise.all([getAllProductSlugs(), getAllComboVarietySlugs()]);
-  return [...new Set([...productSlugs, ...comboSlugs])].map((slug) => ({ slug }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
+  const { shopSlug, slug } = await params;
+  const result = await getShopForCurrentRequest(shopSlug);
+  if (!result) return {};
+  const product = await getShopProductBySlug(result.shop.id, slug);
   if (!product) return {};
-  const canonicalUrl = getCanonicalUrl(`/product/${product.slug}`);
+
+  const canonicalUrl = getCanonicalUrl(`/s/${result.shop.slug}/p/${product.slug}`);
   const priceSnippet = product.price ? ` (${formatRupees(product.price)})` : "";
   let rawTitle = `${product.name_en}${priceSnippet}`;
   if (rawTitle.length > 45) {
     rawTitle = product.name_en.length > 45 ? `${product.name_en.slice(0, 42)}...` : product.name_en;
   }
   const desc = product.price
-    ? `${product.name_en} (${product.name_ta || ""}) at ${formatRupees(product.price)} per ${formatUnit(product.unit)}. Sivakasi crackers enquiry from Kolagalam.`
-    : `${product.name_en} Sivakasi crackers price list & Diwali enquiry from Kolagalam.`;
-  const cleanDesc = desc.replace(/\s+/g, " ").slice(0, 155);
+    ? `${product.name_en} (${product.name_ta || ""}) at ${formatRupees(product.price)} per ${formatUnit(product.unit)}, from ${result.shop.name_en}.`
+    : `${product.name_en} Sivakasi crackers price list & Diwali enquiry from ${result.shop.name_en}.`;
 
   return {
     title: rawTitle,
-    description: cleanDesc,
-    alternates: {
-      canonical: canonicalUrl,
-    },
+    description: desc.replace(/\s+/g, " ").slice(0, 155),
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title: rawTitle,
-      description: cleanDesc,
+      description: desc,
       url: canonicalUrl,
       images: product.image_url ? [product.image_url] : undefined,
     },
+    robots: result.isPreview ? { index: false, follow: false } : undefined,
   };
 }
 
-import { JsonLd, buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonld";
+export default async function ShopProductPage({ params }: RouteParams) {
+  const { shopSlug, slug } = await params;
+  const result = await getShopForCurrentRequest(shopSlug);
+  if (!result) notFound();
+  const { shop } = result;
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getShopProductBySlug(shop.id, slug);
   if (!product) notFound();
 
   const images = product.image_url ? [product.image_url, ...(product.image_urls ?? [])] : [];
@@ -81,28 +63,23 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   const crumbs = [
     { name: "Home", url: getCanonicalUrl("/") },
-    { name: "Products", url: getCanonicalUrl("/products") },
+    { name: shop.name_en, url: getCanonicalUrl(`/s/${shop.slug}`) },
   ];
-  if (product.category) {
+  if (product.category?.slug) {
     crumbs.push({
       name: product.category.name_en,
-      url: getCanonicalUrl(`/products/${product.category.slug}`),
+      url: getCanonicalUrl(`/s/${shop.slug}/c/${product.category.slug}`),
     });
   }
-  crumbs.push({
-    name: product.name_en,
-    url: getCanonicalUrl(`/product/${product.slug}`),
-  });
+  crumbs.push({ name: product.name_en, url: getCanonicalUrl(`/s/${shop.slug}/p/${product.slug}`) });
 
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(crumbs);
   const productJsonLd = buildProductJsonLd({
     name: product.name_en,
-    description:
-      product.description ??
-      `${product.name_en} Sivakasi crackers price list & Diwali order enquiry from Kolagalam.`,
+    description: product.description ?? `${product.name_en} Sivakasi crackers price list, from ${shop.name_en}.`,
     sku: product.sku ?? undefined,
     image: product.image_url ?? undefined,
-    url: getCanonicalUrl(`/product/${product.slug}`),
+    url: getCanonicalUrl(`/s/${shop.slug}/p/${product.slug}`),
     category: product.category?.name_en ?? undefined,
   });
 
@@ -117,38 +94,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         category={product.category?.name_en}
         price={product.price}
       />
-      <nav aria-label="Breadcrumb" className="mb-4 text-xs text-muted">
-        <ol className="flex items-center gap-1.5 flex-wrap">
-          <li>
-            <Link href="/" className="hover:underline">Home</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/products" className="hover:underline">Products</Link>
-          </li>
-          {product.category && (
-            <>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href={`/products/${product.category.slug}`} className="hover:underline">
-                  {product.category.name_en}
-                </Link>
-              </li>
-            </>
-          )}
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="font-medium text-ink">
-            {product.name_en}
-          </li>
-        </ol>
+      <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+        <Link href="/" className="hover:underline">
+          Home
+        </Link>
+        <span aria-hidden="true">/</span>
+        <Link href={`/s/${shop.slug}`} className="hover:underline">
+          {shop.name_en}
+        </Link>
+        {product.category?.slug && (
+          <>
+            <span aria-hidden="true">/</span>
+            <Link href={`/s/${shop.slug}/c/${product.category.slug}`} className="hover:underline">
+              {product.category.name_en}
+            </Link>
+          </>
+        )}
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" className="font-medium text-ink">
+          {product.name_en}
+        </span>
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
           <ProductGallery images={images} name={product.name_en} category={product.category?.name_en ?? ""} />
-          {product.video_url && (
-            <video controls className="mt-4 w-full rounded-lg" src={product.video_url} />
-          )}
+          {product.video_url && <video controls className="mt-4 w-full rounded-lg" src={product.video_url} />}
         </div>
 
         <div className="pb-24 md:pb-0">
@@ -179,9 +150,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   {product.name_ta}
                 </p>
               )}
-              {product.category && (
+              <p className="mt-2 text-xs text-ink-soft">
+                from{" "}
+                <Link href={`/s/${shop.slug}`} className="font-medium text-maroon-ink">
+                  {shop.name_en}
+                </Link>
+              </p>
+              {product.category?.slug && (
                 <Link
-                  href={`/products/${product.category.slug}`}
+                  href={`/s/${shop.slug}/c/${product.category.slug}`}
                   className="mt-2 inline-block text-xs font-medium text-maroon-ink"
                 >
                   {product.category.name_en}
@@ -201,12 +178,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     {!product.is_discountable && <p className="text-sm text-muted">Special price</p>}
                     <div className="flex flex-wrap items-baseline gap-2 tabular-nums">
                       {product.mrp != null && product.mrp > product.price! && (
-                        <span className="text-base text-muted line-through">
-                          {formatRupees(product.mrp)}
-                        </span>
+                        <span className="text-base text-muted line-through">{formatRupees(product.mrp)}</span>
                       )}
                       <span className="text-3xl font-bold text-ink">{formatRupees(product.price!)}</span>{" "}
-                      <span className="text-sm text-muted">per {formatUnit(product.unit)}</span>
+                      <span className="text-sm text-muted">
+                        per {formatUnit(product.unit)}
+                        {product.pack ? ` — ${product.pack}` : ""}
+                      </span>
                       <SparklerIcon size={18} />
                     </div>
                   </div>
@@ -250,19 +228,24 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       {!product.combo && product.category_id && (
         <Suspense fallback={null}>
-          <RelatedProducts categoryId={product.category_id} excludeProductId={product.id} />
+          <RelatedProducts categoryId={product.category_id} excludeProductId={product.id} shopSlug={shop.slug} />
         </Suspense>
       )}
     </div>
   );
 }
 
-/**
- * Streamed in below the fold, after the main content has already painted —
- * "You may also like" is never on the critical path for a page that's
- * pre-rendered for the click-through itself (§ generateStaticParams above).
- */
-async function RelatedProducts({ categoryId, excludeProductId }: { categoryId: string; excludeProductId: string }) {
+async function RelatedProducts({
+  categoryId,
+  excludeProductId,
+}: {
+  categoryId: string;
+  excludeProductId: string;
+  shopSlug: string;
+}) {
+  // categoryId is a uuid unique across shops (never shared between shops),
+  // so this is already shop-scoped without needing an extra filter — see
+  // lib/data.ts#getRelatedProducts.
   const related = await getRelatedProducts(categoryId, excludeProductId);
   if (related.length === 0) return null;
 

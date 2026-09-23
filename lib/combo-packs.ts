@@ -11,6 +11,7 @@ import { createPublicClient } from "@/lib/supabase/public";
  */
 interface PublicComboVarietyRow {
   id: string;
+  shop_id: string;
   combo_pack_id: string;
   slug: string;
   tier_label: string;
@@ -71,6 +72,7 @@ export interface ComboItemGroup {
 
 export interface ComboVarietyDetail {
   varietyId: string;
+  shopId: string;
   varietySlug: string;
   tierLabel: string;
   sellingPrice: number;
@@ -229,6 +231,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
 
   return {
     varietyId: variety.id,
+    shopId: variety.shop_id,
     varietySlug: variety.slug,
     tierLabel: variety.tier_label,
     sellingPrice: getComboUiPrice(variety.slug, variety.selling_price),
