@@ -43,13 +43,13 @@ const HERO_SLIDES: HeroBannerSlide[] = [
     eyebrow: "DIWALI 2026",
   },
   {
-    id: "straight-from-sivakasi",
-    headline: "Straight From Sivakasi. Straight to You.",
-  },
-  {
     id: "all-shops-one-place",
     headline: "Sivakasi's own shops, all in one place.",
     headlineTa: "சிவகாசியின் கடைகள் இப்போது ஒரே இடத்தில். கடை வாரியாக ஒப்பிட்டு, உங்கள் ஆர்டரை உருவாக்குங்கள் — நாங்கள் அழைத்து உறுதி செய்கிறோம்.",
+  },
+  {
+    id: "straight-from-sivakasi",
+    headline: "Straight From Sivakasi. Straight to You.",
   },
 ];
 
