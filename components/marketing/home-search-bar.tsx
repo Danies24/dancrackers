@@ -10,9 +10,10 @@ const ROTATE_INTERVAL_MS = 2600;
 /**
  * Home v2's search bar (Swiggy-redesign plan) — text only, no voice search
  * (dropped per the confirmed scope decision). Submitting routes to
- * /products?q=..., the existing cross-shop grid's own search (lib/
- * catalogue-search.ts), so this stays a thin entry point rather than a
- * second search implementation.
+ * /products?q=..., which redirects straight to /category/[slug] when the
+ * query confidently matches a category (the common case — searching a
+ * cracker type), or falls back to /products' own shop-switcher view
+ * otherwise. No second search implementation lives here.
  */
 export function HomeSearchBar() {
   const router = useRouter();
