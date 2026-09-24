@@ -23,3 +23,11 @@ export async function getAllCategoryGroups(): Promise<CategoryGroupRow[]> {
   if (error) throw error;
   return data ?? [];
 }
+
+/** category_id -> group_id, across every shop — lets the home page tally cross-shop product counts per group without a join per product. */
+export async function getCategoryGroupIdByCategoryId(): Promise<Map<string, string>> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.from("categories").select("id, group_id").not("group_id", "is", null);
+  if (error) throw error;
+  return new Map((data ?? []).map((c) => [c.id, c.group_id as string]));
+}

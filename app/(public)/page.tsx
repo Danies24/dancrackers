@@ -11,7 +11,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCategoryWithCounts } from "@/lib/data";
 import { getShopsForHomeShowcase } from "@/lib/shops";
-import { getAllCategoryGroups } from "@/lib/category-groups";
+import { getAllCategoryGroups, getCategoryGroupIdByCategoryId, type CategoryGroupRow } from "@/lib/category-groups";
 import { getCrossShopProducts } from "@/lib/cross-shop";
 import { getActiveComboPacks } from "@/lib/combo-packs";
 import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
@@ -58,21 +58,53 @@ const TRUST_FEATURES = [
 
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
+const NIGHT_PINNED_SLUGS = ["sparklers", "ground-chakkars", "flower-pots"];
+const DAY_PINNED_SLUGS = ["paper-bombs", "bombs", "sound-crackers"];
+
+/** Pins the given slugs first (in that order), then the rest by cross-shop
+ * product count descending, capped at 10 — the user's explicit ordering
+ * rule for the home Night/Day Crackers tiles. */
+function orderCategoryGroups(groups: CategoryGroupRow[], pinnedSlugs: string[], countByGroupId: Map<string, number>): CategoryGroupRow[] {
+  const bySlug = new Map(groups.map((g) => [g.slug, g]));
+  const pinned = pinnedSlugs.map((slug) => bySlug.get(slug)).filter((g): g is CategoryGroupRow => !!g);
+  const pinnedIds = new Set(pinned.map((g) => g.id));
+  const rest = groups
+    .filter((g) => !pinnedIds.has(g.id))
+    .sort((a, b) => (countByGroupId.get(b.id) ?? 0) - (countByGroupId.get(a.id) ?? 0));
+  return [...pinned, ...rest].slice(0, 10);
+}
+
 export default async function HomePage() {
-  const [categories, shopCards, allCategoryGroups, crossShopProducts, comboPacks] = await Promise.all([
+  const [categories, shopCards, allCategoryGroups, categoryIdToGroupId, crossShopProducts, comboPacks] = await Promise.all([
     getCategoryWithCounts(),
     getShopsForHomeShowcase(),
     getAllCategoryGroups(),
+    getCategoryGroupIdByCategoryId(),
     getCrossShopProducts({}),
     getActiveComboPacks(),
   ]);
   // Shop by category, segregated by when a cracker is conventionally used
-  // (20260924000004) — a real category_group tagged night/day, never the
+  // (20260924000004/5) — a real category_group tagged night/day, never the
   // two virtual "collects_time_of_day" rows themselves (their own
-  // time_of_day is null, so they're naturally excluded here; each section
-  // heading instead links to that shop's own aggregate page).
-  const nightCategoryGroups = allCategoryGroups.filter((g) => g.time_of_day === "night").slice(0, 10);
-  const dayCategoryGroups = allCategoryGroups.filter((g) => g.time_of_day === "day").slice(0, 10);
+  // time_of_day is null, so they're naturally excluded here). Sparklers/
+  // Ground Chakkars/Flower Pots and Paper Bombs/Bombs/Sound Crackers are
+  // pinned first per the user's ask, the rest ranked by cross-shop count.
+  const countByGroupId = new Map<string, number>();
+  for (const p of crossShopProducts) {
+    const groupId = categoryIdToGroupId.get(p.category.id);
+    if (!groupId) continue;
+    countByGroupId.set(groupId, (countByGroupId.get(groupId) ?? 0) + 1);
+  }
+  const nightCategoryGroups = orderCategoryGroups(
+    allCategoryGroups.filter((g) => g.time_of_day === "night"),
+    NIGHT_PINNED_SLUGS,
+    countByGroupId,
+  );
+  const dayCategoryGroups = orderCategoryGroups(
+    allCategoryGroups.filter((g) => g.time_of_day === "day"),
+    DAY_PINNED_SLUGS,
+    countByGroupId,
+  );
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
 
@@ -128,10 +160,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Shop by category — segregated into Night/Day Crackers (20260924000004),
-          each a 4-column grid, no horizontal scroll. The heading itself links
-          to that time-of-day's aggregate page (every matching category's
-          products, cross-shop, in one list) for "see everything at once". */}
+      {/* Shop by category — segregated into Night/Day Crackers (20260924000004/5),
+          each a 4-column grid, no horizontal scroll. "Night Crackers"/"Day
+          Crackers" are plain section titles, not links — they're not a
+          browsable category themselves, just a grouping for the tiles below. */}
       {(nightCategoryGroups.length > 0 || dayCategoryGroups.length > 0) && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
@@ -141,10 +173,7 @@ export default async function HomePage() {
 
           {nightCategoryGroups.length > 0 && (
             <div className="mb-8">
-              <Link href="/category/night-crackers" className="mb-4 flex items-center gap-1.5">
-                <h3 className="font-display text-base font-bold text-ink">🌙 Night Crackers</h3>
-                <span className="text-ink-soft">→</span>
-              </Link>
+              <h3 className="mb-4 font-display text-base font-bold text-ink">🌙 Night Crackers</h3>
               <div className="grid grid-cols-4 gap-x-3 gap-y-5">
                 {nightCategoryGroups.map((group) => (
                   <CategoryGroupTile key={group.id} group={group} />
@@ -155,10 +184,7 @@ export default async function HomePage() {
 
           {dayCategoryGroups.length > 0 && (
             <div>
-              <Link href="/category/morning-crackers" className="mb-4 flex items-center gap-1.5">
-                <h3 className="font-display text-base font-bold text-ink">☀️ Day Crackers</h3>
-                <span className="text-ink-soft">→</span>
-              </Link>
+              <h3 className="mb-4 font-display text-base font-bold text-ink">☀️ Day Crackers</h3>
               <div className="grid grid-cols-4 gap-x-3 gap-y-5">
                 {dayCategoryGroups.map((group) => (
                   <CategoryGroupTile key={group.id} group={group} />
