@@ -5,16 +5,24 @@ import { getPricingSettings } from "@/lib/pricing-settings";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminProductsPage() {
+/**
+ * `?shop=<slug>` scopes the query to one shop's own products, server-side —
+ * without it, the page falls back to the old cross-shop `.limit(500)` view
+ * (multiple shops now push the real total past 500, so that view was
+ * already silently truncating; scoping to one shop sidesteps it rather than
+ * raising the cap, since "all shops, unbounded" isn't a page anyone needs).
+ */
+export default async function AdminProductsPage({ searchParams }: { searchParams: Promise<{ shop?: string }> }) {
+  const { shop: shopSlug } = await searchParams;
   const supabase = createAdminClient();
-  const [{ data: products }, pricingSettings] = await Promise.all([
-    supabase
-      .from("products")
-      .select("*, category:categories(id, slug, name_en)")
-      .order("display_order")
-      .limit(500),
-    getPricingSettings(),
-  ]);
+
+  const { data: shops } = await supabase.from("shops").select("id, slug, name_en").order("display_order");
+  const selectedShop = shopSlug ? (shops ?? []).find((s) => s.slug === shopSlug) : null;
+
+  let query = supabase.from("products").select("*, category:categories(id, slug, name_en)").order("display_order");
+  query = selectedShop ? query.eq("shop_id", selectedShop.id) : query.limit(500);
+
+  const [{ data: products }, pricingSettings] = await Promise.all([query, getPricingSettings()]);
 
   return (
     <div>
@@ -40,7 +48,12 @@ export default async function AdminProductsPage() {
           </Link>
         </div>
       </div>
-      <ProductsTable initialProducts={products ?? []} initialPricingSettings={pricingSettings} />
+      <ProductsTable
+        initialProducts={products ?? []}
+        initialPricingSettings={pricingSettings}
+        shops={shops ?? []}
+        selectedShopSlug={selectedShop?.slug ?? "all"}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
 import { computeProductPricing } from "@/lib/pricing";
@@ -40,10 +41,15 @@ function csvCell(v: unknown): string {
 export function ProductsTable({
   initialProducts,
   initialPricingSettings,
+  shops,
+  selectedShopSlug,
 }: {
   initialProducts: Product[];
   initialPricingSettings: PricingSettings;
+  shops: Array<{ id: string; slug: string; name_en: string }>;
+  selectedShopSlug: string;
 }) {
+  const router = useRouter();
   const [products, setProducts] = useState(initialProducts);
   const [supplierDiscountPercent, setSupplierDiscountPercent] = useState(
     initialPricingSettings.supplierDiscountPercent,
@@ -301,6 +307,18 @@ export function ProductsTable({
 
       {/* Filters */}
       <div className="mb-3 flex flex-wrap gap-2">
+        <select
+          value={selectedShopSlug}
+          onChange={(e) => router.push(e.target.value === "all" ? "/admin/products" : `/admin/products?shop=${e.target.value}`)}
+          className="h-9 rounded-md border border-border bg-surface px-2 text-sm font-semibold"
+        >
+          <option value="all">All shops</option>
+          {shops.map((s) => (
+            <option key={s.id} value={s.slug}>
+              {s.name_en}
+            </option>
+          ))}
+        </select>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
