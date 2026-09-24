@@ -1,5 +1,5 @@
 import "server-only";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { formatRupees } from "./format";
 import { brandConfig } from "@/config/brandConfig";
 
@@ -7,6 +7,17 @@ import { brandConfig } from "@/config/brandConfig";
  * §18. Three independent channels after the DB write commits. Every
  * failure here is logged, never thrown — the enquiry is already durably
  * stored, so a dead email provider must never fail the request (§16.5 step 9).
+ *
+ * Email goes out via Gmail SMTP (nodemailer), not a third-party provider —
+ * Resend's sandbox sender could only ever deliver to the Resend account's
+ * own owner email, never kolagalam.contact@gmail.com, and lifting that
+ * needs a verified domain this project doesn't have (a *.vercel.app
+ * subdomain doesn't qualify). Sending AS kolagalam.contact@gmail.com
+ * through its own Gmail account sidesteps third-party domain verification
+ * entirely — GMAIL_USER is both the authenticating account and the From
+ * address. GMAIL_APP_PASSWORD is a Google Account "App Password" (Google
+ * Account → Security → 2-Step Verification → App Passwords), never the
+ * account's real login password.
  */
 
 export interface NotificationOrder {
@@ -27,43 +38,53 @@ export async function sendEnquiryNotifications(order: NotificationOrder): Promis
   await Promise.allSettled([sendEmailNotification(order), sendTelegramNotification(order)]);
 }
 
-/** NOTIFY_EMAIL_PRIMARY/SECONDARY (.env.example) — was hardcoded to
- * kolagalam.contact@gmail.com and silently ignored both env vars, so
- * changing the destination meant a code deploy instead of an env change. */
+/** NOTIFY_EMAIL_PRIMARY/SECONDARY (.env.example) — the recipients. Kept
+ * separate from GMAIL_USER (the sender/authenticating account) since a
+ * future setup may want to send from one address but notify another. */
 function notifyRecipients(): string[] {
   const primary = process.env.NOTIFY_EMAIL_PRIMARY ?? "kolagalam.contact@gmail.com";
   const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
   return [primary, secondary].filter((v): v is string => Boolean(v));
 }
 
-async function sendEmailNotification(order: NotificationOrder): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
+function getGmailTransport(): { transporter: ReturnType<typeof nodemailer.createTransport>; user: string } | null {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) return null;
+  return { transporter: nodemailer.createTransport({ service: "gmail", auth: { user, pass } }), user };
+}
+
+/** Shared by every-enquiry alerts and the digest — nodemailer's sendMail
+ * rejects on an SMTP-level failure (unlike Resend's old {data, error}
+ * result object, which silently swallowed rejections if the caller never
+ * checked `error` — see git history), so a plain try/catch is sufficient
+ * here to make failures visible in the server logs. */
+async function sendMail(subject: string, html: string, logLabel: string): Promise<void> {
+  const gmail = getGmailTransport();
   const to = notifyRecipients();
-  const from = process.env.RESEND_FROM_EMAIL || "Kolagalam <onboarding@resend.dev>";
-  if (!apiKey || to.length === 0) {
-    console.warn(`[notifications] Resend not configured — skipped email for ${order.orderRef}`);
+  if (!gmail || to.length === 0) {
+    console.warn(`${logLabel} Gmail SMTP not configured — skipped`);
     return;
   }
 
   try {
-    const resend = new Resend(apiKey);
-    // resend.emails.send() does NOT throw for an API-level rejection (rate
-    // limit, quota exceeded, invalid from-address, etc.) — it resolves with
-    // { data: null, error } instead. Checking `error` here is required, not
-    // optional: without it, a rejected send is indistinguishable from a
-    // successful one and the enquiry silently never reaches an inbox.
-    const { error } = await resend.emails.send({
-      from,
+    await gmail.transporter.sendMail({
+      from: `Kolagalam <${gmail.user}>`,
       to,
-      subject: `🎆 New enquiry ${order.orderRef} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
-      html: buildEmailHtml(order),
+      subject,
+      html,
     });
-    if (error) {
-      console.error(`[notifications] Resend rejected email for ${order.orderRef}: ${error.name} — ${error.message}`);
-    }
   } catch (error) {
-    console.error(`[notifications] Email failed for ${order.orderRef}`, error);
+    console.error(`${logLabel} send failed`, error);
   }
+}
+
+async function sendEmailNotification(order: NotificationOrder): Promise<void> {
+  await sendMail(
+    `🎆 New enquiry ${order.orderRef} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
+    buildEmailHtml(order),
+    `[notifications] Email for ${order.orderRef}`,
+  );
 }
 
 function buildEmailHtml(order: NotificationOrder): string {
@@ -144,14 +165,6 @@ export interface DigestInput {
  * per-enquiry alerts.
  */
 export async function sendDigestEmail(input: DigestInput): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = notifyRecipients();
-  const from = process.env.RESEND_FROM_EMAIL || "Kolagalam <onboarding@resend.dev>";
-  if (!apiKey || to.length === 0) {
-    console.warn("[digest] Resend not configured — skipping digest email");
-    return;
-  }
-
   const rows = (orders: DigestOrder[]) =>
     orders.length === 0
       ? "<p>None.</p>"
@@ -175,13 +188,5 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
     </div>
   `;
 
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({ from, to, subject, html });
-    if (error) {
-      console.error(`[digest] Resend rejected email: ${error.name} — ${error.message}`);
-    }
-  } catch (error) {
-    console.error("[digest] send failed", error);
-  }
+  await sendMail(subject, html, "[digest]");
 }
