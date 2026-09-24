@@ -50,7 +50,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
             </p>
           )}
           <div className="font-display text-lg font-bold text-ink">{shop.name_en}</div>
-          {shop.tagline && <p className="mt-0.5 line-clamp-1 text-xs text-ink-soft">{shop.tagline}</p>}
+          {shop.tagline && <p className="mt-0.5 line-clamp-1 text-xs font-bold text-teal-ink">{shop.tagline}</p>}
           <div className="mt-0.5 text-xs text-ink-soft">
             {isComingSoon ? "Coming soon" : `${productCount} items`}
           </div>

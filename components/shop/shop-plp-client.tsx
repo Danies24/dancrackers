@@ -16,7 +16,6 @@ import { useActiveSection } from "@/components/shop/use-active-section";
 import type { ShopPlpSection } from "@/lib/shop-plp-sections";
 import type { ProductWithCategory } from "@/lib/data";
 
-const ALL_ANCHOR_ID = "cat-all";
 const VIEW_MODE_STORAGE_KEY = "kg_shop_view_mode";
 // Global sticky header (h-16 = 64px) + ShopStickyBar (components/shop/
 // shop-sticky-bar.tsx, sticky top-16) — the fixed part of the sticky stack
@@ -125,31 +124,21 @@ export function ShopPlpClient({
     (s): s is Extract<ShopPlpSection, { kind: "category" }> => s.kind === "category",
   );
 
-  // Every category's products in one grid — replaces the old filter chips'
-  // "All" state now that there's no chip row to hold it.
-  const allProducts = useMemo(() => categorySections.flatMap((s) => s.products), [categorySections]);
-
-  const allAnchorIds = useMemo(() => [ALL_ANCHOR_ID, ...sections.map(sectionAnchorId)], [sections]);
+  const allAnchorIds = useMemo(() => sections.map(sectionAnchorId), [sections]);
   const activeAnchorId = useActiveSection(allAnchorIds);
 
-  const circleItems: CategoryCircleItem[] = [
-    { anchorId: ALL_ANCHOR_ID, nameEn: "All", imageUrl: null, count: allProducts.length },
-    ...categorySections.map((s) => ({
-      anchorId: `cat-${s.categorySlug}`,
-      nameEn: s.nameEn,
-      imageUrl: s.products.find((p) => p.image_url)?.image_url ?? null,
-      count: s.products.length,
-    })),
-  ];
+  const circleItems: CategoryCircleItem[] = categorySections.map((s) => ({
+    anchorId: `cat-${s.categorySlug}`,
+    nameEn: s.nameEn,
+    imageUrl: s.products.find((p) => p.image_url)?.image_url ?? null,
+    count: s.products.length,
+  }));
 
-  const menuSections: ShopMenuSection[] = [
-    { anchorId: ALL_ANCHOR_ID, label: "All", count: allProducts.length },
-    ...sections.map((s) => ({
-      anchorId: sectionAnchorId(s),
-      label: s.kind === "category" ? s.nameEn : FLAT_SECTION_LABEL[s.kind],
-      count: s.kind === "combos" ? s.combos.length : s.products.length,
-    })),
-  ];
+  const menuSections: ShopMenuSection[] = sections.map((s) => ({
+    anchorId: sectionAnchorId(s),
+    label: s.kind === "category" ? s.nameEn : FLAT_SECTION_LABEL[s.kind],
+    count: s.kind === "combos" ? s.combos.length : s.products.length,
+  }));
 
   function scrollToAnchor(anchorId: string) {
     document.getElementById(anchorId)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -223,15 +212,10 @@ export function ShopPlpClient({
           return null;
         })}
 
-        {allProducts.length > 0 && (
-          <section id={ALL_ANCHOR_ID} style={{ scrollMarginTop }}>
-            <CollapsibleSection storageKey={`${shopSlug}-all`} title="All" subtitle={`(${allProducts.length})`} defaultOpen={false}>
-              <div className="mb-3 flex justify-end">
-                <ViewModeToggle mode={viewMode} onChange={handleViewModeChange} />
-              </div>
-              {renderProducts(allProducts)}
-            </CollapsibleSection>
-          </section>
+        {categorySections.length > 0 && (
+          <div className="flex justify-end">
+            <ViewModeToggle mode={viewMode} onChange={handleViewModeChange} />
+          </div>
         )}
 
         {categorySections.map((section) => {

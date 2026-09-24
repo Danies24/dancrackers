@@ -8,10 +8,12 @@ import { HeroBannerCarousel, type HeroBannerSlide } from "@/components/marketing
 import { ShopShowcaseCard } from "@/components/shop/shop-showcase-card";
 import { CategoryGroupTile } from "@/components/shop/category-group-tile";
 import { ProductCard } from "@/components/product/product-card";
+import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCategoryWithCounts } from "@/lib/data";
 import { getShopsForHomeShowcase } from "@/lib/shops";
 import { getFeaturedCategoryGroups } from "@/lib/category-groups";
 import { getCrossShopProducts } from "@/lib/cross-shop";
+import { getActiveComboPacks } from "@/lib/combo-packs";
 import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
 import { formatRupees } from "@/lib/format";
 import type { Metadata } from "next";
@@ -57,11 +59,12 @@ const TRUST_FEATURES = [
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
 export default async function HomePage() {
-  const [categories, shopCards, featuredCategoryGroups, crossShopProducts] = await Promise.all([
+  const [categories, shopCards, featuredCategoryGroups, crossShopProducts, comboPacks] = await Promise.all([
     getCategoryWithCounts(),
     getShopsForHomeShowcase(),
     getFeaturedCategoryGroups(),
     getCrossShopProducts({}),
+    getActiveComboPacks(),
   ]);
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
@@ -70,10 +73,6 @@ export default async function HomePage() {
   // discipline for getMaxActiveDiscountPercent, extended cross-shop) — never
   // a stored/stale headline number.
   const maxDiscountPercent = crossShopProducts.reduce((max, p) => Math.max(max, p.discount_percent ?? 0), 0);
-  const topOffers = [...crossShopProducts]
-    .filter((p) => (p.discount_percent ?? 0) > 0)
-    .sort((a, b) => (b.discount_percent ?? 0) - (a.discount_percent ?? 0))
-    .slice(0, 10);
   const under199 = crossShopProducts
     .filter((p) => p.price !== null && p.price < 199)
     .sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
@@ -134,12 +133,6 @@ export default async function HomePage() {
             {featuredCategoryGroups.map((group) => (
               <CategoryGroupTile key={group.id} group={group} />
             ))}
-            <Link href="/products" className="flex flex-col items-center gap-1.5 text-center">
-              <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-secondary-bg text-xs font-semibold text-ink-soft">
-                View all
-              </span>
-              <span className="text-xs font-medium text-ink">எல்லாம் / View all</span>
-            </Link>
           </div>
         </section>
       )}
@@ -169,17 +162,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Top Offers — real, currently-active discounts across every shop
-          (never fabricated). */}
-      {topOffers.length > 0 && (
+      {/* Combo Packs — Sri Ram's premium-showcase treatment (ComboPackCard),
+          replacing the old cross-shop "Top Offers" carousel with a
+          highlighted spotlight on the one shop that actually has them. */}
+      {comboPacks.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
-            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">🔥 Top Offers</h2>
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">🎁 Combo Packs</h2>
+            <p className="text-xs font-semibold text-ink-soft">From Sri Ram Crackers</p>
           </div>
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
-            {topOffers.map((p) => (
-              <div key={p.id} className="w-36 shrink-0 snap-start md:w-auto">
-                <ProductCard product={p} shopName={p.shop.name_en} showShopChip />
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+            {comboPacks.map((combo) => (
+              <div key={combo.id} className="w-64 shrink-0 snap-start md:w-auto">
+                <ComboPackCard combo={combo} />
               </div>
             ))}
           </div>

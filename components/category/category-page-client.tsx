@@ -13,14 +13,11 @@ import type { ProductWithShop } from "@/lib/cross-shop";
 import type { CategoryGroupRow } from "@/lib/category-groups";
 
 type CategoryTab = "crackers" | "shops";
-type CategoryChip = "all" | "under-199" | "kids-safe" | "bestseller" | "min-70-off";
+type CategoryChip = "all" | "under-199";
 
 const CHIPS: Array<{ id: CategoryChip; label: string }> = [
   { id: "all", label: "All" },
   { id: "under-199", label: "₹199 Store" },
-  { id: "kids-safe", label: "🧸 Kids-safe" },
-  { id: "bestseller", label: "★ Bestseller" },
-  { id: "min-70-off", label: "Min 70% off" },
 ];
 
 const CAROUSEL_LIMIT = 10;
@@ -29,12 +26,6 @@ function matchesChip(p: ProductWithShop, chip: CategoryChip): boolean {
   switch (chip) {
     case "under-199":
       return p.price !== null && p.price < 199;
-    case "kids-safe":
-      return !!p.kids_safe;
-    case "bestseller":
-      return p.is_bestseller;
-    case "min-70-off":
-      return (p.discount_percent ?? 0) >= 70;
     case "all":
     default:
       return true;
@@ -57,24 +48,20 @@ export function CategoryPageClient({
   const searchParams = useSearchParams();
 
   const [tab, setTab] = useState<CategoryTab>((searchParams.get("tab") as CategoryTab) ?? "crackers");
-  const [noSound, setNoSound] = useState(searchParams.get("nosound") === "1");
   const [chip, setChip] = useState<CategoryChip>((searchParams.get("chip") as CategoryChip) ?? "all");
   const [sort, setSort] = useState<CategorySortOption>((searchParams.get("sort") as CategorySortOption) ?? "recommended");
   const { totals } = useValidatedCart();
 
   const shopMetaById = useMemo(() => new Map(shopMeta.map((m) => [m.id, m])), [shopMeta]);
 
-  function syncUrl(next: { tab?: CategoryTab; noSound?: boolean; chip?: CategoryChip; sort?: CategorySortOption }) {
+  function syncUrl(next: { tab?: CategoryTab; chip?: CategoryChip; sort?: CategorySortOption }) {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("item");
     const nextTab = next.tab ?? tab;
-    const nextNoSound = next.noSound ?? noSound;
     const nextChip = next.chip ?? chip;
     const nextSort = next.sort ?? sort;
     if (nextTab !== "crackers") params.set("tab", nextTab);
     else params.delete("tab");
-    if (nextNoSound) params.set("nosound", "1");
-    else params.delete("nosound");
     if (nextChip !== "all") params.set("chip", nextChip);
     else params.delete("chip");
     if (nextSort !== "recommended") params.set("sort", nextSort);
@@ -83,10 +70,7 @@ export function CategoryPageClient({
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }
 
-  const filteredProducts = useMemo(
-    () => products.filter((p) => matchesChip(p, chip) && (!noSound || p.noise_type === "no_sound")),
-    [products, chip, noSound],
-  );
+  const filteredProducts = useMemo(() => products.filter((p) => matchesChip(p, chip)), [products, chip]);
 
   const groups = useMemo(
     () => buildCategoryPageGroups(filteredProducts, shopMetaById, sort),
@@ -133,23 +117,7 @@ export function CategoryPageClient({
 
       <div className="sticky top-16 z-20 border-b border-border bg-cream/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3">
-          <div className="flex gap-2">
-            <div className="flex-1 rounded-full bg-secondary-bg px-3 py-2 text-sm text-ink-soft">🔍 {group.name_en}</div>
-            <button
-              type="button"
-              onClick={() => {
-                setNoSound((v) => !v);
-                syncUrl({ noSound: !noSound });
-                trackEvent("category_filter", { chip: "nosound", value: !noSound });
-              }}
-              aria-pressed={noSound}
-              className={`shrink-0 rounded-xl border px-3 py-1.5 text-[11px] font-bold ${
-                noSound ? "border-teal bg-teal-tint text-teal-ink" : "border-border text-ink-soft"
-              }`}
-            >
-              🔇 NO SOUND
-            </button>
-          </div>
+          <div className="flex-1 rounded-full bg-secondary-bg px-3 py-2 text-sm text-ink-soft">🔍 {group.name_en}</div>
 
           <div className="mt-3 flex gap-5 border-b border-border">
             <TabButton active={tab === "crackers"} onClick={() => { setTab("crackers"); syncUrl({ tab: "crackers" }); trackEvent("category_tab", { tab: "crackers" }); }}>
@@ -227,8 +195,7 @@ export function CategoryPageClient({
                 type="button"
                 onClick={() => {
                   setChip("all");
-                  setNoSound(false);
-                  syncUrl({ chip: "all", noSound: false });
+                  syncUrl({ chip: "all" });
                 }}
                 className="text-sm font-semibold text-maroon-ink"
               >
@@ -260,8 +227,7 @@ export function CategoryPageClient({
               type="button"
               onClick={() => {
                 setChip("all");
-                setNoSound(false);
-                syncUrl({ chip: "all", noSound: false });
+                syncUrl({ chip: "all" });
               }}
               className="text-sm font-semibold text-maroon-ink"
             >

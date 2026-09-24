@@ -47,7 +47,7 @@ export function ShopPlpHeader({
               </p>
             )}
             <h1 className="truncate font-display text-lg font-bold">{shop.name_en}</h1>
-            {shop.tagline && <p className="mt-0.5 truncate text-xs text-white/70">{shop.tagline}</p>}
+            {shop.tagline && <p className="mt-0.5 truncate text-xs font-bold" style={{ color: "#ffc857" }}>{shop.tagline}</p>}
           </div>
         </div>
 
