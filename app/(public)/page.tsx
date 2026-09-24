@@ -62,8 +62,8 @@ const NIGHT_PINNED_SLUGS = ["sparklers", "ground-chakkars", "flower-pots"];
 const DAY_PINNED_SLUGS = ["paper-bombs", "bombs", "sound-crackers"];
 
 /** Pins the given slugs first (in that order), then the rest by cross-shop
- * product count descending, capped at 10 — the user's explicit ordering
- * rule for the home Night/Day Crackers tiles. */
+ * product count descending, capped at 9 — a full 3x3 grid on the home
+ * Night/Day Crackers tiles (mobile design). */
 function orderCategoryGroups(groups: CategoryGroupRow[], pinnedSlugs: string[], countByGroupId: Map<string, number>): CategoryGroupRow[] {
   const bySlug = new Map(groups.map((g) => [g.slug, g]));
   const pinned = pinnedSlugs.map((slug) => bySlug.get(slug)).filter((g): g is CategoryGroupRow => !!g);
@@ -71,7 +71,7 @@ function orderCategoryGroups(groups: CategoryGroupRow[], pinnedSlugs: string[], 
   const rest = groups
     .filter((g) => !pinnedIds.has(g.id))
     .sort((a, b) => (countByGroupId.get(b.id) ?? 0) - (countByGroupId.get(a.id) ?? 0));
-  return [...pinned, ...rest].slice(0, 10);
+  return [...pinned, ...rest].slice(0, 9);
 }
 
 export default async function HomePage() {
@@ -181,7 +181,7 @@ export default async function HomePage() {
           {nightCategoryGroups.length > 0 && (
             <div className="mb-8">
               <h3 className="mb-4 font-display text-base font-bold text-ink">🌙 Night Crackers</h3>
-              <div className="grid grid-cols-4 gap-x-3 gap-y-5">
+              <div className="grid grid-cols-3 gap-x-3 gap-y-5">
                 {nightCategoryGroups.map((group) => (
                   <CategoryGroupTile key={group.id} group={group} />
                 ))}
@@ -192,7 +192,7 @@ export default async function HomePage() {
           {dayCategoryGroups.length > 0 && (
             <div>
               <h3 className="mb-4 font-display text-base font-bold text-ink">☀️ Day Crackers</h3>
-              <div className="grid grid-cols-4 gap-x-3 gap-y-5">
+              <div className="grid grid-cols-3 gap-x-3 gap-y-5">
                 {dayCategoryGroups.map((group) => (
                   <CategoryGroupTile key={group.id} group={group} />
                 ))}
