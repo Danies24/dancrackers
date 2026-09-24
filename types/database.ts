@@ -214,6 +214,7 @@ export type Database = {
       }
       category_groups: {
         Row: {
+          collects_time_of_day: string | null
           created_at: string
           display_order: number
           icon_url: string | null
@@ -222,8 +223,10 @@ export type Database = {
           name_en: string
           name_ta: string | null
           slug: string
+          time_of_day: string | null
         }
         Insert: {
+          collects_time_of_day?: string | null
           created_at?: string
           display_order?: number
           icon_url?: string | null
@@ -232,8 +235,10 @@ export type Database = {
           name_en: string
           name_ta?: string | null
           slug: string
+          time_of_day?: string | null
         }
         Update: {
+          collects_time_of_day?: string | null
           created_at?: string
           display_order?: number
           icon_url?: string | null
@@ -242,6 +247,7 @@ export type Database = {
           name_en?: string
           name_ta?: string | null
           slug?: string
+          time_of_day?: string | null
         }
         Relationships: []
       }

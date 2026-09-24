@@ -46,6 +46,8 @@ export async function getCategoryGroupBySlug(slug: string): Promise<CategoryGrou
  */
 export async function getCrossShopProducts(opts: {
   groupId?: string;
+  /** Aggregates every category across all of these groups in one query — the night/morning "collection" pages (a group tagged `collects_time_of_day`) span several real category_groups at once. */
+  groupIds?: string[];
   shopSlug?: string;
   sort?: CrossShopSortOption;
 }): Promise<ProductWithShop[]> {
@@ -70,8 +72,10 @@ export async function getCrossShopProducts(opts: {
     query = query.eq("shop_id", shop.id);
   }
 
-  if (opts.groupId) {
-    const { data: cats, error: catError } = await supabase.from("categories").select("id").eq("group_id", opts.groupId);
+  if (opts.groupId || opts.groupIds) {
+    let categoriesQuery = supabase.from("categories").select("id");
+    categoriesQuery = opts.groupIds ? categoriesQuery.in("group_id", opts.groupIds) : categoriesQuery.eq("group_id", opts.groupId!);
+    const { data: cats, error: catError } = await categoriesQuery;
     if (catError) throw catError;
     const categoryIds = (cats ?? []).map((c) => c.id);
     if (categoryIds.length === 0) return [];
@@ -102,18 +106,29 @@ export interface CategoryPageData {
  * `bestOfferLabel` is computed live via getShopMaxActiveDiscountPercent —
  * never stored — so it can never overstate what's actually on offer (same
  * discipline as lib/data.ts's getMaxActiveDiscountPercent).
+ *
+ * A group with `collects_time_of_day` set (Night Crackers / Morning
+ * Crackers, 20260924000004) is a virtual collection, not a real category
+ * home — it aggregates every real group tagged with that time_of_day
+ * (Flower Pots + Sky Shots + ... for night) instead of the categories under
+ * its own group_id, which stays empty on purpose.
  */
 export async function getCategoryPageData(groupSlug: string, sort: CategorySortOption = "recommended"): Promise<CategoryPageData | null> {
   const group = await getCategoryGroupBySlug(groupSlug);
   if (!group) return null;
 
   const supabase = createPublicClient();
-  const [shops, products, otherGroups, { data: groupCategories, error: catError }] = await Promise.all([
+  const allGroups = await getAllCategoryGroups();
+  const groupIds = group.collects_time_of_day
+    ? allGroups.filter((g) => g.time_of_day === group.collects_time_of_day).map((g) => g.id)
+    : [group.id];
+
+  const [shops, products, { data: groupCategories, error: catError }] = await Promise.all([
     getBrowsableShops(),
-    getCrossShopProducts({ groupId: group.id }),
-    getAllCategoryGroups(),
-    supabase.from("categories").select("shop_id, slug").eq("group_id", group.id),
+    getCrossShopProducts(group.collects_time_of_day ? { groupIds } : { groupId: group.id }),
+    supabase.from("categories").select("shop_id, slug").in("group_id", groupIds),
   ]);
+  const otherGroups = allGroups;
   if (catError) throw catError;
   const ownCategorySlugByShopId = new Map((groupCategories ?? []).map((c) => [c.shop_id, c.slug]));
 
