@@ -70,9 +70,12 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
       </div>
 
       {topProducts.length > 0 && (
-        <div className="scrollbar-none mt-3.5 flex snap-x snap-mandatory gap-3 overflow-x-auto pr-5" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="scrollbar-none mt-3.5 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pr-5"
+          onClick={(e) => e.stopPropagation()}
+        >
           {topProducts.map((p) => (
-            <div key={p.id} className="w-24 shrink-0 snap-start sm:w-28">
+            <div key={p.id} className="w-24 shrink-0 snap-start">
               <ProductCard product={p} shopName={shop.name_en} />
             </div>
           ))}
