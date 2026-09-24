@@ -14,15 +14,17 @@ export type ShopRow = Database["public"]["Tables"]["shops"]["Row"];
 const PREVIEW_TOKEN_PATTERN = /^[0-9a-f]{16}$/;
 
 /**
- * Cart and enquiry submission are still single-shop and hardcoded to Sri
- * Ram (multi-shop spec §6/§8 — one-shop-per-cart and shop agents aren't
- * built yet). A shop can be made publicly visible (`status = 'active'`)
- * before that work lands, to let it be browsed/shown to the shop owner —
- * this is the single place that decides whether it can actually be
- * checked out yet, so the shop page's "not open yet" notice and the
- * enquiry route's rejection can never drift apart.
+ * Every enquiry — regardless of shop — goes to the same place: one global
+ * WhatsApp business number and admin notification inbox (lib/notifications.ts,
+ * settings.whatsapp_business_number), since Kolagalam itself, not a
+ * per-shop agent, handles every enquiry. This allowlist exists only to gate
+ * a shop's real go-live moment independently of `status = 'active'` (which
+ * only controls visibility/browsing) — a shop can be shown before its
+ * catalogue/pricing is actually ready to take real orders. The shop page's
+ * "not open yet" notice and the enquiry route's rejection both read this
+ * same function, so they can never drift apart.
  */
-const ORDERABLE_SHOP_SLUGS = new Set(["sri-ram-crackers"]);
+const ORDERABLE_SHOP_SLUGS = new Set(["sri-ram-crackers", "gurusamy-fireworks"]);
 export function isShopOrderable(shopSlug: string): boolean {
   return ORDERABLE_SHOP_SLUGS.has(shopSlug);
 }
