@@ -40,12 +40,20 @@ async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   try {
     const resend = new Resend(apiKey);
     const to = ["kolagalam.contact@gmail.com"];
-    await resend.emails.send({
+    // resend.emails.send() does NOT throw for an API-level rejection (rate
+    // limit, quota exceeded, invalid from-address, etc.) — it resolves with
+    // { data: null, error } instead. Checking `error` here is required, not
+    // optional: without it, a rejected send is indistinguishable from a
+    // successful one and the enquiry silently never reaches an inbox.
+    const { error } = await resend.emails.send({
       from,
       to,
       subject: `🎆 New enquiry ${order.orderRef} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
       html: buildEmailHtml(order),
     });
+    if (error) {
+      console.error(`[notifications] Resend rejected email for ${order.orderRef}: ${error.name} — ${error.message}`);
+    }
   } catch (error) {
     console.error(`[notifications] Email failed for ${order.orderRef}`, error);
   }
@@ -164,7 +172,10 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
   try {
     const resend = new Resend(apiKey);
     const to = ["kolagalam.contact@gmail.com"];
-    await resend.emails.send({ from, to, subject, html });
+    const { error } = await resend.emails.send({ from, to, subject, html });
+    if (error) {
+      console.error(`[digest] Resend rejected email: ${error.name} — ${error.message}`);
+    }
   } catch (error) {
     console.error("[digest] send failed", error);
   }
