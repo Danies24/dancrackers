@@ -125,7 +125,7 @@ export function ShopPlpClient({
   );
 
   const allAnchorIds = useMemo(() => sections.map(sectionAnchorId), [sections]);
-  const activeAnchorId = useActiveSection(allAnchorIds);
+  const [activeAnchorId, jumpToSection] = useActiveSection(allAnchorIds);
 
   const circleItems: CategoryCircleItem[] = categorySections.map((s) => ({
     anchorId: `cat-${s.categorySlug}`,
@@ -141,6 +141,7 @@ export function ShopPlpClient({
   }));
 
   function scrollToAnchor(anchorId: string) {
+    jumpToSection(anchorId);
     document.getElementById(anchorId)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
