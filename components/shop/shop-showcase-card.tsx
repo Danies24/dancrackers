@@ -75,7 +75,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
           onClick={(e) => e.stopPropagation()}
         >
           {topProducts.map((p) => (
-            <div key={p.id} className="w-24 shrink-0 snap-start">
+            <div key={p.id} className="w-[38%] shrink-0 snap-start">
               <ProductCard product={p} shopName={shop.name_en} />
             </div>
           ))}
