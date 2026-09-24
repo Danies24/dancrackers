@@ -199,9 +199,11 @@ export function ShopPlpClient({
             return (
               <section key={anchorId} id={anchorId} style={{ scrollMarginTop }}>
                 <h2 className="mb-3 font-display text-base font-bold text-ink">{FLAT_SECTION_LABEL[section.kind]}</h2>
-                <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto px-4 pb-1">
+                <div
+                  className={`scrollbar-none -mx-4 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:overflow-visible md:px-0 ${isUnder199 ? "md:grid-cols-6" : "md:grid-cols-5"}`}
+                >
                   {section.products.map((p) => (
-                    <div key={p.id} className={`shrink-0 snap-start ${isUnder199 ? "w-[38%]" : "w-36"}`}>
+                    <div key={p.id} className={`shrink-0 snap-start md:w-auto ${isUnder199 ? "w-[38%]" : "w-36"}`}>
                       <ProductCard product={p} shopName={shopName} onQuickView={openQuickView} />
                     </div>
                   ))}
