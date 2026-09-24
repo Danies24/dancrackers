@@ -167,9 +167,27 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Our Shops — Gurusamy, then Sri Ram, then any others
+          (lib/shops.ts's getShopsForHomeShowcase), each card showing its
+          own top 5 products, the whole card tapping through to that shop.
+          Moved above "Shop by category" per the confirmed home layout. */}
+      {shopCards.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
+          </div>
+          <div className="flex flex-col gap-4">
+            {shopCards.map((card) => (
+              <ShopShowcaseCard key={card.shop.id} card={card} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Shop by category — segregated into Night/Day Crackers (20260924000004/5),
-          each a 4-column grid, no horizontal scroll. "Night Crackers"/"Day
-          Crackers" are plain section titles, not links — they're not a
+          each a 3-column grid (9 tiles), no horizontal scroll. "Night Crackers"/
+          "Day Crackers" are plain section titles, not links — they're not a
           browsable category themselves, just a grouping for the tiles below. */}
       {(nightCategoryGroups.length > 0 || dayCategoryGroups.length > 0) && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
@@ -199,23 +217,6 @@ export default async function HomePage() {
               </div>
             </div>
           )}
-        </section>
-      )}
-
-      {/* Our Shops — Gurusamy, then Sri Ram, then any others
-          (lib/shops.ts's getShopsForHomeShowcase), each card showing its
-          own top 5 products, the whole card tapping through to that shop. */}
-      {shopCards.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-10">
-          <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
-            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
-          </div>
-          <div className="flex flex-col gap-4">
-            {shopCards.map((card) => (
-              <ShopShowcaseCard key={card.shop.id} card={card} />
-            ))}
-          </div>
         </section>
       )}
 
