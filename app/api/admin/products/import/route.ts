@@ -56,6 +56,27 @@ export async function POST(request: Request) {
   const { data: categories } = await supabase.from("categories").select("id, slug, name_en").eq("shop_id", shopId);
   const categoryByName = new Map((categories ?? []).map((c) => [c.name_en.toLowerCase(), c.id]));
 
+  // A new category from this import has no group_id (categories.group_id,
+  // 20260922000003) unless we set one here — the cross-shop /category
+  // pages read only categories that belong to a group, so without this a
+  // whole new shop's catalogue silently never appears there even once
+  // active (surfaced by Gurusamy's first import: 210+ products live on its
+  // own shop page, zero visible on any /category/[groupSlug] page). Same
+  // case-insensitive "contains" heuristic as the one-off SQL backfills in
+  // 20260922000003/20260924000003 — a confident containment match either
+  // way, not a fuzzy score, so an unmatched category is left ungrouped
+  // (same accepted state as Sri Ram's own six ungrouped categories) rather
+  // than risk mis-classifying it.
+  const { data: allGroups } = await supabase.from("category_groups").select("id, name_en");
+  function matchGroupId(categoryName: string): string | null {
+    const name = categoryName.toLowerCase();
+    const match = (allGroups ?? []).find((g) => {
+      const groupName = g.name_en.toLowerCase();
+      return name.includes(groupName) || groupName.includes(name);
+    });
+    return match?.id ?? null;
+  }
+
   let created = 0;
   let updated = 0;
   const commitErrors: Array<{ sku: string; reason: string }> = [];
@@ -66,7 +87,13 @@ export async function POST(request: Request) {
       const slug = slugify(row.category);
       const { data: newCategory, error: catError } = await supabase
         .from("categories")
-        .insert({ shop_id: shopId, slug, name_en: row.category, display_order: categoryByName.size + 1 })
+        .insert({
+          shop_id: shopId,
+          slug,
+          name_en: row.category,
+          display_order: categoryByName.size + 1,
+          group_id: matchGroupId(row.category),
+        })
         .select("id")
         .single();
       if (catError || !newCategory) {
