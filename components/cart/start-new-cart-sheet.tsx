@@ -27,9 +27,7 @@ export function StartNewCartSheet({
   return (
     <Sheet open={open} onClose={onKeepCurrent} ariaLabel="Start a new cart?">
       <div className="p-6">
-        <h2 className="font-display text-lg font-semibold text-ink">
-          புதிய கடையிலிருந்து ஆர்டர் செய்யவா? / Start a new cart?
-        </h2>
+        <h2 className="font-display text-lg font-semibold text-ink">Start a new cart?</h2>
         <p className="mt-3 text-sm text-ink-soft">
           Your cart has items from <strong>{currentShopName ?? "another shop"}</strong>. Adding this will clear it and
           start a cart from <strong>{newShopName}</strong>.
