@@ -151,7 +151,7 @@ export default async function HomePage() {
       {/* The quote — replaces the old "View Products" CTA button. The
           page's one real, always-visible h1 (not the rotating carousel
           below, which is supplementary and moved further down the page). */}
-      <section className="px-4 pb-6 text-center">
+      <section className="px-4 pb-6 pt-6 text-center">
         <h1 className="mx-auto max-w-xl font-display text-2xl font-bold leading-[1.15] text-ink md:text-4xl">
           Straight From Sivakasi. <span className="text-gradient-festival">Straight to You.</span>
         </h1>

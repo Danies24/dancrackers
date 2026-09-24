@@ -31,12 +31,12 @@ export function StartNewCartSheet({
           புதிய கடையிலிருந்து ஆர்டர் செய்யவா? / Start a new cart?
         </h2>
         <p className="mt-3 text-sm text-ink-soft">
-          உங்கள் கார்ட்டில் {currentShopName ?? "another shop"} பொருட்கள் உள்ளன. {newShopName} பொருளைச் சேர்த்தால் பழைய
-          கார்ட் அழிக்கப்படும்.
-        </p>
-        <p className="mt-2 text-sm text-ink-soft">
           Your cart has items from <strong>{currentShopName ?? "another shop"}</strong>. Adding this will clear it and
           start a cart from <strong>{newShopName}</strong>.
+        </p>
+        <p className="mt-2 text-sm text-ink-soft">
+          உங்கள் கார்ட்டில் {currentShopName ?? "another shop"} பொருட்கள் உள்ளன. {newShopName} பொருளைச் சேர்த்தால் பழைய
+          கார்ட் அழிக்கப்படும்.
         </p>
         <div className="mt-6 flex flex-col gap-2">
           <Button size="full" variant="secondary" onClick={onKeepCurrent}>
