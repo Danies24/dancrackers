@@ -50,8 +50,12 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
             </p>
           )}
           <div className="font-display text-lg font-bold text-ink">{shop.name_en}</div>
-          {shop.tagline && <p className="mt-0.5 line-clamp-1 text-xs font-bold text-teal-ink">{shop.tagline}</p>}
-          <div className="mt-0.5 text-xs text-ink-soft">
+          {shop.tagline && (
+            <span className="mt-1 inline-block rounded-full border border-teal bg-teal-tint px-2.5 py-1 text-xs font-extrabold text-teal-ink">
+              {shop.tagline}
+            </span>
+          )}
+          <div className="mt-1.5 text-xs text-ink-soft">
             {isComingSoon ? "Coming soon" : `${productCount} items`}
           </div>
           {maxDiscountPercent > 0 && (
