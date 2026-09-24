@@ -11,7 +11,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCategoryWithCounts } from "@/lib/data";
 import { getShopsForHomeShowcase } from "@/lib/shops";
-import { getFeaturedCategoryGroups } from "@/lib/category-groups";
+import { getAllCategoryGroups } from "@/lib/category-groups";
 import { getCrossShopProducts } from "@/lib/cross-shop";
 import { getActiveComboPacks } from "@/lib/combo-packs";
 import { brandConfig, getCanonicalUrl } from "@/config/brandConfig";
@@ -59,13 +59,20 @@ const TRUST_FEATURES = [
 import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from "@/lib/seo/jsonld";
 
 export default async function HomePage() {
-  const [categories, shopCards, featuredCategoryGroups, crossShopProducts, comboPacks] = await Promise.all([
+  const [categories, shopCards, allCategoryGroups, crossShopProducts, comboPacks] = await Promise.all([
     getCategoryWithCounts(),
     getShopsForHomeShowcase(),
-    getFeaturedCategoryGroups(),
+    getAllCategoryGroups(),
     getCrossShopProducts({}),
     getActiveComboPacks(),
   ]);
+  // Shop by category, segregated by when a cracker is conventionally used
+  // (20260924000004) — a real category_group tagged night/day, never the
+  // two virtual "collects_time_of_day" rows themselves (their own
+  // time_of_day is null, so they're naturally excluded here; each section
+  // heading instead links to that shop's own aggregate page).
+  const nightCategoryGroups = allCategoryGroups.filter((g) => g.time_of_day === "night").slice(0, 10);
+  const dayCategoryGroups = allCategoryGroups.filter((g) => g.time_of_day === "day").slice(0, 10);
   const orgJsonLd = buildOrganizationJsonLd();
   const websiteJsonLd = buildWebSiteJsonLd();
 
@@ -121,19 +128,44 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Shop by category — 4 columns, every row filled, no horizontal
-          scroll (per the confirmed home layout). */}
-      {featuredCategoryGroups.length > 0 && (
+      {/* Shop by category — segregated into Night/Day Crackers (20260924000004),
+          each a 4-column grid, no horizontal scroll. The heading itself links
+          to that time-of-day's aggregate page (every matching category's
+          products, cross-shop, in one list) for "see everything at once". */}
+      {(nightCategoryGroups.length > 0 || dayCategoryGroups.length > 0) && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">வகைகள்</p>
             <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Shop by category</h2>
           </div>
-          <div className="grid grid-cols-4 gap-x-3 gap-y-5">
-            {featuredCategoryGroups.map((group) => (
-              <CategoryGroupTile key={group.id} group={group} />
-            ))}
-          </div>
+
+          {nightCategoryGroups.length > 0 && (
+            <div className="mb-8">
+              <Link href="/category/night-crackers" className="mb-4 flex items-center gap-1.5">
+                <h3 className="font-display text-base font-bold text-ink">🌙 Night Crackers</h3>
+                <span className="text-ink-soft">→</span>
+              </Link>
+              <div className="grid grid-cols-4 gap-x-3 gap-y-5">
+                {nightCategoryGroups.map((group) => (
+                  <CategoryGroupTile key={group.id} group={group} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {dayCategoryGroups.length > 0 && (
+            <div>
+              <Link href="/category/morning-crackers" className="mb-4 flex items-center gap-1.5">
+                <h3 className="font-display text-base font-bold text-ink">☀️ Day Crackers</h3>
+                <span className="text-ink-soft">→</span>
+              </Link>
+              <div className="grid grid-cols-4 gap-x-3 gap-y-5">
+                {dayCategoryGroups.map((group) => (
+                  <CategoryGroupTile key={group.id} group={group} />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
