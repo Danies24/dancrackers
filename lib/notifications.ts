@@ -27,19 +27,26 @@ export async function sendEnquiryNotifications(order: NotificationOrder): Promis
   await Promise.allSettled([sendEmailNotification(order), sendTelegramNotification(order)]);
 }
 
+/** NOTIFY_EMAIL_PRIMARY/SECONDARY (.env.example) — was hardcoded to
+ * kolagalam.contact@gmail.com and silently ignored both env vars, so
+ * changing the destination meant a code deploy instead of an env change. */
+function notifyRecipients(): string[] {
+  const primary = process.env.NOTIFY_EMAIL_PRIMARY ?? "kolagalam.contact@gmail.com";
+  const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
+  return [primary, secondary].filter((v): v is string => Boolean(v));
+}
+
 async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const primary = "kolagalam.contact@gmail.com";
-  const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
-  const from = "Kolagalam <onboarding@resend.dev>";
-  if (!apiKey || !from || (!primary && !secondary)) {
+  const to = notifyRecipients();
+  const from = process.env.RESEND_FROM_EMAIL || "Kolagalam <onboarding@resend.dev>";
+  if (!apiKey || to.length === 0) {
     console.warn(`[notifications] Resend not configured — skipped email for ${order.orderRef}`);
     return;
   }
 
   try {
     const resend = new Resend(apiKey);
-    const to = ["kolagalam.contact@gmail.com"];
     // resend.emails.send() does NOT throw for an API-level rejection (rate
     // limit, quota exceeded, invalid from-address, etc.) — it resolves with
     // { data: null, error } instead. Checking `error` here is required, not
@@ -138,10 +145,9 @@ export interface DigestInput {
  */
 export async function sendDigestEmail(input: DigestInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const primary = "kolagalam.contact@gmail.com";
-  const secondary = process.env.NOTIFY_EMAIL_SECONDARY;
-  const from = "Kolagalam <onboarding@resend.dev>";
-  if (!apiKey || !from || (!primary && !secondary)) {
+  const to = notifyRecipients();
+  const from = process.env.RESEND_FROM_EMAIL || "Kolagalam <onboarding@resend.dev>";
+  if (!apiKey || to.length === 0) {
     console.warn("[digest] Resend not configured — skipping digest email");
     return;
   }
@@ -171,7 +177,6 @@ export async function sendDigestEmail(input: DigestInput): Promise<void> {
 
   try {
     const resend = new Resend(apiKey);
-    const to = ["kolagalam.contact@gmail.com"];
     const { error } = await resend.emails.send({ from, to, subject, html });
     if (error) {
       console.error(`[digest] Resend rejected email: ${error.name} — ${error.message}`);
