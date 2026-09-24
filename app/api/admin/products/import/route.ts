@@ -81,6 +81,17 @@ export async function POST(request: Request) {
 
     const slug = slugify(row.name_en);
 
+    // `price` is trigger-maintained from mrp (products_compute_price,
+    // 20260917000001) and is recomputed on every INSERT regardless of what
+    // this upsert sends — a brand-new row has mrp = null, so the trigger
+    // sets price back to null, silently discarding row.price. Treat the CSV
+    // price as the sale price itself for a new SKU: mrp = price with 0%
+    // discount reproduces it exactly. Existing rows keep their own
+    // mrp/discount_percent — this importer only ever refreshes `price` for
+    // them (the trigger doesn't fire on a plain price update, which is how
+    // Sri Ram's re-imports already work without touching its real discount%).
+    const newRowPricingFields = existing ? {} : { mrp: row.price, discount_percent: 0 };
+
     const { data: upserted, error: upsertError } = await supabase
       .from("products")
       .upsert(
@@ -95,6 +106,7 @@ export async function POST(request: Request) {
           unit: row.unit,
           is_discountable: row.is_discountable,
           display_order: row.display_order,
+          ...newRowPricingFields,
         },
         { onConflict: "shop_id,sku" },
       )
