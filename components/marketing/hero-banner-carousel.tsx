@@ -45,9 +45,16 @@ export function HeroBannerCarousel({ slides }: { slides: HeroBannerSlide[] }) {
   useEffect(() => {
     const scroller = scrollerRef.current;
     const card = scroller?.children[active] as HTMLElement | undefined;
-    if (!card) return;
+    if (!scroller || !card) return;
     isSyncingRef.current = true;
-    card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    // scroller.scrollTo (not card.scrollIntoView) — scrollIntoView's
+    // block/inline options still let the browser walk up and scroll any
+    // scrollable ancestor, including the page itself, to bring the card
+    // fully into view. On a page where the carousel isn't the section
+    // currently in view, that yanked the whole page back down to it on
+    // every auto-advance tick. scrollTo targets this element's own
+    // scrollLeft directly, so only the horizontal strip ever moves.
+    scroller.scrollTo({ left: card.offsetLeft, behavior: "smooth" });
     const t = setTimeout(() => {
       isSyncingRef.current = false;
     }, 600);

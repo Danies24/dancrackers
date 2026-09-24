@@ -256,6 +256,10 @@ input[type="radio"] {
   background-image: var(--gradient-primary);
 }
 
+.bg-gradient-festival {
+  background-image: var(--gradient-festival);
+}
+
 .text-gradient-festival {
   background-image: var(--gradient-festival);
   -webkit-background-clip: text;
