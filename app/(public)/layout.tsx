@@ -3,6 +3,8 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { StickyCartBar } from "@/components/cart/sticky-cart-bar";
 import { FloatingWhatsApp } from "@/components/layout/floating-whatsapp";
+import { TrustBar } from "@/components/layout/trust-bar";
+import { LiveSalesTicker } from "@/components/marketing/live-sales-ticker";
 import { getCategoryWithCounts } from "@/lib/data";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -14,12 +16,14 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <CartProvider>
       <Header categories={categories} />
+      <TrustBar />
       <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer topCategories={categories} />
       <StickyCartBar />
       <FloatingWhatsApp />
+      <LiveSalesTicker />
     </CartProvider>
   );
 }
