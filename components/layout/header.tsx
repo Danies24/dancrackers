@@ -99,13 +99,10 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
 
           <div className="flex flex-1 items-center justify-end gap-1 md:flex-none">
             <ThemeToggle />
-            <div className="hidden md:block">
-              <HeaderSearch className="mr-1 w-full max-w-[140px] md:max-w-[200px]" />
-            </div>
             <Link
               href="/search"
               aria-label="Search products"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink"
             >
               <Search size={18} aria-hidden />
             </Link>
