@@ -7,12 +7,14 @@ import { ChevronRight, Menu, Search, ShoppingCart, X } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { DiyaIcon } from "@/components/marketing/diya-icon";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { HeaderSearch } from "@/components/layout/header-search";
 import type { CategoryRow } from "@/lib/data";
 import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
+  { href: "/#shops", label: "Shops" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
@@ -20,6 +22,7 @@ const NAV_LINKS = [
 
 const MOBILE_DRAWER_LINKS = [
   { href: "/products", label: "Products" },
+  { href: "/#shops", label: "Shops" },
   { href: "/shipping", label: "Shipping & Delivery" },
   { href: "/about", label: "About us" },
   { href: "/how-it-works", label: "How it works" },
@@ -94,15 +97,9 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-1 items-center justify-end gap-1 md:flex-none">
             <ThemeToggle />
-            <Link
-              href="/products"
-              aria-label="Search products"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink"
-            >
-              <Search size={18} aria-hidden />
-            </Link>
+            <HeaderSearch className="mr-1 w-full max-w-[140px] md:max-w-[200px]" />
             <Link
               href="/cart"
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}

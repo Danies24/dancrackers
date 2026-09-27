@@ -172,7 +172,7 @@ export default async function HomePage() {
           own top 5 products, the whole card tapping through to that shop.
           Moved above "Shop by category" per the confirmed home layout. */}
       {shopCards.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-10">
+        <section id="shops" className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
             <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
