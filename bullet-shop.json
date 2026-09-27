@@ -1,0 +1,27 @@
+◇ injected env (24) from .env.local // tip: ⌘ override existing { override: true }
+{
+  "id": "00000000-0000-0000-0000-000000000003",
+  "slug": "bullet-crackers",
+  "name_en": "The Bullet Crackers",
+  "name_ta": "தி புல்லட் பட்டாசு",
+  "tagline": null,
+  "logo_url": null,
+  "banner_url": null,
+  "status": "active",
+  "pricing_mode": "net_markup",
+  "customer_discount_percent": null,
+  "supplier_discount_percent": null,
+  "markup_percent": 2,
+  "agent_markup_percent": 0,
+  "default_agent_id": "00000000-0000-0000-0000-000000000004",
+  "preview_token": "0123456789abcdef",
+  "min_order_value": null,
+  "display_order": 3,
+  "created_at": "2026-09-22T15:54:52.178669+00:00",
+  "updated_at": "2026-09-22T15:54:52.178669+00:00",
+  "specialties": [],
+  "hero_images": [],
+  "location_label": null,
+  "dispatch_label": null,
+  "is_featured": false
+}

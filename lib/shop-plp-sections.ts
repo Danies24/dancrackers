@@ -2,7 +2,7 @@ import type { ProductWithCategory } from "@/lib/data";
 import type { ComboPackSummary } from "@/lib/combo-packs";
 
 export interface ShopPlpFlatSection {
-  kind: "top-picks" | "recommended" | "under-199";
+  kind: "top-picks" | "recommended" | "under-99";
   products: ProductWithCategory[];
 }
 
@@ -30,12 +30,12 @@ export interface ShopPlpCategoryInput {
   display_order: number;
 }
 
-const UNDER_199_THRESHOLD = 199;
+const UNDER_99_THRESHOLD = 99;
 
 /**
  * Buckets one shop's already-fetched catalogue (already `rankProducts()`-
  * tiered by `getShopCatalogue()`) into the PLP's sections — Top Picks /
- * Recommended / Under-₹199 / Combos first, then one "category" section per
+ * Recommended / Under-₹99 / Combos first, then one "category" section per
  * active category in the shop's own display_order. Pure and
  * framework-agnostic (no "server-only"), mirroring lib/cross-shop-sort.ts's
  * split between pure bucketing logic and the server-side fetch that calls
@@ -43,7 +43,7 @@ const UNDER_199_THRESHOLD = 199;
  * feeds every section here, never one query per section.
  *
  * A product can land in more than one bucket (e.g. a top pick that's also
- * under ₹199) — sections overlap on purpose, same as Swiggy's own dish
+ * under ₹99) — sections overlap on purpose, same as Swiggy's own dish
  * groupings. Empty sections are omitted entirely so the PLP never renders a
  * header with nothing under it.
  */
@@ -60,8 +60,8 @@ export function buildShopPlpSections(
   const recommended = products.filter((p) => p.is_recommended);
   if (recommended.length > 0) sections.push({ kind: "recommended", products: recommended });
 
-  const under199 = products.filter((p) => p.price !== null && p.price < UNDER_199_THRESHOLD);
-  if (under199.length > 0) sections.push({ kind: "under-199", products: under199 });
+  const under99 = products.filter((p) => p.price !== null && p.price < UNDER_99_THRESHOLD);
+  if (under99.length > 0) sections.push({ kind: "under-99", products: under99 });
 
   if (combos.length > 0) sections.push({ kind: "combos", combos });
 

@@ -21,9 +21,9 @@ export const revalidate = 120;
 /**
  * /products (Swiggy-redesign follow-up) — a shop switcher over the exact
  * same per-shop experience as /s/[shopSlug] (categories, grid/list toggle,
- * its own Under ₹199 section), rather than one flat cross-shop grid. Each
- * shop's "Under ₹199" only ever shows that shop's own items this way, same
- * as the home page's per-shop ₹199 Store sections — never merged.
+ * its own Under ₹99 section), rather than one flat cross-shop grid. Each
+ * shop's "Under ₹99" only ever shows that shop's own items this way, same
+ * as the home page's per-shop ₹99 Store sections — never merged.
  *
  * `?q=` is a legacy/search entry point (HomeSearchBar and any old links) —
  * a query that confidently matches a category (e.g. "flower pots") redirects

@@ -1,0 +1,21 @@
+◇ injected env (24) from .env.local // tip: ⌁ auth for agents [www.vestauth.com]
+[
+  {
+    "name_en": "7 cm Electric Sparklers",
+    "supplier_price": 14,
+    "mrp": 14,
+    "price": 15
+  },
+  {
+    "name_en": "7 cm Colour Sparklers",
+    "supplier_price": 15,
+    "mrp": 15,
+    "price": 16
+  },
+  {
+    "name_en": "7 cm Green Sparklers",
+    "supplier_price": 16,
+    "mrp": 16,
+    "price": 17
+  }
+]

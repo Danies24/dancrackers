@@ -13,19 +13,19 @@ import type { ProductWithShop } from "@/lib/cross-shop";
 import type { CategoryGroupRow } from "@/lib/category-groups";
 
 type CategoryTab = "crackers" | "shops";
-type CategoryChip = "all" | "under-199";
+type CategoryChip = "all" | "under-99";
 
 const CHIPS: Array<{ id: CategoryChip; label: string }> = [
   { id: "all", label: "All" },
-  { id: "under-199", label: "₹199 Store" },
+  { id: "under-99", label: "₹99 Store" },
 ];
 
 const CAROUSEL_LIMIT = 10;
 
 function matchesChip(p: ProductWithShop, chip: CategoryChip): boolean {
   switch (chip) {
-    case "under-199":
-      return p.price !== null && p.price < 199;
+    case "under-99":
+      return p.price !== null && p.price < 99;
     case "all":
     default:
       return true;

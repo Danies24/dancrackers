@@ -114,13 +114,13 @@ export default async function HomePage() {
   const maxDiscountPercent = crossShopProducts.reduce((max, p) => Math.max(max, p.discount_percent ?? 0), 0);
   // Segregated per shop (not one merged cross-shop carousel) — each gets
   // its own top-10, price-sorted list, in the same shop order as "Our Shops".
-  const under199ByShopSlug = new Map<string, ProductWithShop[]>();
+  const under99ByShopSlug = new Map<string, ProductWithShop[]>();
   for (const p of crossShopProducts) {
-    if (p.price === null || p.price >= 199) continue;
-    if (!under199ByShopSlug.has(p.shop.slug)) under199ByShopSlug.set(p.shop.slug, []);
-    under199ByShopSlug.get(p.shop.slug)!.push(p);
+    if (p.price === null || p.price >= 99) continue;
+    if (!under99ByShopSlug.has(p.shop.slug)) under99ByShopSlug.set(p.shop.slug, []);
+    under99ByShopSlug.get(p.shop.slug)!.push(p);
   }
-  for (const products of under199ByShopSlug.values()) {
+  for (const products of under99ByShopSlug.values()) {
     products.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   }
 
@@ -247,16 +247,16 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ₹199 Store — real, price-sorted, one horizontal scroll per shop
+      {/* ₹99 Store — real, price-sorted, one horizontal scroll per shop
           (not merged cross-shop), in the same shop order as "Our Shops". */}
       {shopCards.map((card) => {
-        const products = (under199ByShopSlug.get(card.shop.slug) ?? []).slice(0, 10);
+        const products = (under99ByShopSlug.get(card.shop.slug) ?? []).slice(0, 10);
         if (products.length === 0) return null;
         return (
           <section key={card.shop.id} className="mx-auto max-w-6xl px-4 pb-10">
             <div className="mb-4">
-              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">₹199 Store</h2>
-              <p className="text-xs font-semibold text-ink-soft">From {card.shop.name_en}</p>
+              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">₹99 Store</h2>
+              <p className="text-xs font-semibold text-ink-soft">Products under ₹99 from {card.shop.name_en}</p>
             </div>
             <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
               {products.map((p) => (

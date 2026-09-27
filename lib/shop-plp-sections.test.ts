@@ -53,15 +53,15 @@ describe("buildShopPlpSections", () => {
   it("lets a product land in more than one bucket at once", () => {
     const p1 = product({ id: "p1", category_id: "cat-sparklers", is_top_pick: true, price: 99 });
     const sections = buildShopPlpSections([p1], [sparklers]);
-    expect(sections.map((s) => s.kind)).toEqual(expect.arrayContaining(["top-picks", "under-199", "category"]));
+    expect(sections.map((s) => s.kind)).toEqual(expect.arrayContaining(["top-picks", "under-99", "category"]));
   });
 
-  it("buckets under-₹199 strictly below the threshold, not at it", () => {
+  it("buckets under-₹99 strictly below the threshold, not at it", () => {
     const cheap = product({ id: "cheap", category_id: "cat-sparklers", price: 198 });
-    const boundary = product({ id: "boundary", category_id: "cat-sparklers", price: 199 });
+    const boundary = product({ id: "boundary", category_id: "cat-sparklers", price: 99 });
     const sections = buildShopPlpSections([cheap, boundary], [sparklers]);
-    const under199 = sections.find((s) => s.kind === "under-199");
-    expect(under199 && "products" in under199 ? under199.products.map((p) => p.sku) : []).toEqual(["cheap"]);
+    const under99 = sections.find((s) => s.kind === "under-99");
+    expect(under99 && "products" in under99 ? under99.products.map((p) => p.sku) : []).toEqual(["cheap"]);
   });
 
   it("includes a combos section only when combos are passed, never with empty products", () => {
