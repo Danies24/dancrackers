@@ -5,6 +5,7 @@ import { StickyCartBar } from "@/components/cart/sticky-cart-bar";
 import { FloatingWhatsApp } from "@/components/layout/floating-whatsapp";
 import { TrustBar } from "@/components/layout/trust-bar";
 import { LiveSalesTicker } from "@/components/marketing/live-sales-ticker";
+import { LivePulseBadge } from "@/components/marketing/live-pulse-badge";
 import { getCategoryWithCounts } from "@/lib/data";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -23,6 +24,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <Footer topCategories={categories} />
       <StickyCartBar />
       <FloatingWhatsApp />
+      <LivePulseBadge />
       <LiveSalesTicker />
     </CartProvider>
   );

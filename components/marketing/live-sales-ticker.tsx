@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const NAMES = ["Senthil", "Karthik", "Ramesh", "Suresh", "Dinesh", "Kumar", "Rajesh", "Balaji", "Arun", "Vijay", "Prakash", "Ashok", "Siva", "Manoj", "Pradeep", "Vignesh"];
@@ -13,6 +14,7 @@ function getRandom(arr: string[]) {
 }
 
 export function LiveSalesTicker() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [time, setTime] = useState("");
@@ -68,7 +70,7 @@ export function LiveSalesTicker() {
     };
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || pathname !== "/") return null;
 
   return (
     <div
