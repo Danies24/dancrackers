@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 
 const NAMES = ["Senthil", "Karthik", "Ramesh", "Suresh", "Dinesh", "Kumar", "Rajesh", "Balaji", "Arun", "Vijay", "Prakash", "Ashok", "Siva", "Manoj", "Pradeep", "Vignesh"];
 const CITIES = ["Chennai", "Coimbatore", "Madurai", "Trichy", "Salem", "Tirunelveli", "Erode", "Vellore", "Tiruppur", "Kanyakumari", "Bengaluru", "Pondicherry", "Kochi"];
-const PRODUCTS = ["Mega Combo Pack", "Family Combo", "Kids Special Combo", "Standard Combo", "Night Crackers Box", "Sparklers Value Pack", "1000-Wala Garland", "12-Shot Sky Flash"];
+const PRODUCTS = ["Mega Family Combo", "Kids Special Combo", "Standard Combo", "Night Crackers Box", "Sparklers Value Pack", "1000-Wala Garland"];
+const SHOPS = ["Sri Ram Crackers", "Gurusamy Fireworks", "Standard Fireworks", "Bullet Crackers"];
 
 function getRandom(arr: string[]) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -13,35 +14,51 @@ function getRandom(arr: string[]) {
 
 export function LiveSalesTicker() {
   const [visible, setVisible] = useState(false);
-  const [data, setData] = useState({ name: "", city: "", product: "", time: "Just now" });
+  const [message, setMessage] = useState("");
+  const [time, setTime] = useState("");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     
-    // Initial delay before first popup
+    // Initial delay: 6 minutes (360,000 ms) as requested for realism
+    // Note: Most users leave before 6 mins, but this strictly follows the business tactic requested.
     const initialTimer = setTimeout(() => {
       showNext();
-    }, 5000); // 5 seconds after load
+    }, 6 * 60 * 1000);
     
     let hideTimer: NodeJS.Timeout;
     let showTimer: NodeJS.Timeout;
 
     function showNext() {
-      setData({
-        name: getRandom(NAMES),
-        city: getRandom(CITIES),
-        product: getRandom(PRODUCTS),
-        time: Math.random() > 0.5 ? "Just now" : `${Math.floor(Math.random() * 15) + 1} mins ago`,
-      });
+      const name = getRandom(NAMES);
+      const city = getRandom(CITIES);
+      const product = getRandom(PRODUCTS);
+      const shop = getRandom(SHOPS);
+      const price = Math.floor(Math.random() * (12000 - 3000 + 1)) + 3000; // ₹3000 to ₹12000
+
+      // Randomly pick between product enquiry or price enquiry
+      const isPriceEnquiry = Math.random() > 0.5;
+      const includeCity = Math.random() > 0.5;
+
+      let text = "";
+      if (isPriceEnquiry) {
+        text = `${name}${includeCity ? ` from ${city}` : ""} enquired for ₹${price} worth of crackers from ${shop}`;
+      } else {
+        text = `${name}${includeCity ? ` from ${city}` : ""} enquired ${product} from ${shop}`;
+      }
+
+      setMessage(text);
+      setTime(Math.random() > 0.5 ? "Just now" : `${Math.floor(Math.random() * 5) + 1} mins ago`);
       setVisible(true);
 
-      // Hide after 5 seconds
+      // Hide popup after 6 seconds
       hideTimer = setTimeout(() => {
         setVisible(false);
-        // Show next after 10-25 seconds
-        showTimer = setTimeout(showNext, Math.floor(Math.random() * 15000) + 10000);
-      }, 5000);
+        // Next popup in 5 to 10 minutes (300,000 to 600,000 ms)
+        const nextDelay = (Math.floor(Math.random() * 6) + 5) * 60 * 1000; 
+        showTimer = setTimeout(showNext, nextDelay);
+      }, 6000);
     }
 
     return () => {
@@ -56,7 +73,7 @@ export function LiveSalesTicker() {
   return (
     <div
       className={cn(
-        "fixed bottom-24 left-4 z-50 max-w-[280px] rounded-xl border border-border bg-surface p-3.5 shadow-2xl transition-all duration-700 ease-out sm:max-w-xs",
+        "fixed bottom-24 left-4 z-50 max-w-[320px] rounded-xl border border-border bg-surface p-3.5 shadow-2xl transition-all duration-700 ease-out sm:max-w-sm",
         visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0 pointer-events-none"
       )}
     >
@@ -67,14 +84,11 @@ export function LiveSalesTicker() {
           </svg>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] leading-snug text-ink">
-            <span className="font-bold text-ink">{data.name}</span> from <span className="font-semibold text-ink-soft">{data.city}</span> just ordered
-          </p>
-          <p className="mt-0.5 truncate text-[13px] font-bold text-maroon-ink">
-            {data.product}
+          <p className="text-[13px] leading-snug text-ink capitalize-first">
+            {message}
           </p>
           <p className="mt-1 text-[10px] font-medium text-muted">
-            {data.time} • Verified Purchase
+            {time} • Verified Enquiry
           </p>
         </div>
       </div>

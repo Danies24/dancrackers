@@ -563,3 +563,17 @@ input[type="radio"] {
     animation-name: sheet-fade-scale-out;
   }
 }
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee-mobile {
+  display: inline-flex;
+  white-space: nowrap;
+}
+@media (max-width: 639px) {
+  .animate-marquee-mobile {
+    animation: marquee-scroll 10s linear infinite;
+  }
+}
