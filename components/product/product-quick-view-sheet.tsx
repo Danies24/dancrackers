@@ -87,9 +87,13 @@ export function ProductQuickViewSheet({
                 className="object-contain p-3"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center font-display text-4xl font-semibold text-maroon-ink">
-                {product.name_en.trim().charAt(0).toUpperCase() || "?"}
-              </div>
+              <ImageWithSkeleton
+                src="/product-placeholder.jpg"
+                alt={`${product.name_en} — ${product.category?.name_en ?? ""}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 448px"
+                className="object-contain p-3"
+              />
             )}
             {product.mrp != null && product.price != null && product.mrp > product.price && (
               <span className="absolute left-3 top-3 rounded-lg bg-price-tag-bg px-2 py-1 text-[11px] font-bold text-price-tag-fg">

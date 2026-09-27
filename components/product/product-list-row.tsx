@@ -17,11 +17,14 @@ import { ProductShopChip } from "@/components/shop/product-shop-chip";
 import type { ProductWithCategory } from "@/lib/data";
 
 function PlaceholderImage({ name }: { name: string }) {
-  const letter = name.trim().charAt(0).toUpperCase() || "?";
   return (
-    <div className="flex h-full w-full items-center justify-center bg-maroon-tint text-xl font-display font-semibold text-maroon-ink">
-      {letter}
-    </div>
+    <ImageWithSkeleton
+      src="/product-placeholder.jpg"
+      alt={name}
+      fill
+      sizes="48px"
+      className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+    />
   );
 }
 

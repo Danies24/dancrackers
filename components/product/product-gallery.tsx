@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import Image from "next/image";
 import { ImageWithSkeleton } from "@/components/product/image-with-skeleton";
 
 interface Props {
@@ -45,10 +46,14 @@ export function ProductGallery({ images, name, category }: Props) {
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-maroon-tint">
-        <span className="font-display text-6xl font-semibold text-maroon-ink">
-          {name.trim().charAt(0).toUpperCase() || "?"}
-        </span>
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-cream">
+        <Image
+          src="/product-placeholder.jpg"
+          alt={name}
+          fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-cover"
+        />
       </div>
     );
   }

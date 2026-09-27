@@ -74,9 +74,13 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
               className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center font-display text-2xl font-semibold text-maroon-ink">
-              {combo.name.charAt(0)}
-            </div>
+            <Image
+              src="/product-placeholder.jpg"
+              alt={combo.name}
+              fill
+              sizes="(max-width: 640px) 250px, 280px"
+              className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+            />
           )}
           <span className="absolute left-2 top-2 rounded-full bg-combo-badge-bg px-2.5 py-1 text-[10px] font-bold tracking-wide text-combo-badge-text">
             {combo.badgeText}

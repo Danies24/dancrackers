@@ -181,10 +181,13 @@ export function ProductCard({
 }
 
 function PlaceholderImage({ name }: { name: string }) {
-  const letter = name.trim().charAt(0).toUpperCase() || "?";
   return (
-    <div className="flex h-full w-full items-center justify-center bg-maroon-tint text-3xl font-display font-semibold text-maroon-ink">
-      {letter}
-    </div>
+    <ImageWithSkeleton
+      src="/product-placeholder.jpg"
+      alt={name}
+      fill
+      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+      className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+    />
   );
 }
