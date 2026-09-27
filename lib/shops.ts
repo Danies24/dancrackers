@@ -236,11 +236,64 @@ export interface ShopShowcaseCard {
   topProducts: ProductWithCategory[];
 }
 
+function pickShowcaseProductsByPriceDistribution(catalogue: ProductWithCategory[]): ProductWithCategory[] {
+  // We only care about products with a valid price
+  const priced = [...catalogue].filter((p) => p.price !== null).sort((a, b) => a.price! - b.price!);
+
+  if (priced.length === 0) return catalogue.slice(0, 6);
+  if (priced.length < 6) return priced;
+
+  const lowest = priced[0];
+  const secondLowest = priced[1];
+  const thirdLowest = priced[2];
+  const highest = priced[priced.length - 1];
+  
+  // 10th lowest, fallback if shop doesn't have 10 products
+  const tenthLowest = priced.length >= 10 ? priced[9] : priced[Math.floor(priced.length / 2)];
+
+  // Average
+  const sum = priced.reduce((acc, p) => acc + p.price!, 0);
+  const avg = sum / priced.length;
+  let closestToAvg = priced[0];
+  let minDiff = Math.abs(priced[0].price! - avg);
+  for (const p of priced) {
+    const diff = Math.abs(p.price! - avg);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestToAvg = p;
+    }
+  }
+
+  // Desired order: 1st (lowest), 2nd (2nd lowest), 3rd (average), 4th (10th lowest), 5th (highest), 6th (3rd lowest)
+  const result: ProductWithCategory[] = [];
+  const seen = new Set<string>();
+
+  const add = (p: ProductWithCategory) => {
+    if (!seen.has(p.id)) {
+      result.push(p);
+      seen.add(p.id);
+    }
+  };
+
+  add(lowest);
+  add(secondLowest);
+  add(closestToAvg);
+  add(tenthLowest);
+  add(highest);
+  add(thirdLowest);
+
+  // If we don't have exactly 6 unique products yet (e.g. if tenthLowest overlapped), fill with remaining
+  for (const p of priced) {
+    if (result.length >= 6) break;
+    add(p);
+  }
+
+  return result;
+}
+
 /**
  * Home page "Our Shops" showcase (Swiggy-redesign follow-up) — each card's
- * own top-5 products (by rankProducts() tiering, same as the shop PLP), not
- * just a count, so the home page can show a live product carousel per shop
- * instead of a single static image.
+ * own top products ordered by a custom price distribution.
  */
 export async function getShopsForHomeShowcase(): Promise<ShopShowcaseCard[]> {
   const shops = await getShopsForHomeRail();
@@ -264,7 +317,7 @@ export async function getShopsForHomeShowcase(): Promise<ShopShowcaseCard[]> {
         shop,
         productCount: shop.productCount,
         maxDiscountPercent,
-        topProducts: catalogue.slice(0, 5),
+        topProducts: pickShowcaseProductsByPriceDistribution(catalogue),
       };
     }),
   );

@@ -71,7 +71,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
 
       {topProducts.length > 0 && (
         <div
-          className="scrollbar-none mt-3.5 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pr-5 md:grid md:grid-cols-5 md:overflow-visible"
+          className="scrollbar-none mt-3.5 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pr-5 md:grid md:grid-cols-6 md:overflow-visible"
           onClick={(e) => e.stopPropagation()}
         >
           {topProducts.map((p) => (

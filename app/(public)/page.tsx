@@ -185,6 +185,39 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ₹99 Store — real, price-sorted, one horizontal scroll per shop
+          (not merged cross-shop), in the same shop order as "Our Shops". */}
+      {shopCards.map((card) => {
+        const products = (under99ByShopSlug.get(card.shop.slug) ?? []).slice(0, 10);
+        if (products.length === 0) return null;
+        return (
+          <section key={card.shop.id} className="mx-auto max-w-6xl px-4 pb-10">
+            <div className="mb-4">
+              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">₹99 Store</h2>
+              <p className="text-xs font-semibold text-ink-soft">Products under ₹99 from {card.shop.name_en}</p>
+            </div>
+            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-6 md:overflow-visible md:px-0">
+              {products.map((p) => (
+                <div key={p.id} className="w-36 shrink-0 snap-start md:w-auto">
+                  <ProductCard product={p} shopName={p.shop.name_en} />
+                </div>
+              ))}
+              <div className="w-36 shrink-0 snap-start md:w-auto">
+                <Link
+                  href={`/s/${card.shop.slug}`}
+                  className="flex h-full min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border bg-ink-[0.02] text-sm font-semibold text-ink-soft transition-colors hover:border-maroon hover:bg-maroon/5 hover:text-maroon-ink"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+                    <span className="text-xl">→</span>
+                  </div>
+                  View All
+                </Link>
+              </div>
+            </div>
+          </section>
+        );
+      })}
+
       {/* Shop by category — segregated into Night/Day Crackers (20260924000004/5),
           each a 3-column grid (9 tiles), no horizontal scroll. "Night Crackers"/
           "Day Crackers" are plain section titles, not links — they're not a
@@ -246,28 +279,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* ₹99 Store — real, price-sorted, one horizontal scroll per shop
-          (not merged cross-shop), in the same shop order as "Our Shops". */}
-      {shopCards.map((card) => {
-        const products = (under99ByShopSlug.get(card.shop.slug) ?? []).slice(0, 10);
-        if (products.length === 0) return null;
-        return (
-          <section key={card.shop.id} className="mx-auto max-w-6xl px-4 pb-10">
-            <div className="mb-4">
-              <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">₹99 Store</h2>
-              <p className="text-xs font-semibold text-ink-soft">Products under ₹99 from {card.shop.name_en}</p>
-            </div>
-            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
-              {products.map((p) => (
-                <div key={p.id} className="w-36 shrink-0 snap-start md:w-auto">
-                  <ProductCard product={p} shopName={p.shop.name_en} />
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      })}
 
       {/* Trust section */}
       <section className="bg-secondary-bg px-4 py-14">
