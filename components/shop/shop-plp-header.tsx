@@ -41,11 +41,6 @@ export function ShopPlpHeader({
             </div>
           )}
           <div className="min-w-0">
-            {shop.name_ta && (
-              <p lang="ta" className="truncate text-xs text-white/70">
-                {shop.name_ta}
-              </p>
-            )}
             <h1 className="truncate font-display text-lg font-bold">{shop.name_en}</h1>
             {shop.tagline && <p className="mt-0.5 truncate text-xs font-bold" style={{ color: "#ffc857" }}>{shop.tagline}</p>}
           </div>

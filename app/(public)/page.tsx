@@ -218,6 +218,25 @@ export default async function HomePage() {
         );
       })}
 
+      {/* Combo Packs — Sri Ram's premium-showcase treatment (ComboPackCard),
+          replacing the old cross-shop "Top Offers" carousel with a
+          highlighted spotlight on the one shop that actually has them. */}
+      {comboPacks.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <div className="mb-4">
+            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">🎁 Combo Packs</h2>
+            <p className="text-xs font-semibold text-ink-soft">From Sri Ram Crackers</p>
+          </div>
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+            {comboPacks.map((combo) => (
+              <div key={combo.id} className="w-64 shrink-0 snap-start md:w-auto">
+                <ComboPackCard combo={combo} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Shop by category — segregated into Night/Day Crackers (20260924000004/5),
           each a 3-column grid (9 tiles), no horizontal scroll. "Night Crackers"/
           "Day Crackers" are plain section titles, not links — they're not a
@@ -261,24 +280,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Combo Packs — Sri Ram's premium-showcase treatment (ComboPackCard),
-          replacing the old cross-shop "Top Offers" carousel with a
-          highlighted spotlight on the one shop that actually has them. */}
-      {comboPacks.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-10">
-          <div className="mb-4">
-            <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">🎁 Combo Packs</h2>
-            <p className="text-xs font-semibold text-ink-soft">From Sri Ram Crackers</p>
-          </div>
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
-            {comboPacks.map((combo) => (
-              <div key={combo.id} className="w-64 shrink-0 snap-start md:w-auto">
-                <ComboPackCard combo={combo} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Trust section */}
       <section className="bg-secondary-bg px-4 py-14">

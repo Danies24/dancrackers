@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/leads", label: "Leads" },
   { href: "/admin/products", label: "Products" },
+  { href: "/admin/products/import", label: "Bulk Upload" },
   { href: "/admin/combopacks", label: "Combo Packs" },
   { href: "/admin/captains", label: "Captains" },
   { href: "/admin/shops", label: "Shops" },
@@ -35,16 +36,21 @@ export function AdminNav({ userName }: { userName: string }) {
           Sign out ({userName})
         </button>
       </div>
-      <nav className="flex border-t border-border">
+      <nav className="flex border-t border-border overflow-x-auto whitespace-nowrap scrollbar-hide">
         {links.map((link) => {
-          const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
+          const active =
+            link.href === "/admin"
+              ? pathname === "/admin"
+              : link.href === "/admin/products"
+                ? pathname === "/admin/products" || pathname.startsWith("/admin/products/new")
+                : pathname.startsWith(link.href);
           return (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "flex-1 py-3 text-center text-sm font-medium",
-                active ? "border-b-2 border-gold-ink text-ink" : "text-ink-soft",
+                "px-4 py-3 text-center text-sm font-medium transition-colors",
+                active ? "border-b-2 border-gold-ink text-ink" : "text-ink-soft hover:text-ink",
               )}
             >
               {link.label}

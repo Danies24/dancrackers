@@ -19,7 +19,7 @@ export function ShopStickyBar({ shop }: { shop: ShopRow }) {
         <ArrowLeft size={16} aria-hidden />
       </Link>
       <span className="truncate text-sm font-semibold text-ink">
-        {shop.name_ta ? `${shop.name_ta} · ${shop.name_en}` : shop.name_en}
+        {shop.name_en}
       </span>
     </div>
   );

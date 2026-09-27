@@ -44,11 +44,6 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
     >
       <div className="flex items-start justify-between pr-5">
         <div className="min-w-0">
-          {shop.name_ta && (
-            <p lang="ta" className="truncate text-xs text-muted">
-              {shop.name_ta}
-            </p>
-          )}
           <div className="font-display text-lg font-bold text-ink">{shop.name_en}</div>
           {shop.tagline && (
             <span className="mt-1 inline-block rounded-full border border-teal bg-teal-tint px-2.5 py-1 text-xs font-extrabold text-teal-ink">
@@ -71,7 +66,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
 
       {topProducts.length > 0 && (
         <div
-          className="scrollbar-none mt-3.5 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pr-5 md:grid md:grid-cols-6 md:overflow-visible"
+          className="scrollbar-none mt-3.5 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto pr-5 md:grid md:grid-cols-5 md:overflow-visible"
           onClick={(e) => e.stopPropagation()}
         >
           {topProducts.map((p) => (

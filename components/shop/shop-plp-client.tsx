@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { LayoutGrid, List as ListIcon } from "lucide-react";
+import { LayoutGrid, List as ListIcon, ArrowDownUp } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductListRow } from "@/components/product/product-list-row";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
@@ -59,6 +59,21 @@ export function ShopPlpClient({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+
+  const sortedSections = useMemo(() => {
+    if (!sortOrder) return sections;
+    return sections.map(s => {
+      if (s.kind === "combos") return s;
+      const sortedProducts = [...s.products].sort((a, b) => {
+        const pA = a.price ?? 0;
+        const pB = b.price ?? 0;
+        return sortOrder === "asc" ? pA - pB : pB - pA;
+      });
+      return { ...s, products: sortedProducts };
+    });
+  }, [sections, sortOrder]);
+
   const stickyRowRef = useRef<HTMLDivElement>(null);
   const [scrollMarginTop, setScrollMarginTop] = useState(HEADER_STACK_HEIGHT + 90);
 
@@ -120,11 +135,11 @@ export function ShopPlpClient({
     router.back();
   }
 
-  const categorySections = sections.filter(
+  const categorySections = sortedSections.filter(
     (s): s is Extract<ShopPlpSection, { kind: "category" }> => s.kind === "category",
   );
 
-  const allAnchorIds = useMemo(() => sections.map(sectionAnchorId), [sections]);
+  const allAnchorIds = useMemo(() => sortedSections.map(sectionAnchorId), [sections]);
   const [activeAnchorId, jumpToSection] = useActiveSection(allAnchorIds);
 
   const circleItems: CategoryCircleItem[] = categorySections.map((s) => ({
@@ -134,7 +149,7 @@ export function ShopPlpClient({
     count: s.products.length,
   }));
 
-  const menuSections: ShopMenuSection[] = sections.map((s) => ({
+  const menuSections: ShopMenuSection[] = sortedSections.map((s) => ({
     anchorId: sectionAnchorId(s),
     label: s.kind === "category" ? s.nameEn : FLAT_SECTION_LABEL[s.kind],
     count: s.kind === "combos" ? s.combos.length : s.products.length,
@@ -177,7 +192,10 @@ export function ShopPlpClient({
       </div>
 
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pt-2">
-        {sections.map((section) => {
+        <div className="mb-[-1rem] mt-2 flex justify-end">
+          <ViewAndSortToolbar mode={viewMode} onModeChange={handleViewModeChange} sort={sortOrder} onSortChange={setSortOrder} />
+        </div>
+        {sortedSections.map((section) => {
           const anchorId = sectionAnchorId(section);
 
           if (section.kind === "combos") {
@@ -215,11 +233,7 @@ export function ShopPlpClient({
           return null;
         })}
 
-        {categorySections.length > 0 && (
-          <div className="flex justify-end">
-            <ViewModeToggle mode={viewMode} onChange={handleViewModeChange} />
-          </div>
-        )}
+        
 
         {categorySections.map((section) => {
           const anchorId = `cat-${section.categorySlug}`;
@@ -245,27 +259,48 @@ export function ShopPlpClient({
   );
 }
 
-function ViewModeToggle({ mode, onChange }: { mode: "grid" | "list"; onChange: (mode: "grid" | "list") => void }) {
+function ViewAndSortToolbar({
+  mode,
+  onModeChange,
+  sort,
+  onSortChange,
+}: {
+  mode: "grid" | "list";
+  onModeChange: (mode: "grid" | "list") => void;
+  sort: "asc" | "desc" | null;
+  onSortChange: (sort: "asc" | "desc" | null) => void;
+}) {
   return (
-    <div className="flex items-center overflow-hidden rounded-md border border-border bg-surface">
+    <div className="flex items-center overflow-hidden rounded-lg border border-border bg-surface shadow-md">
       <button
         type="button"
-        onClick={() => onChange("grid")}
+        onClick={() => onModeChange("grid")}
         aria-label="Grid view"
-        aria-pressed={mode === "grid"}
-        className={`p-1.5 transition-colors ${mode === "grid" ? "bg-maroon-tint text-maroon-ink" : "text-muted"}`}
+        className={`p-2.5 transition-colors ${mode === "grid" ? "bg-maroon text-white" : "text-ink-soft hover:bg-secondary-bg hover:text-ink"}`}
       >
-        <LayoutGrid size={16} />
+        <LayoutGrid size={22} />
       </button>
       <button
         type="button"
-        onClick={() => onChange("list")}
+        onClick={() => onModeChange("list")}
         aria-label="List view"
-        aria-pressed={mode === "list"}
-        className={`border-l border-border p-1.5 transition-colors ${mode === "list" ? "bg-maroon-tint text-maroon-ink" : "text-muted"}`}
+        className={`border-l border-border p-2.5 transition-colors ${mode === "list" ? "bg-maroon text-white" : "text-ink-soft hover:bg-secondary-bg hover:text-ink"}`}
       >
-        <ListIcon size={16} />
+        <ListIcon size={22} />
       </button>
+      <div className={`relative flex items-center border-l border-border p-2.5 transition-colors ${sort ? "bg-maroon text-white" : "text-ink-soft hover:bg-secondary-bg hover:text-ink"}`}>
+        <ArrowDownUp size={22} />
+        <select
+          aria-label="Sort products"
+          value={sort || ""}
+          onChange={(e) => onSortChange(e.target.value ? (e.target.value as "asc" | "desc") : null)}
+          className="absolute inset-0 w-full opacity-0 cursor-pointer"
+        >
+          <option value="">Sort (Default)</option>
+          <option value="asc">Price: Low to High</option>
+          <option value="desc">Price: High to Low</option>
+        </select>
+      </div>
     </div>
   );
 }
