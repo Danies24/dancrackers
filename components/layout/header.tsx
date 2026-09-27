@@ -9,7 +9,7 @@ import { DiyaIcon } from "@/components/marketing/diya-icon";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { HeaderSearch } from "@/components/layout/header-search";
 import type { CategoryRow } from "@/lib/data";
-import { brandConfig, getPhoneE164 } from "@/config/brandConfig";
+import { brandConfig, getPhoneE164, getPhoneDisplay, getWhatsAppLink } from "@/config/brandConfig";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -99,7 +99,16 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
 
           <div className="flex flex-1 items-center justify-end gap-1 md:flex-none">
             <ThemeToggle />
-            <HeaderSearch className="mr-1 w-full max-w-[140px] md:max-w-[200px]" />
+            <div className="hidden md:block">
+              <HeaderSearch className="mr-1 w-full max-w-[140px] md:max-w-[200px]" />
+            </div>
+            <Link
+              href="/search"
+              aria-label="Search products"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:border-maroon hover:text-maroon-ink md:hidden"
+            >
+              <Search size={18} aria-hidden />
+            </Link>
             <Link
               href="/cart"
               aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
@@ -124,6 +133,17 @@ export function Header({ categories = [] }: { categories?: CategoryRow[] }) {
                 </span>
               )}
             </Link>
+            <a
+              href={getWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 hidden items-center gap-1.5 rounded-full border border-[#25D366] px-4 py-2 text-sm font-semibold text-[#25D366] transition-colors hover:bg-[#25D366] hover:text-white md:inline-flex"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                <path d="M12.031 2.007c-5.511 0-9.986 4.475-9.986 9.985 0 1.761.458 3.483 1.328 4.996l-1.424 5.204 5.32-1.395c1.474.808 3.143 1.233 4.862 1.234h.004c5.509 0 9.985-4.474 9.985-9.984 0-2.67-1.04-5.18-2.929-7.07-1.889-1.89-4.402-2.93-7.072-2.93a.294.294 0 0 0-.088 0zm0 17.585h-.003c-1.492-.001-2.955-.401-4.238-1.161l-.304-.18-3.151.826.84-3.073-.197-.314c-.833-1.325-1.272-2.853-1.272-4.436 0-4.597 3.742-8.338 8.338-8.338 2.228 0 4.324.868 5.899 2.444s2.443 3.673 2.443 5.901c-.001 4.597-3.742 8.338-8.339 8.338l-.016-.007zm4.573-6.248c-.251-.126-1.486-.734-1.716-.818-.23-.084-.398-.126-.565.126-.168.252-.647.818-.794.986-.147.168-.293.189-.544.063-2.14-1.074-3.415-1.745-4.664-3.927-.147-.253.111-.237.545-.717.084-.092.167-.189.251-.285.084-.097.112-.167.168-.278.056-.112.028-.21-.014-.294-.042-.084-.565-1.362-.774-1.865-.203-.491-.41-.424-.565-.431-.147-.008-.314-.008-.482-.008s-.44.063-.67.315c-.23.252-.88 .86-.88 2.096s.901 2.43 1.026 2.597c.126.168 1.77 2.702 4.285 3.788 2.148.927 2.404.743 2.844.7 2.096-.201 1.442-.89 1.631-1.751.04-.184.04-.343.028-.376-.013-.033-.056-.053-.153-.102z" />
+              </svg>
+              {getPhoneDisplay()}
+            </a>
             <Link
               href={isHome ? "#enquiry" : "/#enquiry"}
               className="ml-2 hidden items-center gap-1 rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-on-fill transition-all hover:-translate-y-0.5 hover:glow-orange md:inline-flex"
