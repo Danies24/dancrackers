@@ -25,13 +25,13 @@ const CELEBRATION_MS = 800;
  * returns the celebration to render (burst particles + a one-line message)
  * for `CELEBRATION_MS`, then clears itself so the next sentence can show.
  */
-export function useCartMilestoneCelebration(subtotal: number): MilestoneCelebration | null {
+export function useCartMilestoneCelebration(subtotal: number, shopSlug?: string | null): MilestoneCelebration | null {
   const previousTierRef = useRef<number | null>(null);
   const keyRef = useRef(0);
   const [celebration, setCelebration] = useState<MilestoneCelebration | null>(null);
 
   useEffect(() => {
-    const tier = getCartTier(subtotal);
+    const tier = getCartTier(subtotal, shopSlug);
     const previousTier = previousTierRef.current;
     previousTierRef.current = tier;
 
@@ -43,7 +43,7 @@ export function useCartMilestoneCelebration(subtotal: number): MilestoneCelebrat
 
     const timeout = setTimeout(() => setCelebration(null), CELEBRATION_MS);
     return () => clearTimeout(timeout);
-  }, [subtotal]);
+  }, [subtotal, shopSlug]);
 
   return celebration;
 }

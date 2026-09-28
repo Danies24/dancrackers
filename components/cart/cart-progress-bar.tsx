@@ -15,9 +15,9 @@ import { useCartMilestoneCelebration } from "@/components/cart/use-cart-mileston
  * milestone (use-cart-milestone-celebration.ts), never on a loop.
  * `subtotal` is the item subtotal — before packaging/delivery are added.
  */
-export function CartProgressBar({ subtotal }: { subtotal: number }) {
-  const progress = getCartProgress(subtotal);
-  const celebration = useCartMilestoneCelebration(subtotal);
+export function CartProgressBar({ subtotal, shopSlug }: { subtotal: number; shopSlug?: string | null }) {
+  const progress = getCartProgress(subtotal, shopSlug);
+  const celebration = useCartMilestoneCelebration(subtotal, shopSlug);
 
   if (progress.done) {
     return (

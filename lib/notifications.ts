@@ -32,6 +32,8 @@ export interface NotificationOrder {
   notes?: string;
   itemLines: string[]; // pre-formatted "1. Seven Shot — 10 pkt — ₹1,440"
   adminOrderUrl: string;
+  /** e.g. the Gurusamy wholesale/delivery-charge notice — surfaced in both the email and Telegram alert when set. */
+  deliveryNoticeLine?: string;
 }
 
 export async function sendEnquiryNotifications(order: NotificationOrder): Promise<void> {
@@ -95,6 +97,7 @@ function buildEmailHtml(order: NotificationOrder): string {
       <p>${order.address}<br/>${order.city} ${order.pincode}</p>
       <p>${order.itemLines.join("<br/>")}</p>
       <p><strong>Total: ${formatRupees(order.grandTotal)}</strong></p>
+      ${order.deliveryNoticeLine ? `<p>${order.deliveryNoticeLine}</p>` : ""}
       <p>Captain: ${order.captainCode ?? "DIRECT"}</p>
       ${order.notes ? `<p>Notes: ${order.notes}</p>` : ""}
       <p><a href="${order.adminOrderUrl}">Open in admin →</a></p>
@@ -121,6 +124,7 @@ async function sendTelegramNotification(order: NotificationOrder): Promise<void>
     ...order.itemLines,
     "",
     `Total: ${formatRupees(order.grandTotal)}`,
+    order.deliveryNoticeLine ?? "",
     order.notes ? `Notes: ${order.notes}` : "",
     order.adminOrderUrl,
   ]

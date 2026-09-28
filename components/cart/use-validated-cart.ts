@@ -34,7 +34,7 @@ export interface ValidatedCart {
  * minimum-order check is flat (§ cartCharges) — no delivery state needed.
  */
 export function useValidatedCart(): ValidatedCart {
-  const { items } = useCart();
+  const { items, shopSlug } = useCart();
   const [validated, setValidated] = useState<ValidateResultItem[] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -103,6 +103,7 @@ export function useValidatedCart(): ValidatedCart {
       isDiscountable: l.validated!.isDiscountable ?? true,
       mrp: l.validated!.mrp,
     })),
+    shopSlug,
   );
 
   return {

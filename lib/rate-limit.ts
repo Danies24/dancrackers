@@ -1,19 +1,12 @@
 import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { redis } from "@/lib/redis";
 
 /**
  * §30.2: /api/enquiry 5/IP/10min + 20/IP/day, /api/track 60/IP/min.
  * No-ops (never blocks) when Upstash env vars are absent — e.g. local dev —
  * rather than failing closed and taking the whole enquiry flow down.
  */
-const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : null;
 
 const enquiryPer10Min = redis
   ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "10 m"), prefix: "dc:enquiry:10m" })

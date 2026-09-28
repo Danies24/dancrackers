@@ -50,6 +50,21 @@ interface CartContextValue {
   setQty: (productId: string, qty: number) => void;
   remove: (productId: string) => void;
   clear: () => void;
+  /**
+   * Loads several items from `shop` in one atomic update — used by the
+   * shared-cart "Load into my cart" flow, which has already resolved any
+   * shop conflict itself (a confirm dialog, not the add()/StartNewCartSheet
+   * pending flow) before calling this. "replace" starts from an empty cart;
+   * "merge" adds onto whatever's already there, summing quantities on any
+   * overlapping productId (addItem's existing behaviour). A single apply()
+   * call, so it never races add()'s stateRef-based conflict check the way
+   * looping add() calls after clear() would.
+   */
+  loadItems: (
+    items: Array<{ productId: string; sku: string; price: number; qty: number }>,
+    shop: CartShop,
+    mode: "merge" | "replace",
+  ) => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -149,6 +164,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
   const clear = useCallback(() => apply(() => clearCart()), [apply]);
 
+  const loadItems = useCallback(
+    (
+      itemsToLoad: Array<{ productId: string; sku: string; price: number; qty: number }>,
+      shop: CartShop,
+      mode: "merge" | "replace",
+    ) => {
+      apply((prev) => {
+        const base = mode === "replace" ? emptyCart() : prev;
+        return itemsToLoad.reduce(
+          (acc, item) => addItem(acc, { productId: item.productId, sku: item.sku, price: item.price }, item.qty, shop),
+          base,
+        );
+      });
+    },
+    [apply],
+  );
+
   const itemCount = useMemo(
     () => (hydrated ? state.items.reduce((sum, i) => sum + i.qty, 0) : 0),
     [state.items, hydrated],
@@ -169,8 +201,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setQty,
       remove,
       clear,
+      loadItems,
     }),
-    [state, hydrated, itemCount, storageAvailable, add, increment, decrement, setQty, remove, clear],
+    [state, hydrated, itemCount, storageAvailable, add, increment, decrement, setQty, remove, clear, loadItems],
   );
 
   return (

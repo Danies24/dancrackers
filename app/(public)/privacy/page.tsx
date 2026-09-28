@@ -43,6 +43,19 @@ export default function PrivacyPage() {
             full address — only your first name, order status and amount.
           </p>
         </Section>
+        <Section title="Payment details">
+          <p>
+            No payment details are ever collected or stored by this website — no card, UPI, or bank account
+            numbers. Payment happens directly between you and us by UPI or bank transfer, after our
+            confirmation call.
+          </p>
+        </Section>
+        <Section title="Shared cart links">
+          <p>
+            A cart link you share, or one shared with you, carries only item slugs and quantities — never your
+            name, phone number, address, or any other personal data.
+          </p>
+        </Section>
         <Section title="Analytics">
           <p>
             We use Google Analytics (GA4) and Microsoft Clarity to understand how the site is used and to fix

@@ -80,6 +80,21 @@ const FAQ_LIST: FAQItem[] = [
     linkText: "Read our firecracker safety guide",
     linkHref: "/safety",
   },
+  {
+    question: "How do I share my cart?",
+    answer:
+      "On the cart page, tap \"Share cart\" to get a link you can send on WhatsApp or anywhere else — or copy your cart as a plain text list. Whoever opens the link sees the same items with live prices; no personal details are included in the link.",
+  },
+  {
+    question: "Why is there a delivery charge for Gurusamy Fireworks?",
+    answer:
+      "Gurusamy Fireworks sells at wholesale, factory-direct prices with no packaging charge at all — in exchange, a flat delivery charge applies to every order from that shop, regardless of order value.",
+  },
+  {
+    question: "When is delivery free?",
+    answer:
+      "Free delivery is offered by Sri Ram Crackers only, on orders above the threshold shown in your cart. It does not apply to every shop on Kolagalam.",
+  },
 ];
 
 export default function FAQPage() {

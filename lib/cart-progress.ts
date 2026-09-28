@@ -7,6 +7,7 @@
  * themselves.
  */
 import { brandConfig } from "@/config/brandConfig";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 import { formatRupees } from "@/lib/format";
 import { round2 } from "@/lib/pricing";
 
@@ -34,9 +35,9 @@ interface MilestoneDef {
   message: (remaining: string) => string;
 }
 
-export function getCartProgress(subtotal: number): CartProgressState {
-  const { minimumOrderValue, packagingChargeWaiverThreshold, deliveryChargeWaiverThreshold } =
-    brandConfig.cartCharges;
+export function getCartProgress(subtotal: number, shopSlug?: string | null): CartProgressState {
+  const { minimumOrderValue } = brandConfig.cartCharges;
+  const { packaging, delivery } = getShopDeliveryConfig(shopSlug);
 
   const milestones: MilestoneDef[] = [
     {
@@ -44,17 +45,21 @@ export function getCartProgress(subtotal: number): CartProgressState {
       tag: "MINIMUM ORDER",
       message: (remaining) => `Add ${remaining} more to reach the ${formatRupees(minimumOrderValue)} minimum order`,
     },
-    {
-      threshold: packagingChargeWaiverThreshold,
+  ];
+  if (packaging.enabled) {
+    milestones.push({
+      threshold: packaging.waiverThreshold,
       tag: "FREE PACKAGING",
       message: (remaining) => `Add ${remaining} more to avail zero packaging charges`,
-    },
-    {
-      threshold: deliveryChargeWaiverThreshold,
+    });
+  }
+  if (delivery.freeThreshold != null) {
+    milestones.push({
+      threshold: delivery.freeThreshold,
       tag: "FREE DELIVERY",
       message: (remaining) => `Add ${remaining} more to avail zero delivery charges`,
-    },
-  ];
+    });
+  }
 
   const next = milestones.find((m) => subtotal < m.threshold);
   if (!next) return { done: true };
@@ -78,11 +83,11 @@ export function getCartProgress(subtotal: number): CartProgressState {
  * A rising tier is exactly the moment to fire the crossing celebration —
  * see components/cart/use-cart-milestone-celebration.ts.
  */
-export function getCartTier(subtotal: number): 0 | 1 | 2 | 3 {
-  const { minimumOrderValue, packagingChargeWaiverThreshold, deliveryChargeWaiverThreshold } =
-    brandConfig.cartCharges;
-  if (subtotal >= deliveryChargeWaiverThreshold) return 3;
-  if (subtotal >= packagingChargeWaiverThreshold) return 2;
+export function getCartTier(subtotal: number, shopSlug?: string | null): 0 | 1 | 2 | 3 {
+  const { minimumOrderValue } = brandConfig.cartCharges;
+  const { packaging, delivery } = getShopDeliveryConfig(shopSlug);
+  if (delivery.freeThreshold != null && subtotal >= delivery.freeThreshold) return 3;
+  if (packaging.enabled && subtotal >= packaging.waiverThreshold) return 2;
   if (subtotal >= minimumOrderValue) return 1;
   return 0;
 }

@@ -7,12 +7,15 @@ import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
 import { ReferralCodeField } from "@/components/cart/referral-code-field";
 import { CartProgressBar } from "@/components/cart/cart-progress-bar";
+import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
+import { ShareCartButton } from "@/components/cart/share-cart-button";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { brandConfig, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
+import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
 import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 /** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
@@ -35,6 +38,7 @@ function CartLineSkeleton() {
 export default function CartPage() {
   const { items, setQty, remove, shopSlug, shopName } = useCart();
   const { loading, activeLines, unavailableLines, totals, belowMinimum } = useValidatedCart();
+  const deliveryConfig = getShopDeliveryConfig(shopSlug);
 
   useEffect(() => {
     if (!loading && items.length > 0) {
@@ -61,9 +65,12 @@ export default function CartPage() {
         Your Order <span className="text-base font-normal text-muted">({items.length} items)</span>
       </h1>
       {shopSlug && shopName && (
-        <Link href={`/s/${shopSlug}`} className="mt-1 inline-block text-sm font-medium text-maroon-ink hover:underline">
-          from {shopName} →
-        </Link>
+        <div className="mt-1 flex items-center justify-between gap-3">
+          <Link href={`/s/${shopSlug}`} className="inline-block text-sm font-medium text-maroon-ink hover:underline">
+            from {shopName} →
+          </Link>
+          {!loading && activeLines.length > 0 && <ShareCartButton shopSlug={shopSlug} activeLines={activeLines} />}
+        </div>
       )}
 
       {loading ? (
@@ -151,12 +158,14 @@ export default function CartPage() {
         <>
           <div className="mt-6 rounded-lg border border-border bg-surface p-4">
             <Row label="Item subtotal" value={totals.subtotal} muted />
-            <Row
-              label={`Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%)`}
-              value={totals.packagingCharge}
-              muted={totals.packagingCharge === 0}
-              free={totals.packagingCharge === 0}
-            />
+            {deliveryConfig.packaging.enabled && (
+              <Row
+                label={`Packaging charge (${deliveryConfig.packaging.percent}%)`}
+                value={totals.packagingCharge}
+                muted={totals.packagingCharge === 0}
+                free={totals.packagingCharge === 0}
+              />
+            )}
             <Row
               label="Delivery charge"
               value={totals.deliveryCharge}
@@ -176,7 +185,11 @@ export default function CartPage() {
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
             <div className="mb-3">
-              <CartProgressBar subtotal={totals.subtotal} />
+              {isGurusamyShop(shopSlug) ? (
+                <GurusamyDeliveryNotice subtotal={totals.subtotal} />
+              ) : (
+                <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
+              )}
             </div>
             {isOrderDeadlineBlocked() ? (
               <div className="flex flex-col gap-2">

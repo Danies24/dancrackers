@@ -6,6 +6,8 @@ import { useCart } from "@/components/cart/cart-provider";
 import { formatRupees } from "@/lib/format";
 import { computeTotals } from "@/lib/pricing";
 import { CartProgressBanner } from "@/components/cart/cart-progress-banner";
+import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
+import { isGurusamyShop } from "@/config/deliveryConfig";
 import { useEffect, useState } from "react";
 
 /**
@@ -18,7 +20,7 @@ import { useEffect, useState } from "react";
  * approximation until the cart page's server revalidation corrects it.
  */
 export function StickyCartBar() {
-  const { items, itemCount, hydrated } = useCart();
+  const { items, itemCount, hydrated, shopSlug } = useCart();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -31,11 +33,18 @@ export function StickyCartBar() {
 
   const totals = computeTotals(
     items.map((i) => ({ price: i.priceAtAdd, quantity: i.qty, isDiscountable: true })),
+    shopSlug,
   );
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-30" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <CartProgressBanner subtotal={totals.subtotal} />
+      {isGurusamyShop(shopSlug) ? (
+        <div className="border-b border-border bg-cream px-4 py-2">
+          <GurusamyDeliveryNotice subtotal={totals.subtotal} compact />
+        </div>
+      ) : (
+        <CartProgressBanner subtotal={totals.subtotal} shopSlug={shopSlug} />
+      )}
       <div className="flex h-16 items-center justify-between bg-maroon px-4 text-white shadow-lg">
         <span className="text-sm font-medium">
           {itemCount} item{itemCount === 1 ? "" : "s"} · {formatRupees(totals.grandTotal)}

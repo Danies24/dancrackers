@@ -60,6 +60,8 @@ export const brandConfig = {
         whatsapp: "6363930412",
         // TODO(confirm): licence number — get in writing from the supplier before this appears on a live page.
         licenceNo: "TODO(confirm)",
+        // TODO(confirm): licence validity/expiry date — get in writing from the supplier before this appears on a live page.
+        licenceValidity: "TODO(confirm)",
         isPrimary: true,
       },
     ],
@@ -67,6 +69,19 @@ export const brandConfig = {
     gstin: "TODO(confirm)" as string | null,
     complianceNotice:
       "Online sale of firecrackers is not permitted. This website collects enquiries only. No payment is taken here. Pay securely by UPI or bank transfer after our confirmation call.",
+    // TODO(confirm): a named grievance officer (name/email/phone) is an Indian
+    // consumer-protection expectation for a consumer-facing site — get real
+    // details before this appears on a live page.
+    grievanceOfficer: {
+      name: "TODO(confirm)",
+      email: "TODO(confirm)",
+      phone: "TODO(confirm)",
+    },
+    // TODO(legal-review): confirm the actual governing-law/jurisdiction clause with counsel before relying on this.
+    governingLaw: {
+      country: "India",
+      courts: "Virudhunagar / Sivakasi, Tamil Nadu",
+    },
   },
 
   // No individual names surfaced anywhere on the site — kept as an empty,
@@ -303,6 +318,7 @@ const UNCONFIRMED = "TODO(confirm)";
 export function getManufacturerFacilitatorNotice(): {
   facilitatedBy: string;
   licenceLine: string | null;
+  licenceValidityLine: string | null;
   gstinLine: string | null;
 } {
   const supplier = getPrimarySupplier();
@@ -313,8 +329,19 @@ export function getManufacturerFacilitatorNotice(): {
     // this repo's convention is to omit an unconfirmed legal fact entirely
     // rather than print the placeholder to customers.
     licenceLine: supplier.licenceNo && supplier.licenceNo !== UNCONFIRMED ? `Licence No.: ${supplier.licenceNo}` : null,
+    licenceValidityLine:
+      supplier.licenceValidity && supplier.licenceValidity !== UNCONFIRMED
+        ? `Licence valid until: ${supplier.licenceValidity}`
+        : null,
     gstinLine: brandConfig.legal.gstin && brandConfig.legal.gstin !== UNCONFIRMED ? `GSTIN: ${brandConfig.legal.gstin}` : null,
   };
+}
+
+/** Same "omit rather than print a placeholder" convention as getManufacturerFacilitatorNotice(). */
+export function getGrievanceOfficer(): { name: string; email: string; phone: string } | null {
+  const { name, email, phone } = brandConfig.legal.grievanceOfficer;
+  if (name === UNCONFIRMED || email === UNCONFIRMED || phone === UNCONFIRMED) return null;
+  return { name, email, phone };
 }
 
 /** The flat minimum cart (item subtotal, before packaging/delivery charges) required to check out (§ cartCharges). */

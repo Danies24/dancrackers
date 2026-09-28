@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PackageCheck, Truck, Clock, ShieldAlert, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
-import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
+import { brandConfig, getCanonicalUrl, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
+import { SHOP_DELIVERY_CONFIG } from "@/config/deliveryConfig";
+import { formatRupees } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Shipping & Delivery",
@@ -35,18 +37,21 @@ const SHIPPING_POINTS = [
     icon: Truck,
   },
   {
-    en: "Minimum purchase value within Tamil Nadu should be ₹3,000 (after discount).",
-    ta: "தமிழ்நாட்டிற்குள் குறைந்தபட்ச கொள்முதல் மதிப்பு (தள்ளுபடிக்குப் பிறகு) ₹3,000 ஆக இருக்க வேண்டும்.",
+    // TODO(legal-review): confirm no state ever requires customer pickup —
+    // previous copy said below ₹5,000, verify with ops/legal before this
+    // page is treated as final.
+    en: `Minimum order value is ${formatRupees(getMinimumOrderValue())} (after discount), the same across every state — no separate Tamil Nadu / other-state minimum.`,
+    ta: `குறைந்தபட்ச ஆர்டர் மதிப்பு (தள்ளுபடிக்குப் பிறகு) ${formatRupees(getMinimumOrderValue())} — எல்லா மாநிலங்களுக்கும் ஒரே மதிப்பு.`,
     icon: CheckCircle2,
   },
   {
-    en: "Minimum purchase value for other states should be ₹5,000 (after discount).",
-    ta: "பிற மாநிலங்களுக்கு குறைந்தபட்ச கொள்முதல் மதிப்பு (தள்ளுபடிக்குப் பிறகு) ₹5,000 ஆக இருக்க வேண்டும்.",
+    en: `Sri Ram Crackers: packaging is free above ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].packaging.waiverThreshold)} and delivery is free on orders of ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].delivery.freeThreshold ?? 0)} and above. Below that, the packaging/delivery charges shown in your cart apply.`,
+    ta: `ஸ்ரீ ராம் பட்டாசு: ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].packaging.waiverThreshold)}-க்கு மேல் பேக்கிங் கட்டணம் இல்லை, ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].delivery.freeThreshold ?? 0)}-க்கு மேல் டெலிவரி இலவசம். அதற்குக் குறைவாக இருந்தால், கார்ட்டில் காட்டப்படும் கட்டணங்கள் பொருந்தும்.`,
     icon: CheckCircle2,
   },
   {
-    en: "If the order value is below ₹5,000, the customer must collect the goods from the nearest parcel service office (after discount).",
-    ta: "தள்ளுபடிக்குப் பிறகு ஆர்டர் மதிப்பு ₹5,000-க்கும் குறைவாக இருந்தால், வாடிக்கையாளர் அருகிலுள்ள பார்சல் சேவை அலுவலகத்தில் இருந்து பொருட்களை பெற்றுக்கொள்ள வேண்டும்.",
+    en: `Gurusamy Fireworks: wholesale factory-direct pricing, no packaging charge at all, and a flat ${formatRupees(SHOP_DELIVERY_CONFIG["gurusamy-fireworks"].delivery.flatCharge)} delivery charge on every order — this is never waived.`,
+    ta: `குருசாமி பட்டாசு: தொழிற்சாலை நேரடி மொத்த விலை, பேக்கிங் கட்டணம் இல்லை, ஒவ்வொரு ஆர்டருக்கும் ${formatRupees(SHOP_DELIVERY_CONFIG["gurusamy-fireworks"].delivery.flatCharge)} நிலையான டெலிவரி கட்டணம் — இது எப்போதும் தள்ளுபடி செய்யப்படாது.`,
     icon: MapPin,
   },
   {

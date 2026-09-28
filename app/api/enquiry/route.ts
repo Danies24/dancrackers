@@ -4,6 +4,8 @@ import { enquirySchema, normalizePhone } from "@/lib/validation";
 import { computeProductPricing, computeTotals, isBelowMinimumOrder, round2 } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/pricing-settings";
 import { getMinimumOrderValue, getSiteUrl } from "@/config/brandConfig";
+import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
+import { formatRupees } from "@/lib/format";
 import { getSettings } from "@/lib/data";
 import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashIp } from "@/lib/hash";
@@ -200,6 +202,7 @@ export async function POST(request: Request) {
     );
   }
   const shopId = [...distinctShopIds][0] ?? null;
+  let shopSlug: string | null = null;
   if (shopId) {
     const { data: shop } = await supabase.from("shops").select("slug").eq("id", shopId).maybeSingle();
     if (!shop || !isShopOrderable(shop.slug)) {
@@ -213,6 +216,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    shopSlug = shop.slug;
   }
 
   const validLines = input.items
@@ -243,6 +247,8 @@ export async function POST(request: Request) {
   const settings = await getSettings();
   const servedPincodes = Array.isArray(settings.served_pincodes) ? (settings.served_pincodes as string[]) : [];
 
+  const deliveryConfig = getShopDeliveryConfig(shopSlug);
+
   const totals = computeTotals(
     validLines.map((l) => ({
       price: l.pricing.customerPrice!,
@@ -250,6 +256,7 @@ export async function POST(request: Request) {
       isDiscountable: l.product.is_discountable,
       mrp: l.product.mrp,
     })),
+    shopSlug,
   );
 
   const supplierTotal = round2(
@@ -434,6 +441,10 @@ export async function POST(request: Request) {
   }
 
   // ── Notifications (§16.5 step 9, §18) — failures never affect the response ──
+  const deliveryNoticeLine = isGurusamyShop(shopSlug)
+    ? `Wholesale factory direct sale – delivery charges applicable (${formatRupees(deliveryConfig.delivery.flatCharge)})`
+    : undefined;
+
   const whatsappBusinessNumber = String(settings.whatsapp_business_number ?? "");
   const whatsappUrl = whatsappBusinessNumber
     ? buildWhatsAppUrl(
@@ -453,6 +464,8 @@ export async function POST(request: Request) {
           deliveryCharge: totals.deliveryCharge,
           grandTotal: totals.grandTotal,
           address: input.customer.address,
+          packagingEnabled: deliveryConfig.packaging.enabled,
+          deliveryNotice: deliveryNoticeLine,
         }),
       )
     : null;
@@ -472,6 +485,7 @@ export async function POST(request: Request) {
       (i, idx) => `${idx + 1}. ${i.name_en} — ${i.quantity} ${i.unit} — ₹${i.line_total}`,
     ),
     adminOrderUrl: `${siteUrl}/admin/orders/${order.id}`,
+    deliveryNoticeLine,
   }).catch((err) => console.error("[enquiry] notifications failed", err));
 
   return NextResponse.json(

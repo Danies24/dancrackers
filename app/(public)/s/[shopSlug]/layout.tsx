@@ -3,6 +3,8 @@ import { getShopForCurrentRequest, isShopOrderable } from "@/lib/shops";
 import { ShopStickyBar } from "@/components/shop/shop-sticky-bar";
 import { ShopPreviewBanner } from "@/components/shop/shop-preview-banner";
 import { ShopNotOrderableBanner } from "@/components/shop/shop-not-orderable-banner";
+import { WholesaleNoticeBanner } from "@/components/shop/wholesale-notice-banner";
+import { isGurusamyShop } from "@/config/deliveryConfig";
 
 export default async function ShopLayout({
   children,
@@ -20,6 +22,7 @@ export default async function ShopLayout({
     <div>
       {isPreview && <ShopPreviewBanner />}
       {!isShopOrderable(shop.slug) && <ShopNotOrderableBanner />}
+      {isGurusamyShop(shop.slug) && <WholesaleNoticeBanner />}
       <ShopStickyBar shop={shop} />
       {children}
     </div>

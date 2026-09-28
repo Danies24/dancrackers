@@ -16,10 +16,10 @@ import { useCartMilestoneCelebration } from "@/components/cart/use-cart-mileston
  * blast, fired exactly when `subtotal` newly crosses ₹2,999 / ₹3,499 /
  * ₹3,999 (use-cart-milestone-celebration.ts), never on a loop.
  */
-export function CartProgressBanner({ subtotal }: { subtotal: number }) {
-  const progress = getCartProgress(subtotal);
+export function CartProgressBanner({ subtotal, shopSlug }: { subtotal: number; shopSlug?: string | null }) {
+  const progress = getCartProgress(subtotal, shopSlug);
   const fillPercent = progress.done ? 100 : Math.max(progress.progressPercent, 6);
-  const celebration = useCartMilestoneCelebration(subtotal);
+  const celebration = useCartMilestoneCelebration(subtotal, shopSlug);
 
   return (
     <div className="relative overflow-hidden border-b border-border bg-cream px-4 pb-2.5 pt-3">

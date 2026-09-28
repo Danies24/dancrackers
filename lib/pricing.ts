@@ -6,7 +6,8 @@
  * totals on one order.
  */
 
-import { brandConfig, getMinimumOrderValue } from "@/config/brandConfig";
+import { getMinimumOrderValue } from "@/config/brandConfig";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 
 export interface PricingLine {
   price: number;
@@ -108,7 +109,7 @@ export function computeProductPricing(input: ProductPricingInput): ProductPricin
  * separate global discount step any more). Pure and synchronous — the cart
  * UI calls this on every quantity change with no server round trip.
  */
-export function computeTotals(lines: PricingLine[]): PricingResult {
+export function computeTotals(lines: PricingLine[], shopSlug?: string | null): PricingResult {
   const linesWithTotals = lines.map((line) => ({
     ...line,
     lineTotal: lineTotal(line),
@@ -127,8 +128,8 @@ export function computeTotals(lines: PricingLine[]): PricingResult {
       .reduce((sum, l) => sum + (l.mrp as number) * l.quantity, 0),
   );
   const youSave = Math.max(0, round2(mrpTotal - discountableSubtotal));
-  const packagingCharge = computePackagingCharge(subtotal);
-  const deliveryCharge = computeDeliveryCharge(subtotal);
+  const packagingCharge = computePackagingCharge(subtotal, shopSlug);
+  const deliveryCharge = computeDeliveryCharge(subtotal, shopSlug);
   const grandTotal = round2(subtotal + packagingCharge + deliveryCharge);
   const totalQuantity = lines.reduce((sum, l) => sum + l.quantity, 0);
 
@@ -169,16 +170,26 @@ export function shortfallToMinimumValue(subtotal: number): number {
   return shortfallToMinimum(subtotal, getMinimumOrderValue());
 }
 
-/** 3% of the item subtotal, waived once the subtotal reaches the packaging waiver threshold (§ cartCharges). */
-export function computePackagingCharge(subtotal: number): number {
-  const { packagingChargeWaiverThreshold, packagingChargePercent } = brandConfig.cartCharges;
-  if (subtotal <= 0 || subtotal >= packagingChargeWaiverThreshold) return 0;
-  return round2((subtotal * packagingChargePercent) / 100);
+/**
+ * Percent of the item subtotal, waived once the subtotal reaches the
+ * packaging waiver threshold — both figures per-shop (config/deliveryConfig.ts).
+ * A shop with packaging disabled entirely (e.g. Gurusamy) always returns 0.
+ */
+export function computePackagingCharge(subtotal: number, shopSlug?: string | null): number {
+  const { packaging } = getShopDeliveryConfig(shopSlug);
+  if (!packaging.enabled) return 0;
+  if (subtotal <= 0 || subtotal >= packaging.waiverThreshold) return 0;
+  return round2((subtotal * packaging.percent) / 100);
 }
 
-/** Flat delivery fee, waived once the subtotal reaches the delivery waiver threshold (§ cartCharges). */
-export function computeDeliveryCharge(subtotal: number): number {
-  const { deliveryChargeWaiverThreshold, deliveryCharge } = brandConfig.cartCharges;
-  if (subtotal <= 0 || subtotal >= deliveryChargeWaiverThreshold) return 0;
-  return deliveryCharge;
+/**
+ * Flat delivery fee, waived once the subtotal reaches the shop's delivery
+ * waiver threshold (config/deliveryConfig.ts). A shop with `freeThreshold:
+ * null` (e.g. Gurusamy) always charges the flat fee, regardless of subtotal.
+ */
+export function computeDeliveryCharge(subtotal: number, shopSlug?: string | null): number {
+  const { delivery } = getShopDeliveryConfig(shopSlug);
+  if (subtotal <= 0) return 0;
+  if (delivery.freeThreshold != null && subtotal >= delivery.freeThreshold) return 0;
+  return delivery.flatCharge;
 }

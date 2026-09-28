@@ -59,6 +59,10 @@ export const preferredCallTimeSchema = z
   .enum(["anytime", "morning", "afternoon", "evening"])
   .optional();
 
+export const ageConfirmedSchema = z.boolean().refine((v) => v === true, {
+  message: "Please confirm you are 18 years or older",
+});
+
 export const enquiryCustomerSchema = z.object({
   name: nameSchema,
   phone: phoneSchema,
@@ -72,6 +76,7 @@ export const enquiryCustomerSchema = z.object({
   landmark: z.string().trim().max(100).optional(),
   preferredCallTime: preferredCallTimeSchema,
   notes: notesSchema,
+  ageConfirmed: ageConfirmedSchema,
 });
 
 export const enquiryItemSchema = z.object({

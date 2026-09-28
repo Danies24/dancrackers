@@ -50,18 +50,26 @@ export interface CustomerMessageInput {
   deliveryCharge?: number;
   grandTotal: number;
   address: string;
+  /** false hides the packaging-charge line entirely (Gurusamy has no packaging charge at all). Defaults to true. */
+  packagingEnabled?: boolean;
+  /** e.g. the Gurusamy wholesale/delivery-charge notice — appended as its own line when given. */
+  deliveryNotice?: string;
 }
 
 /** Message 1 — customer to us (§17.3). Secondary action; the enquiry is already saved. */
 export function buildCustomerMessage(input: CustomerMessageInput): string {
+  const packagingEnabled = input.packagingEnabled ?? true;
   const chargeLines: string[] = [];
-  if (input.subtotal != null && (input.packagingCharge || input.deliveryCharge)) {
+  if (input.subtotal != null && ((packagingEnabled && input.packagingCharge) || input.deliveryCharge)) {
     chargeLines.push("", `Item subtotal: ${formatRupees(input.subtotal)}`);
-    chargeLines.push(
-      `Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%): ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
-    );
+    if (packagingEnabled) {
+      chargeLines.push(
+        `Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%): ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
+      );
+    }
     chargeLines.push(`Delivery charge: ${input.deliveryCharge ? formatRupees(input.deliveryCharge) : "Free"}`);
   }
+  if (input.deliveryNotice) chargeLines.push("", input.deliveryNotice);
 
   return [
     brandConfig.messages.whatsappGreeting,

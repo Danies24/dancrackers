@@ -147,7 +147,7 @@ export default async function HomePage() {
               <div className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-left shadow-soft">
                 <p className="font-display text-lg font-extrabold text-ink">FREE Delivery</p>
                 <p className="text-[11px] font-semibold text-ink-soft">
-                  on orders {formatRupees(brandConfig.cartCharges.deliveryChargeWaiverThreshold)}+
+                  on Sri Ram Crackers orders {formatRupees(brandConfig.cartCharges.deliveryChargeWaiverThreshold)}+
                 </p>
               </div>
             </div>

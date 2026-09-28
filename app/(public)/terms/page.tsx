@@ -26,10 +26,13 @@ const TERMS_CLAUSES = [
     ta: "முழு தொகை பெறப்பட்டு, பணம் செலுத்தியதற்கான ஸ்கிரீன்ஷாட் அல்லது வங்கி வரவு உறுதிசெய்யப்பட்ட பிறகே பொருட்கள் அனுப்பப்படும்.",
   },
   {
+    // TODO(legal-review): confirm this wording still reflects the actual
+    // delivery-charge/free-delivery policy before relying on it — it now
+    // depends on config/deliveryConfig.ts rather than a flat customer-pays rule.
     num: "2",
-    title: "Transportation Charges Borne by Customer",
-    en: "Transportation charges and all related expenses shall be borne by the customer unless otherwise agreed in writing.",
-    ta: "போக்குவரத்து கட்டணம் மற்றும் அதனுடன் தொடர்புடைய அனைத்து செலவுகளையும் வாடிக்கையாளரே ஏற்க வேண்டும் (எழுத்துப்பூர்வமாக வேறு ஒப்பந்தம் செய்யப்பட்டிருந்தால் தவிர).",
+    title: "Delivery Charges As Shown In Your Cart",
+    en: "Delivery charges, if any, are exactly what is shown in your cart at the time of your enquiry, and confirmed again on our call. Free delivery only applies where a shop states it and your order value qualifies — it is not offered by every shop on this site.",
+    ta: "டெலிவரி கட்டணம் (இருந்தால்) உங்கள் விசாரணையின் போது கார்ட்டில் காட்டப்படும் தொகையே — எங்கள் அழைப்பின் போது மீண்டும் உறுதி செய்யப்படும். இலவச டெலிவரி, அந்தக் கடை அதைக் குறிப்பிட்டு, உங்கள் ஆர்டர் மதிப்பு தகுதி பெற்றால் மட்டுமே பொருந்தும் — இது எல்லா கடைகளுக்கும் இல்லை.",
   },
   {
     num: "3",
@@ -115,6 +118,40 @@ export default function TermsPage() {
               <Link href="/safety" className="font-semibold text-maroon-ink hover:underline">
                 Safety Guidance &rarr;
               </Link>
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-ink">8. Shared Cart Links</h3>
+            <p className="mt-1">
+              A cart link shared by another customer is only a list of items and quantities — it carries no price, no availability guarantee, and no personal data. Prices, stock and any applicable delivery charge are always recalculated from our live catalogue when the link is opened, and confirmed again by phone before any order is placed.
+            </p>
+          </div>
+
+          {/* TODO(legal-review): confirm this price/stock-change wording before relying on it. */}
+          <div>
+            <h3 className="font-semibold text-ink">9. Prices &amp; Stock May Change Before Confirmation</h3>
+            <p className="mt-1">
+              Prices, stock availability and applicable charges shown while browsing or in an enquiry can change before our confirmation call — the amount confirmed on that call, not any earlier figure, is what you pay.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-ink">10. When An Order Is Confirmed</h3>
+            <p className="mt-1">
+              No order is confirmed by submitting an enquiry or a cart alone. An order is confirmed only after our team has called you to verify the items and total, and payment has been received as described above.
+            </p>
+          </div>
+
+          {/* TODO(legal-review): confirm this facilitator/seller-of-record wording with counsel. */}
+          <div>
+            <h3 className="font-semibold text-ink">11. Kolagalam Is A Facilitator, Not The Seller</h3>
+            <p className="mt-1">
+              Kolagalam facilitates enquiries and connects you with a licensed fireworks manufacturer/seller — it is not itself the seller of record. Where applicable, the licensed seller is named on your invoice. See our{" "}
+              <Link href="/compliance" className="font-semibold text-maroon-ink hover:underline">
+                Compliance Notice &rarr;
+              </Link>{" "}
+              for the full legal position.
             </p>
           </div>
         </div>

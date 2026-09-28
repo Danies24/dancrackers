@@ -215,6 +215,44 @@ describe("computePackagingCharge / computeDeliveryCharge — § cartCharges (299
   });
 });
 
+describe("per-shop delivery config (config/deliveryConfig.ts)", () => {
+  it("Gurusamy: never charges packaging, and always charges the flat delivery fee, even far above 3999", () => {
+    expect(computePackagingCharge(10000, "gurusamy-fireworks")).toBe(0);
+    expect(computeDeliveryCharge(10000, "gurusamy-fireworks")).toBe(400);
+    expect(computePackagingCharge(100, "gurusamy-fireworks")).toBe(0);
+    expect(computeDeliveryCharge(100, "gurusamy-fireworks")).toBe(400);
+  });
+
+  it("Sri Ram: unchanged 2999/3499/3999 behaviour when a shop slug is passed explicitly", () => {
+    expect(computePackagingCharge(3000, "sri-ram-crackers")).toBe(90);
+    expect(computeDeliveryCharge(3000, "sri-ram-crackers")).toBe(400);
+    expect(computePackagingCharge(3499, "sri-ram-crackers")).toBe(0);
+    expect(computeDeliveryCharge(3499, "sri-ram-crackers")).toBe(400);
+    expect(computeDeliveryCharge(3999, "sri-ram-crackers")).toBe(0);
+  });
+
+  it("Bullet: same rules as Sri Ram (routed through the same default config)", () => {
+    expect(computePackagingCharge(3000, "bullet-crackers")).toBe(90);
+    expect(computeDeliveryCharge(3999, "bullet-crackers")).toBe(0);
+  });
+
+  it("an unknown or missing shop slug falls back to the default (Sri Ram-equivalent) rules", () => {
+    expect(computeDeliveryCharge(3999, "some-future-shop")).toBe(0);
+    expect(computeDeliveryCharge(3999, undefined)).toBe(0);
+    expect(computeDeliveryCharge(3999, null)).toBe(0);
+  });
+
+  it("computeTotals hides packaging (always 0) and never waives delivery for a Gurusamy cart", () => {
+    const result = computeTotals(
+      [{ price: 5000, quantity: 1, isDiscountable: true, mrp: 6000 }],
+      "gurusamy-fireworks",
+    );
+    expect(result.packagingCharge).toBe(0);
+    expect(result.deliveryCharge).toBe(400);
+    expect(result.grandTotal).toBe(5400);
+  });
+});
+
 describe("roundToRupee", () => {
   it("rounds the display total to a whole rupee", () => {
     expect(roundToRupee(5856.5)).toBe(5857);

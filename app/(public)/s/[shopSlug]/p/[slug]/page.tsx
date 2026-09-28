@@ -11,6 +11,8 @@ import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { Badge } from "@/components/ui/badge";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { getShopForCurrentRequest, getShopProductBySlug } from "@/lib/shops";
+import { WholesaleNoticeBanner } from "@/components/shop/wholesale-notice-banner";
+import { isGurusamyShop } from "@/config/deliveryConfig";
 import { getRelatedProducts } from "@/lib/data";
 import { getCanonicalUrl, getPhoneDisplay, getPhoneE164 } from "@/config/brandConfig";
 import { JsonLd, buildBreadcrumbJsonLd, buildProductJsonLd } from "@/lib/seo/jsonld";
@@ -115,6 +117,12 @@ export default async function ShopProductPage({ params }: RouteParams) {
           {product.name_en}
         </span>
       </nav>
+
+      {isGurusamyShop(shop.slug) && (
+        <div className="mb-4 rounded-lg overflow-hidden">
+          <WholesaleNoticeBanner />
+        </div>
+      )}
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>

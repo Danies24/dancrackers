@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
+import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { formatRupees } from "@/lib/format";
@@ -15,6 +16,7 @@ import { getReferral } from "@/lib/referral";
 import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import {
   addressSchema,
+  ageConfirmedSchema,
   citySchema,
   emailSchema,
   nameSchema,
@@ -23,6 +25,7 @@ import {
   stateSchema,
 } from "@/lib/validation";
 import { brandConfig, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
+import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
 import { INDIAN_STATES } from "@/lib/indian-states";
 import { trackEnquirySubmitState, trackEvent } from "@/lib/analytics";
 import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
@@ -44,6 +47,7 @@ const formSchema = z
     email: emailSchema,
     preferredCallTime: z.enum(["anytime", "morning", "afternoon", "evening"]).optional(),
     notes: z.string().max(500).optional(),
+    ageConfirmed: ageConfirmedSchema,
     hp_check: z.string().optional(), // honeypot — see lib/validation.ts for why it's not named something autofill-prone
   })
   .superRefine((data, ctx) => {
@@ -59,7 +63,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function EnquiryPage() {
   const router = useRouter();
-  const { items, clear } = useCart();
+  const { items, clear, shopSlug } = useCart();
   const [hydrated, setHydrated] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -103,11 +107,13 @@ export default function EnquiryPage() {
       email: draft?.email ?? "",
       preferredCallTime: draft?.preferredCallTime ?? "anytime",
       notes: draft?.notes ?? "",
+      ageConfirmed: false,
     },
   });
 
   const values = watch();
   const { loading, activeLines, totals, belowMinimum, shortfall } = useValidatedCart();
+  const deliveryConfig = getShopDeliveryConfig(shopSlug);
 
   useEffect(() => {
     try {
@@ -128,6 +134,10 @@ export default function EnquiryPage() {
 
   const whatsappSame = watch("whatsappSame");
 
+  const gurusamyNoticeText = isGurusamyShop(shopSlug)
+    ? `Wholesale factory direct sale – delivery charges applicable (${formatRupees(deliveryConfig.delivery.flatCharge)})`
+    : undefined;
+
   function buildFallbackWhatsAppUrl(formValues: FormValues): string {
     const message = buildCustomerMessage({
       orderRef: "(not yet saved)",
@@ -144,6 +154,8 @@ export default function EnquiryPage() {
       deliveryCharge: totals.deliveryCharge,
       grandTotal: totals.grandTotal,
       address: formValues.address,
+      packagingEnabled: deliveryConfig.packaging.enabled,
+      deliveryNotice: gurusamyNoticeText,
     });
     return buildWhatsAppUrl(getPhoneE164().replace(/^91/, ""), message);
   }
@@ -169,6 +181,7 @@ export default function EnquiryPage() {
             landmark: formValues.landmark || undefined,
             preferredCallTime: formValues.preferredCallTime,
             notes: formValues.notes || undefined,
+            ageConfirmed: formValues.ageConfirmed,
           },
           items: activeLines.map((l) => ({ productId: l.productId, quantity: l.qty })),
           captainCode: getReferral() ?? undefined,
@@ -242,6 +255,12 @@ export default function EnquiryPage() {
         </p>
       )}
 
+      {!loading && isGurusamyShop(shopSlug) && (
+        <div className="mt-3">
+          <GurusamyDeliveryNotice subtotal={totals.subtotal} />
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>
         {/* Honeypot — hidden from real users, any value silently drops the submission (§30.2) */}
         <input
@@ -269,6 +288,19 @@ export default function EnquiryPage() {
           <input type="checkbox" {...register("whatsappSame")} className="h-5 w-5" />
           WhatsApp number is the same as above
         </label>
+
+        <div className="flex flex-col gap-1">
+          <label className="flex items-start gap-2 text-sm text-ink-soft">
+            <input type="checkbox" required {...register("ageConfirmed")} className="mt-0.5 h-5 w-5" />
+            <span>
+              நான் 18 வயது அல்லது அதற்கு மேற்பட்டவன் / நான் உள்ளூர் விதிமுறைகளைப் பின்பற்றுவேன். I am 18 years or older
+              and will follow local rules.
+            </span>
+          </label>
+          {errors.ageConfirmed?.message && (
+            <p className="text-xs text-red-ink">{errors.ageConfirmed.message}</p>
+          )}
+        </div>
 
         {!whatsappSame && (
           <Input
@@ -313,9 +345,10 @@ export default function EnquiryPage() {
           </select>
           {errors.state?.message && <p className="text-xs text-red-ink">{errors.state.message}</p>}
           <p className="text-xs text-muted">
-            Minimum order {formatRupees(getMinimumOrderValue())}. Packaging is free above{" "}
-            {formatRupees(brandConfig.cartCharges.packagingChargeWaiverThreshold)} and delivery is free above{" "}
-            {formatRupees(brandConfig.cartCharges.deliveryChargeWaiverThreshold)}.
+            Minimum order {formatRupees(getMinimumOrderValue())}.{" "}
+            {deliveryConfig.packaging.enabled && deliveryConfig.delivery.freeThreshold != null
+              ? `Packaging is free above ${formatRupees(deliveryConfig.packaging.waiverThreshold)} and delivery is free above ${formatRupees(deliveryConfig.delivery.freeThreshold)}.`
+              : `A flat delivery charge of ${formatRupees(deliveryConfig.delivery.flatCharge)} applies to every order.`}
           </p>
         </div>
 
@@ -393,6 +426,10 @@ export default function EnquiryPage() {
             {submitting ? "Submitting…" : "Submit Enquiry"}
           </Button>
         )}
+
+        <p className="text-center text-[11px] text-muted">
+          இது ஒரு விசாரணை மட்டுமே, உறுதி செய்யப்பட்ட விற்பனை அல்ல. This is an enquiry, not a confirmed sale.
+        </p>
 
         <p className="mt-2 text-center text-xs text-ink-soft">
           {brandConfig.orderDeadline.enabled ? (

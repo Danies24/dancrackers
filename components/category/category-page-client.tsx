@@ -6,7 +6,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductQuickViewSheet } from "@/components/product/product-quick-view-sheet";
 import { CartProgressBar } from "@/components/cart/cart-progress-bar";
+import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
+import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
+import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
 import { trackEvent } from "@/lib/analytics";
 import { buildCategoryPageGroups, type CategoryPageGroup, type CategoryPageShopMeta, type CategorySortOption } from "@/lib/category-page-sections";
 import type { ProductWithShop } from "@/lib/cross-shop";
@@ -51,6 +54,8 @@ export function CategoryPageClient({
   const [chip, setChip] = useState<CategoryChip>((searchParams.get("chip") as CategoryChip) ?? "all");
   const [sort, setSort] = useState<CategorySortOption>((searchParams.get("sort") as CategorySortOption) ?? "recommended");
   const { totals } = useValidatedCart();
+  const { shopSlug } = useCart();
+  const deliveryFreeThreshold = getShopDeliveryConfig(shopSlug).delivery.freeThreshold;
 
   const shopMetaById = useMemo(() => new Map(shopMeta.map((m) => [m.id, m])), [shopMeta]);
 
@@ -213,9 +218,13 @@ export function CategoryPageClient({
                 <CategoryShopGroup key={g.shop.id} group={g} categorySlug={group.slug} onQuickView={openQuickView} />
               ))}
 
-              {!totals.grandTotal || totals.subtotal < 3999 ? (
+              {isGurusamyShop(shopSlug) ? (
                 <div className="rounded-xl bg-teal-tint px-4 py-3 text-center">
-                  <CartProgressBar subtotal={totals.subtotal} />
+                  <GurusamyDeliveryNotice subtotal={totals.subtotal} />
+                </div>
+              ) : !totals.grandTotal || deliveryFreeThreshold == null || totals.subtotal < deliveryFreeThreshold ? (
+                <div className="rounded-xl bg-teal-tint px-4 py-3 text-center">
+                  <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
                 </div>
               ) : null}
             </div>
