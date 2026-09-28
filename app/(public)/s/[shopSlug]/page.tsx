@@ -9,7 +9,6 @@ import {
 } from "@/lib/shops";
 import { ShopPlpHeader } from "@/components/shop/shop-plp-header";
 import { ShopPlpClient } from "@/components/shop/shop-plp-client";
-import { ShopPhotoGallery } from "@/components/shop/shop-photo-gallery";
 import { getCanonicalUrl } from "@/config/brandConfig";
 
 type RouteParams = { params: Promise<{ shopSlug: string }> };
@@ -45,10 +44,6 @@ export default async function ShopHomePage({ params }: RouteParams) {
   return (
     <div>
       <ShopPlpHeader shop={shop} merchandising={merchandising} offers={offers} maxDiscountPercent={maxDiscountPercent} />
-      
-      <div className="mx-auto max-w-6xl">
-        <ShopPhotoGallery images={merchandising.heroImages} shopName={shop.name_en} />
-      </div>
 
       {!hasAnyProducts ? (
         <p className="py-16 text-center text-ink-soft">Our catalogue for this shop is being updated.</p>
