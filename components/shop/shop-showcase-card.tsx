@@ -55,7 +55,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
           </div>
           {maxDiscountPercent > 0 && (
             <span className="mt-1.5 inline-block rounded-full border border-gold bg-maroon-tint px-2 py-0.5 text-[11px] font-bold text-maroon-ink">
-              Upto {maxDiscountPercent}% off
+              Upto {Math.max(maxDiscountPercent, 80)}% Off . Branded crackers.
             </span>
           )}
         </div>

@@ -53,7 +53,7 @@ export function ShopPlpHeader({
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold"
                 style={{ background: "rgba(32,214,163,0.18)", color: "#5eeac2" }}
               >
-                Up to {maxDiscountPercent}% OFF
+                Up to {Math.max(maxDiscountPercent, 80)}% OFF . Branded crackers.
               </span>
             )}
             {merchandising.locationLabel && (
