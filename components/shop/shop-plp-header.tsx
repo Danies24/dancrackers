@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ShopRow, ShopMerchandising, ShopOffer } from "@/lib/shops";
 import { ShopOfferPager } from "@/components/shop/shop-offer-pager";
+import { getShopDiscountBadgeText } from "@/lib/shop-marketing";
 
 /**
  * The shop PLP's dark hero header (Swiggy-redesign plan) — deliberately
@@ -53,7 +54,7 @@ export function ShopPlpHeader({
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold"
                 style={{ background: "rgba(32,214,163,0.18)", color: "#5eeac2" }}
               >
-                Up to {Math.max(maxDiscountPercent, 80)}% OFF . Branded crackers.
+                {getShopDiscountBadgeText(shop.slug, maxDiscountPercent)}
               </span>
             )}
             {merchandising.locationLabel && (

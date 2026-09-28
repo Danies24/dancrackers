@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
 import { formatRupees } from "@/lib/format";
+import { getShopDiscountBadgeText } from "@/lib/shop-marketing";
+import { isGurusamyShop } from "@/config/deliveryConfig";
+import { cn } from "@/lib/utils";
 import type { ShopShowcaseCard as ShopShowcaseCardData } from "@/lib/shops";
 
 /**
@@ -21,6 +24,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
   const router = useRouter();
   const { shop, productCount, maxDiscountPercent, topProducts } = card;
   const isComingSoon = shop.status === "coming_soon";
+  const isStandout = isGurusamyShop(shop.slug);
   const href = `/s/${shop.slug}`;
 
   function handleCardClick() {
@@ -28,7 +32,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
     router.push(href);
   }
 
-  return (
+  const cardBody = (
     <div
       role="link"
       tabIndex={0}
@@ -40,7 +44,10 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
           handleCardClick();
         }
       }}
-      className="cursor-pointer rounded-[28px] border border-border bg-surface py-5 pl-5 transition-colors hover:border-maroon-ink/40"
+      className={cn(
+        "cursor-pointer rounded-[28px] py-5 pl-5 transition-colors",
+        isStandout ? "bg-combo-highlight-bg" : "border border-border bg-surface hover:border-maroon-ink/40",
+      )}
     >
       <div className="flex items-start justify-between pr-5">
         <div className="min-w-0">
@@ -55,7 +62,7 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
           </div>
           {maxDiscountPercent > 0 && (
             <span className="mt-1.5 inline-block rounded-full border border-gold bg-maroon-tint px-2 py-0.5 text-[11px] font-bold text-maroon-ink">
-              Upto {Math.max(maxDiscountPercent, 80)}% Off . Branded crackers.
+              {getShopDiscountBadgeText(shop.slug, maxDiscountPercent)}
             </span>
           )}
         </div>
@@ -80,6 +87,17 @@ export function ShopShowcaseCard({ card }: { card: ShopShowcaseCardData }) {
       {shop.min_order_value != null && shop.min_order_value > 0 && (
         <p className="mt-2 text-xs text-ink-soft">Min order {formatRupees(shop.min_order_value)}</p>
       )}
+    </div>
+  );
+
+  if (!isStandout) return cardBody;
+
+  return (
+    <div className="relative rounded-[30px] p-[2px]" style={{ background: "var(--combo-highlight-border)" }}>
+      {cardBody}
+      <span className="absolute -top-2 right-4 rounded-full bg-combo-badge-bg px-2.5 py-1 text-[10px] font-bold tracking-wide text-combo-badge-text shadow-soft">
+        ⭐ Featured
+      </span>
     </div>
   );
 }
