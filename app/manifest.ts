@@ -3,7 +3,7 @@ import { brandConfig } from "@/config/brandConfig";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${brandConfig.brand.name} (${brandConfig.brand.nameTamil}) — Sivakasi Crackers`,
+    name: `${brandConfig.brand.name} — Sivakasi Crackers`,
     short_name: brandConfig.brand.name,
     description: brandConfig.seo.defaultDescription,
     start_url: "/",

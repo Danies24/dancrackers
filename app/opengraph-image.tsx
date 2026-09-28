@@ -25,7 +25,6 @@ export default async function Image() {
       >
         <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
           <span style={{ fontSize: 76, fontWeight: 700, color: "#FFFFFF" }}>{brandConfig.brand.name}</span>
-          <span style={{ fontSize: 44, fontWeight: 600, color: "#F5D9A8" }}>({brandConfig.brand.nameTamil})</span>
         </div>
         <div style={{ display: "flex", fontSize: 32, marginTop: 24, color: "#F5D9A8", fontWeight: 600, maxWidth: 900 }}>
           {brandConfig.brand.tagline}

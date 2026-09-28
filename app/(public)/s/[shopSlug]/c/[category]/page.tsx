@@ -78,11 +78,6 @@ export default async function ShopCategoryPage({ params }: RouteParams) {
         </ol>
       </nav>
       <h1 className="font-display text-2xl font-semibold text-ink">{category.name_en}</h1>
-      {category.name_ta && (
-        <p lang="ta" className="mt-0.5 text-sm text-muted">
-          {category.name_ta}
-        </p>
-      )}
       {category.description && <p className="mt-2 text-sm text-ink-soft">{category.description}</p>}
 
       <Suspense fallback={<CatalogueLoadingSkeleton />}>

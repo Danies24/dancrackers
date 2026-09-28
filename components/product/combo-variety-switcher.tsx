@@ -84,10 +84,7 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
               <ul className="flex flex-col gap-1">
                 {group.items.map((item, i) => (
                   <li key={i} className="flex justify-between text-sm text-ink-soft">
-                    <span>
-                      {item.name_en}
-                      {item.name_ta && <span lang="ta"> ({item.name_ta})</span>}
-                    </span>
+                    <span>{item.name_en}</span>
                     <span className="tabular-nums font-medium text-ink">× {item.quantity}</span>
                   </li>
                 ))}

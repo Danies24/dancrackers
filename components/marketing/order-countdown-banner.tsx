@@ -102,10 +102,6 @@ export function OrderCountdownBanner() {
         <div className="flex items-center gap-2">
           <Clock size={13} className="text-maroon-ink" aria-hidden="true" />
           <span className="font-semibold">{config.labels.en.title}</span>
-          <span className="text-muted">·</span>
-          <span className="text-ink-soft" lang="ta">
-            {config.labels.ta.title}
-          </span>
         </div>
       </aside>
     );
@@ -114,7 +110,6 @@ export function OrderCountdownBanner() {
   const result: OrderDeadlineResult = getOrderDeadlineStatus(config.iso, now);
   const { isClosed, urgency, days, hours, minutes, seconds } = result;
   const en = config.labels.en;
-  const ta = config.labels.ta;
 
   // Visual styling variants by urgency level
   const urgencyStyles = {
@@ -133,9 +128,7 @@ export function OrderCountdownBanner() {
     closed: "bg-surface text-muted border-border",
   };
 
-  const accessibleText = isClosed
-    ? `${en.closedTitle}. ${ta.closedTitle}.`
-    : formatAccessibleAnnouncement(days, hours, minutes);
+  const accessibleText = isClosed ? `${en.closedTitle}.` : formatAccessibleAnnouncement(days, hours, minutes);
 
   return (
     <aside
@@ -159,10 +152,6 @@ export function OrderCountdownBanner() {
           />
           <span className="font-bold tracking-tight">
             {isClosed ? en.closedTitle : en.title}
-          </span>
-          <span className="hidden text-muted md:inline">·</span>
-          <span className="hidden text-[11px] text-ink-soft md:inline" lang="ta">
-            {isClosed ? ta.closedTitle : ta.title}
           </span>
         </div>
 

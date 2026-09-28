@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 
-const ROTATING_TERMS = ["sparklers", "flower pots", "gift boxes", "ground chakkars", "சக்கரம்", "sound crackers"];
+const ROTATING_TERMS = ["sparklers", "flower pots", "gift boxes", "ground chakkars", "chakkars", "sound crackers"];
 const ROTATE_INTERVAL_MS = 2600;
 
 /**

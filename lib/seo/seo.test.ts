@@ -185,7 +185,6 @@ describe("SEO Foundation: Structured Data (JSON-LD)", () => {
     expect(ws["@context"]).toBe("https://schema.org");
     expect(ws["@type"]).toBe("WebSite");
     expect(ws.name).toBe("Kolagalam");
-    expect(ws.alternateName).toBe("கோலாகலம்");
     expect(ws.url).toBe(getCanonicalUrl("/"));
   });
 

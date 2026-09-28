@@ -5,39 +5,35 @@ import { getCanonicalUrl } from "@/config/brandConfig";
 
 export const metadata: Metadata = {
   title: "Firecracker Safety Guide",
-  description:
-    "Essential firecracker safety instructions in Tamil and English. Safe handling tips for a joyful and secure Diwali celebration.",
+  description: "Essential firecracker safety instructions. Safe handling tips for a joyful and secure Diwali celebration.",
   alternates: {
     canonical: getCanonicalUrl("/safety"),
   },
   openGraph: {
     title: "Firecracker Safety Guide",
-    description:
-      "Essential firecracker safety instructions in Tamil and English. Safe handling tips for a joyful and secure Diwali celebration.",
+    description: "Essential firecracker safety instructions. Safe handling tips for a joyful and secure Diwali celebration.",
     url: getCanonicalUrl("/safety"),
   },
 };
 
 // [BLOCKED — PRD §12.9, §42.1 item 9] This is a SAMPLE safety text, sourced
 // from the representative sample catalogue (Selva Fancy Crackers 2026), not
-// yet confirmed by the real supplier. The English column is an
-// unverified rendering for layout purposes only. Per the PRD's hard rule
+// yet confirmed by the real supplier. Per the PRD's hard rule
 // (§14.3/§12.9): "do not paraphrase or invent safety guidance" — this MUST
-// be replaced with the real supplier's own text, in both languages, before
-// launch. Item 8 was not legible in the source scan and is left blank
-// rather than guessed.
-const instructions: Array<{ ta: string; en: string }> = [
-  { ta: "பட்டாசு வெடிக்க சிறிய தீக்குச்சிகள், சிறிய ஊதுபத்திகளை பயன்படுத்தக் கூடாது.", en: "Do not use small matchsticks or small incense sticks to light fireworks." },
-  { ta: "மரங்கள் மற்றும் மின்சார ஒயர்கள் இருக்கும் இடங்களுக்கு கீழே பட்டாசுகளை வெடிக்க கூடாது.", en: "Do not burst crackers under trees or electrical wires." },
-  { ta: "இரண்டு மூன்று வெடிகளை இணைத்து வெடிக்க கூடாது.", en: "Do not join two or three crackers together and light them at once." },
-  { ta: "உபயோகப்படுத்தப்பட்ட பட்டாசுகளின் அருகில் எரியும் விளக்கு, ஊதுபத்தி போன்றவற்றை வைக்க கூடாது.", en: "Do not keep a lit lamp or incense stick near stored crackers." },
-  { ta: "வெடிக்காமல் பாதியில் நின்று போன வெடிகளுக்கு அருகில் சென்று அவற்றை வெடிக்க வைக்கும் முயற்சியில் ஈடுபடக் கூடாது.", en: "Do not go near a cracker that failed to burst, or try to relight it." },
-  { ta: "தெருக்கள் மற்றும் சாலைகளில் பொதுமக்கள் நடந்து செல்லும் பொழுதோ அல்லது வாகனங்களில் செல்லும் பொழுதோ வெடிகளை வீசுவது கூடாது.", en: "Do not throw lit crackers on streets or roads while people or vehicles are passing." },
-  { ta: "எந்த ஒரு பட்டாசையும் மற்றவரை நோக்கி எறியவோ குறி வைத்து சுடவோ கூடாது.", en: "Never throw or aim a firework at another person." },
-  { ta: "வீட்டிற்குள் பட்டாசுகளை வெடிக்கக் கூடாது.", en: "Do not burst crackers inside the house." },
-  { ta: "நாம் பற்றவைத்த பட்டாசுகளை வெடிக்கவில்லை என்றால் அவற்றை கையில் தூக்கிப் பார்ப்பது அல்லது காலால் தள்ளுவது போன்றவைகளை செய்யக்கூடாது.", en: "If a lit cracker does not go off, do not pick it up or kick it." },
-  { ta: "பட்டாசு வெடிக்கும் போது பருத்தியினால் ஆன ஆடைகளை அணிவது நல்லது.", en: "Wear cotton clothing while bursting crackers." },
-  { ta: "பாதுகாப்பாக வெடித்து, மகிழ்ச்சியாக தீபாவளியை கொண்டாடுவோம்.", en: "Burst crackers safely and celebrate a happy Deepavali." },
+// be replaced with the real supplier's own text before launch. Item 8 was
+// not legible in the source scan and is left blank rather than guessed.
+const instructions: Array<{ en: string }> = [
+  { en: "Do not use small matchsticks or small incense sticks to light fireworks." },
+  { en: "Do not burst crackers under trees or electrical wires." },
+  { en: "Do not join two or three crackers together and light them at once." },
+  { en: "Do not keep a lit lamp or incense stick near stored crackers." },
+  { en: "Do not go near a cracker that failed to burst, or try to relight it." },
+  { en: "Do not throw lit crackers on streets or roads while people or vehicles are passing." },
+  { en: "Never throw or aim a firework at another person." },
+  { en: "Do not burst crackers inside the house." },
+  { en: "If a lit cracker does not go off, do not pick it up or kick it." },
+  { en: "Wear cotton clothing while bursting crackers." },
+  { en: "Burst crackers safely and celebrate a happy Deepavali." },
 ];
 
 export default function SafetyPage() {
@@ -49,10 +45,7 @@ export default function SafetyPage() {
         {instructions.map((item, i) => (
           <li key={i} className="rounded-lg border border-border bg-surface p-3">
             <span className="text-xs font-semibold text-muted">{i + 1}.</span>
-            <p lang="ta" className="mt-1 text-ink">
-              {item.ta}
-            </p>
-            <p className="mt-1 text-sm text-ink-soft">{item.en}</p>
+            <p className="mt-1 text-ink">{item.en}</p>
           </li>
         ))}
       </ol>

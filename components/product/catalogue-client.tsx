@@ -138,7 +138,7 @@ export function CatalogueClient({ products, categories, lockedCategory, shopName
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search crackers, e.g. flower pot, சக்கரம்..."
+                placeholder="Search crackers, e.g. flower pot, chakkaram..."
                 aria-label="Search products"
                 className="h-11 w-full rounded-md border border-border bg-surface pl-10 pr-4 text-[16px]"
               />
@@ -224,7 +224,7 @@ export function CatalogueClient({ products, categories, lockedCategory, shopName
                 groupedProducts.map((group) => (
                   <div key={group.category.id || group.category.name_en} className="mb-6">
                     <h2 className="sticky top-[124px] z-10 -mx-4 px-4 py-2 bg-cream/95 backdrop-blur font-display text-lg font-semibold text-ink border-y border-border/50 mb-3 shadow-sm">
-                      {group.category.name_en} {group.category.name_ta && <span className="text-sm font-normal text-muted ml-1" lang="ta">({group.category.name_ta})</span>}
+                      {group.category.name_en}
                     </h2>
                     <div className="flex flex-col">
                       {group.products.map(p => (

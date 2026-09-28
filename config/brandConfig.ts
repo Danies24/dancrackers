@@ -12,7 +12,6 @@
 export const brandConfig = {
   brand: {
     name: "Kolagalam",
-    nameTamil: "கோலாகலம்",
     descriptor: "Sivakasi Crackers",
     tagline: "Authentic Sivakasi Crackers Direct To Your Doorstep",
     // Replace once a real custom domain (e.g. kolagalam.com) is registered —
@@ -158,34 +157,14 @@ export const brandConfig = {
           s: "s",
         },
       },
-      ta: {
-        title: "அக்டோபர் 25-க்குள் ஆர்டர் செய்யுங்கள்",
-        closedTitle: "இந்த ஆண்டுக்கான முன்பதிவு முடிந்தது",
-        closedMessage: "இந்த தீபாவளிக்கான புதிய முன்பதிவுகள் நிறைவடைந்துவிட்டன. அவசர தேவைகளுக்கு எங்களை வாட்ஸ்அப் அல்லது தொலைபேசியில் தொடர்பு கொள்ளவும்.",
-        reminderText: "விசாரணை அனுப்ப கடைசி நாள்: 25 அக்டோபர் 2026",
-        closedReminderText: "முன்பதிவு நிறைவடைந்தது. எங்களை நேரடியாக தொடர்பு கொள்ளலாம்.",
-        successNote: "சீசன் முன்பதிவு முடிவதற்குள் (25 அக்டோபர்) உங்கள் விசாரணை பெறப்பட்டது.",
-        units: {
-          days: "நாள்",
-          hours: "மணி",
-          minutes: "நிமிடம்",
-          seconds: "வினாடி",
-        },
-        shortUnits: {
-          d: "நாள்",
-          h: "மணி",
-          m: "நிமி",
-          s: "விநா",
-        },
-      },
     },
   },
 
   seo: {
     titleTemplate: "%s | Kolagalam",
-    defaultTitle: "Kolagalam (கோலாகலம்) — Best Sivakasi Crackers Online",
+    defaultTitle: "Kolagalam — Best Sivakasi Crackers Online",
     defaultDescription:
-      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam (கோலாகலம்). Best place to buy wholesale crackers online.",
+      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam. Best place to buy wholesale crackers online.",
     keywords: [
       "Kolagalam",
       "Kolagalam crackers",
@@ -196,9 +175,6 @@ export const brandConfig = {
       "Sivakasi crackers price list",
       "Diwali crackers enquiry",
       "wholesale crackers online",
-      "கோலாகலம்",
-      "கோலாகலம் பட்டாசு",
-      "சிவகாசி பட்டாசு",
     ],
   },
 

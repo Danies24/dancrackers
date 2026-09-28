@@ -23,17 +23,14 @@ export const metadata: Metadata = {
 const SHIPPING_POINTS = [
   {
     en: "All materials are packed in quality waterproof cartons with special care.",
-    ta: "அனைத்து பொருட்களும் உயர்தர நீர்ப்புகா (Waterproof) கார்ட்டன்களில் மிகுந்த கவனத்துடன் பேக் செய்து அனுப்பப்படும்.",
     icon: PackageCheck,
   },
   {
     en: "After your order has been confirmed on completion of payment, we will dispatch your products to the lorry shed within 24–72 hours.",
-    ta: "உங்கள் கட்டணம் முழுமையாக உறுதிசெய்யப்பட்ட பிறகு, 24–72 மணி நேரத்திற்குள் உங்கள் பொருட்கள் லாரி சரக்கு நிலையத்திற்கு (Lorry Shed) அனுப்பி வைக்கப்படும்.",
     icon: Clock,
   },
   {
     en: "We will constantly monitor each order to ensure it reaches you quickly and safely.",
-    ta: "உங்கள் ஆர்டர் விரைவாகவும் பாதுகாப்பாகவும் சென்றடைய, அதன் அனுப்பும் நிலையை தொடர்ந்து கண்காணிப்போம்.",
     icon: Truck,
   },
   {
@@ -41,27 +38,22 @@ const SHIPPING_POINTS = [
     // previous copy said below ₹5,000, verify with ops/legal before this
     // page is treated as final.
     en: `Minimum order value is ${formatRupees(getMinimumOrderValue())} (after discount), the same across every state — no separate Tamil Nadu / other-state minimum.`,
-    ta: `குறைந்தபட்ச ஆர்டர் மதிப்பு (தள்ளுபடிக்குப் பிறகு) ${formatRupees(getMinimumOrderValue())} — எல்லா மாநிலங்களுக்கும் ஒரே மதிப்பு.`,
     icon: CheckCircle2,
   },
   {
     en: `Sri Ram Crackers: packaging is free above ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].packaging.waiverThreshold)} and delivery is free on orders of ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].delivery.freeThreshold ?? 0)} and above. Below that, the packaging/delivery charges shown in your cart apply.`,
-    ta: `ஸ்ரீ ராம் பட்டாசு: ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].packaging.waiverThreshold)}-க்கு மேல் பேக்கிங் கட்டணம் இல்லை, ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].delivery.freeThreshold ?? 0)}-க்கு மேல் டெலிவரி இலவசம். அதற்குக் குறைவாக இருந்தால், கார்ட்டில் காட்டப்படும் கட்டணங்கள் பொருந்தும்.`,
     icon: CheckCircle2,
   },
   {
     en: `Gurusamy Fireworks: wholesale factory-direct pricing, no packaging charge at all, and a flat ${formatRupees(SHOP_DELIVERY_CONFIG["gurusamy-fireworks"].delivery.flatCharge)} delivery charge on every order — this is never waived.`,
-    ta: `குருசாமி பட்டாசு: தொழிற்சாலை நேரடி மொத்த விலை, பேக்கிங் கட்டணம் இல்லை, ஒவ்வொரு ஆர்டருக்கும் ${formatRupees(SHOP_DELIVERY_CONFIG["gurusamy-fireworks"].delivery.flatCharge)} நிலையான டெலிவரி கட்டணம் — இது எப்போதும் தள்ளுபடி செய்யப்படாது.`,
     icon: MapPin,
   },
   {
     en: "After your order is successfully placed and dispatched, the products will be delivered within 4 to 5 working days.",
-    ta: "ஆர்டர் வெற்றிகரமாக பதிவு செய்யப்பட்டு அனுப்பப்பட்ட பிறகு, பொருட்கள் 4 முதல் 5 வேலை நாட்களுக்குள் டெலிவரி செய்யப்படும்.",
     icon: Clock,
   },
   {
     en: "Delivery may take a few additional days if there are public holidays, festivals, or bandhs in between.",
-    ta: "அரசு விடுமுறை, பண்டிகை நாட்கள் அல்லது வேலைநிறுத்தம் (Bandh) போன்ற காரணங்களால் டெலிவரியில் கூடுதல் தாமதம் ஏற்படலாம்.",
     icon: ShieldAlert,
   },
 ];
@@ -79,9 +71,6 @@ export default function ShippingPage() {
           DISPATCH & TRANSPORT
         </span>
         <h1 className="mt-3 font-display text-3xl font-bold text-ink md:text-4xl">Shipping & Delivery</h1>
-        <p className="mt-2 text-sm text-ink-soft md:text-base">
-          நேரடி சிவகாசி பட்டாசு டெலிவரி மற்றும் போக்குவரத்து வழிகாட்டுதல்கள்
-        </p>
       </div>
 
       {/* Main Points */}
@@ -100,9 +89,6 @@ export default function ShippingPage() {
                 <p className="text-sm font-medium text-ink md:text-[15px] leading-relaxed">
                   {item.en}
                 </p>
-                <p lang="ta" className="text-xs text-ink-soft md:text-sm leading-relaxed">
-                  {item.ta}
-                </p>
               </div>
             </div>
           );
@@ -111,21 +97,15 @@ export default function ShippingPage() {
 
       {/* Note Box */}
       <div className="mt-6 rounded-2xl border border-amber/30 bg-gold-tint p-5 text-ink-soft">
-        <h2 className="font-display text-sm font-bold text-ink">Important Note / முக்கிய குறிப்பு:</h2>
+        <h2 className="font-display text-sm font-bold text-ink">Important Note:</h2>
         <p className="mt-1.5 text-xs md:text-sm leading-relaxed">
           <strong>Note:</strong> Delivery timelines are approximate and may vary depending on transport availability, weather conditions, and unforeseen circumstances.
-        </p>
-        <p lang="ta" className="mt-1 text-xs md:text-sm leading-relaxed">
-          <strong>குறிப்பு:</strong> டெலிவரி காலம் தோராயமாகக் குறிப்பிடப்பட்டுள்ளது. போக்குவரத்து வசதி, வானிலை மற்றும் எதிர்பாராத சூழ்நிலைகள் காரணமாக டெலிவரியில் தாமதம் ஏற்படலாம்.
         </p>
       </div>
 
       {/* Support & Contacts Helpdesk */}
       <div className="mt-8 rounded-2xl border border-border bg-surface p-6 shadow-soft">
         <h2 className="font-display text-base font-bold text-ink md:text-lg">Customer Care & Order Desk</h2>
-        <p className="mt-1 text-xs text-ink-soft">
-          எங்கள் உதவி மையத்தை எந்த நேரத்திலும் தொடர்பு கொள்ளலாம்:
-        </p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3">

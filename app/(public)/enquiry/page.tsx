@@ -292,10 +292,7 @@ export default function EnquiryPage() {
         <div className="flex flex-col gap-1">
           <label className="flex items-start gap-2 text-sm text-ink-soft">
             <input type="checkbox" required {...register("ageConfirmed")} className="mt-0.5 h-5 w-5" />
-            <span>
-              நான் 18 வயது அல்லது அதற்கு மேற்பட்டவன் / நான் உள்ளூர் விதிமுறைகளைப் பின்பற்றுவேன். I am 18 years or older
-              and will follow local rules.
-            </span>
+            <span>I am 18 years or older and will follow local rules.</span>
           </label>
           {errors.ageConfirmed?.message && (
             <p className="text-xs text-red-ink">{errors.ageConfirmed.message}</p>
@@ -427,9 +424,7 @@ export default function EnquiryPage() {
           </Button>
         )}
 
-        <p className="text-center text-[11px] text-muted">
-          இது ஒரு விசாரணை மட்டுமே, உறுதி செய்யப்பட்ட விற்பனை அல்ல. This is an enquiry, not a confirmed sale.
-        </p>
+        <p className="text-center text-[11px] text-muted">This is an enquiry, not a confirmed sale.</p>
 
         <p className="mt-2 text-center text-xs text-ink-soft">
           {brandConfig.orderDeadline.enabled ? (
@@ -439,10 +434,6 @@ export default function EnquiryPage() {
               <>
                 <span className="font-semibold text-maroon-ink">
                   {brandConfig.orderDeadline.labels.en.reminderText}
-                </span>
-                <span className="hidden text-muted sm:inline"> · </span>
-                <span className="hidden text-ink-soft sm:inline" lang="ta">
-                  {brandConfig.orderDeadline.labels.ta.reminderText}
                 </span>
               </>
             )

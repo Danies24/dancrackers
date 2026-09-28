@@ -98,11 +98,6 @@ export default function CartPage() {
                 <div className="flex-1">
                   <Link href={`/s/${v.shopSlug}/p/${v.slug}`} className="group block">
                     <p className="text-sm font-semibold text-ink transition-colors group-hover:text-maroon-ink">{v.name_en}</p>
-                    {v.name_ta && (
-                      <p lang="ta" className="text-xs text-muted">
-                        {v.name_ta}
-                      </p>
-                    )}
                   </Link>
                   <p className="tabular-nums text-xs text-muted">
                     {formatRupees(v.price!)} per {formatUnit(v.unit ?? "")}
@@ -234,10 +229,6 @@ export default function CartPage() {
                   <>
                     <span className="font-semibold text-maroon-ink">
                       {brandConfig.orderDeadline.labels.en.reminderText}
-                    </span>
-                    <span className="hidden text-muted sm:inline"> · </span>
-                    <span className="hidden text-ink-soft sm:inline" lang="ta">
-                      {brandConfig.orderDeadline.labels.ta.reminderText}
                     </span>
                   </>
                 )

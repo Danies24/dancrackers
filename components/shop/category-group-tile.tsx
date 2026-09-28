@@ -20,11 +20,6 @@ export function CategoryGroupTile({ group }: { group: CategoryGroupRow }) {
           <span className="font-display text-lg font-bold text-gold-ink">{group.name_en.charAt(0)}</span>
         )}
       </span>
-      {group.name_ta && (
-        <span lang="ta" className="line-clamp-1 text-[11px] text-muted">
-          {group.name_ta}
-        </span>
-      )}
       <span className="line-clamp-1 text-xs font-medium text-ink">{group.name_en}</span>
     </Link>
   );

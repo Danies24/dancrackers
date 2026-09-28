@@ -184,7 +184,6 @@
 
   --font-display: var(--font-display);
   --font-body: var(--font-body);
-  --font-tamil: var(--font-tamil);
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -204,10 +203,6 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
-}
-
-[lang="ta"] {
-  font-family: var(--font-tamil), var(--font-body), system-ui, sans-serif;
 }
 
 .tabular-nums {

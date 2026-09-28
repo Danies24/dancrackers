@@ -56,9 +56,6 @@ export default function AboutPage() {
         <h1 className="mt-3 font-display text-3xl font-bold text-ink md:text-4xl">
           About <span className="text-gradient-festival">Kolagalam</span>
         </h1>
-        <p className="mt-2 text-sm text-ink-soft md:text-base">
-          நேரடி சிவகாசி பட்டாசு மொத்த விற்பனை மற்றும் இணைய சேவை
-        </p>
       </div>
 
       {/* Main Story Box: About Company */}
@@ -115,9 +112,6 @@ export default function AboutPage() {
       {/* Support & Contact Details */}
       <div className="mt-8 rounded-3xl border border-border bg-surface p-6 shadow-soft md:p-8">
         <h2 className="font-display text-lg font-bold text-ink">Customer Care & Enquiry Desk</h2>
-        <p className="mt-1 text-xs text-ink-soft">
-          எங்களை நேரடியாக அழைக்க அல்லது வாட்ஸ்அப் மூலம் தொடர்புகொள்ள:
-        </p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex items-center justify-between rounded-xl border border-border bg-cream/50 p-3.5">

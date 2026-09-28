@@ -103,11 +103,6 @@ export function ProductListRow({
               </span>
             )}
           </div>
-          {product.name_ta && (
-            <p lang="ta" className="text-xs text-muted mt-0.5 leading-tight">
-              {product.name_ta}
-            </p>
-          )}
         </Link>
 
         {product.price == null ? (

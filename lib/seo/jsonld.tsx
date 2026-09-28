@@ -22,7 +22,7 @@ export interface ProductJsonLdParams {
 
 /**
  * Builds Schema.org Organization structured data.
- * Includes official brand details, contact point, email, and bilingual language support.
+ * Includes official brand details, contact point, and email.
  */
 export function buildOrganizationJsonLd(): Record<string, unknown> {
   const siteUrl = getSiteUrl();
@@ -34,7 +34,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: brandConfig.brand.name,
-    alternateName: [brandConfig.brand.nameTamil, `${brandConfig.brand.name} Crackers`],
+    alternateName: `${brandConfig.brand.name} Crackers`,
     url: canonicalHome,
     logo: `${siteUrl}${brandConfig.brand.logo.primary}`,
     email: email.address,
@@ -43,7 +43,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
       telephone: phoneE164,
       contactType: "customer service",
       areaServed: "IN",
-      availableLanguage: ["en", "ta"],
+      availableLanguage: ["en"],
     },
   };
 
@@ -66,7 +66,6 @@ export function buildWebSiteJsonLd(): Record<string, unknown> {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: brandConfig.brand.name,
-    alternateName: brandConfig.brand.nameTamil,
     url: getCanonicalUrl("/"),
   };
 }

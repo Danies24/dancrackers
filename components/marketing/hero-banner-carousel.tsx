@@ -9,7 +9,6 @@ export interface HeroBannerSlide {
   imageUrl?: string;
   eyebrow?: string;
   headline?: string;
-  headlineTa?: string;
 }
 
 const AUTO_ADVANCE_MS = 4500;
@@ -111,11 +110,6 @@ export function HeroBannerCarousel({ slides }: { slides: HeroBannerSlide[] }) {
                     <h2 className="mt-3 font-display text-2xl font-bold leading-tight text-white md:text-4xl">
                       {slide.headline}
                     </h2>
-                  )}
-                  {slide.headlineTa && (
-                    <p lang="ta" className="mt-1.5 max-w-lg text-sm text-white/85 md:text-base">
-                      {slide.headlineTa}
-                    </p>
                   )}
                 </div>
               </>

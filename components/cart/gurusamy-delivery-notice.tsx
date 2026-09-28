@@ -21,9 +21,6 @@ export function GurusamyDeliveryNotice({ subtotal, compact = false }: { subtotal
           Add {formatRupees(shortfall)} more to reach the minimum order
         </p>
       )}
-      <p lang="ta" className={compact ? "text-[11px] font-semibold text-gold-ink" : "text-xs font-semibold text-gold-ink"}>
-        மொத்த விற்பனை நேரடி தொழிற்சாலை விலை – டெலிவரி கட்டணம் பொருந்தும் ({formatRupees(delivery.flatCharge)})
-      </p>
       <p className={compact ? "text-[11px] text-ink-soft" : "text-xs text-ink-soft"}>
         Wholesale factory direct sale – delivery charges applicable ({formatRupees(delivery.flatCharge)})
       </p>

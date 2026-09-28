@@ -113,11 +113,6 @@ export default async function SharedCartPage({ searchParams }: { searchParams: S
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-ink">{line.product.name_en}</p>
-                    {line.product.name_ta && (
-                      <p lang="ta" className="text-xs text-muted">
-                        {line.product.name_ta}
-                      </p>
-                    )}
                     <p className="tabular-nums text-xs text-muted">
                       {formatRupees(line.product.price!)} per {formatUnit(line.product.unit)} × {line.qty}
                     </p>
@@ -167,9 +162,6 @@ export default async function SharedCartPage({ searchParams }: { searchParams: S
 
       {isGurusamyShop(shop.slug) && (
         <div className="mt-3 rounded-md bg-gold-tint px-3 py-2">
-          <p lang="ta" className="text-xs font-semibold text-gold-ink">
-            மொத்த விற்பனை நேரடி தொழிற்சாலை விலை – டெலிவரி கட்டணம் பொருந்தும் ({formatRupees(deliveryConfig.delivery.flatCharge)})
-          </p>
           <p className="text-xs text-ink-soft">
             Wholesale factory direct sale – delivery charges applicable ({formatRupees(deliveryConfig.delivery.flatCharge)})
           </p>

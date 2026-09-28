@@ -117,11 +117,6 @@ export function ProductCard({
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-maroon-ink transition-colors">
             {product.name_en}
           </h3>
-          {product.name_ta && (
-            <p lang="ta" className="line-clamp-1 text-xs text-muted mt-0.5">
-              {product.name_ta}
-            </p>
-          )}
         </Link>
 
         <div className="mt-auto flex flex-col gap-2 pt-1">

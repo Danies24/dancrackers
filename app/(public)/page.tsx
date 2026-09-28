@@ -20,10 +20,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Kolagalam (கோலாகலம்) — Sivakasi Crackers Price List",
+    absolute: "Kolagalam — Sivakasi Crackers Price List",
   },
   description:
-    "Browse 2026 Sivakasi crackers price list from Kolagalam (கோலாகலம்). Premium sparklers, rockets, ground chakkars & gift boxes direct to your door.",
+    "Browse 2026 Sivakasi crackers price list from Kolagalam. Premium sparklers, rockets, ground chakkars & gift boxes direct to your door.",
   alternates: {
     canonical: getCanonicalUrl("/"),
   },
@@ -174,7 +174,7 @@ export default async function HomePage() {
       {shopCards.length > 0 && (
         <section id="shops" className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">கடைகள்</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">SHOPS</p>
             <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Our Shops</h2>
           </div>
           <div className="flex flex-col gap-4">
@@ -244,7 +244,7 @@ export default async function HomePage() {
       {(nightCategoryGroups.length > 0 || dayCategoryGroups.length > 0) && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
           <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">வகைகள்</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-ink">CATEGORIES</p>
             <h2 className="font-display text-xl font-semibold text-ink md:text-2xl">Shop by category</h2>
           </div>
 

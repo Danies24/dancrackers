@@ -153,11 +153,6 @@ export default async function ShopProductPage({ params }: RouteParams) {
           ) : (
             <>
               <h1 className="font-display text-2xl font-semibold text-ink md:text-3xl">{product.name_en}</h1>
-              {product.name_ta && (
-                <p lang="ta" className="mt-1 text-base text-muted">
-                  {product.name_ta}
-                </p>
-              )}
               <p className="mt-2 text-xs text-ink-soft">
                 from{" "}
                 <Link href={`/s/${shop.slug}`} className="font-medium text-maroon-ink">

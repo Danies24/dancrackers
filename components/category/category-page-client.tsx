@@ -111,11 +111,6 @@ export function CategoryPageClient({
           </Link>
           <div>
             <h1 className="font-display text-base font-bold text-ink">{group.name_en}</h1>
-            {group.name_ta && (
-              <p lang="ta" className="text-xs text-muted">
-                {group.name_ta}
-              </p>
-            )}
           </div>
         </div>
       </div>

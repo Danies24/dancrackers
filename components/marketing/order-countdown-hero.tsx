@@ -69,8 +69,6 @@ export function OrderCountdownHero() {
         <div className="flex items-center justify-center gap-2 text-xs font-semibold text-ink-soft">
           <Clock size={15} className="text-maroon-ink" aria-hidden="true" />
           <span>{config.labels.en.title}</span>
-          <span className="text-muted">·</span>
-          <span lang="ta">{config.labels.ta.title}</span>
         </div>
         <div className="mt-3 grid grid-cols-4 gap-2">
           {["Days", "Hours", "Mins", "Secs"].map((label) => (
@@ -90,11 +88,8 @@ export function OrderCountdownHero() {
   const result: OrderDeadlineResult = getOrderDeadlineStatus(config.iso, now);
   const { isClosed, urgency, days, hours, minutes, seconds } = result;
   const en = config.labels.en;
-  const ta = config.labels.ta;
 
-  const accessibleText = isClosed
-    ? `${en.closedTitle}. ${ta.closedTitle}.`
-    : formatAccessibleAnnouncement(days, hours, minutes);
+  const accessibleText = isClosed ? `${en.closedTitle}.` : formatAccessibleAnnouncement(days, hours, minutes);
 
   // Urgency styling variants
   const cardBorderStyles = {
@@ -114,10 +109,10 @@ export function OrderCountdownHero() {
   };
 
   const timeUnits = [
-    { value: days, enLabel: en.units.days, taLabel: ta.units.days },
-    { value: hours, enLabel: en.units.hours, taLabel: ta.units.hours },
-    { value: minutes, enLabel: en.units.minutes, taLabel: ta.units.minutes },
-    { value: seconds, enLabel: en.units.seconds, taLabel: ta.units.seconds },
+    { value: days, enLabel: en.units.days },
+    { value: hours, enLabel: en.units.hours },
+    { value: minutes, enLabel: en.units.minutes },
+    { value: seconds, enLabel: en.units.seconds },
   ];
 
   return (
@@ -139,7 +134,6 @@ export function OrderCountdownHero() {
             <Clock size={13} aria-hidden="true" />
             <span>{en.closedTitle}</span>
           </div>
-          <p className="mt-2 text-sm font-semibold text-ink">{ta.closedTitle}</p>
           <p className="mt-1 text-xs text-ink-soft">{en.closedMessage}</p>
 
           <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row">
@@ -173,9 +167,6 @@ export function OrderCountdownHero() {
               <Clock size={13} aria-hidden="true" />
               <span>{en.title}</span>
             </span>
-            <span className="text-xs font-medium text-ink-soft" lang="ta">
-              {ta.title}
-            </span>
           </div>
 
           <div aria-hidden="true" className="mt-3.5 grid grid-cols-4 gap-2">
@@ -197,9 +188,6 @@ export function OrderCountdownHero() {
                 </span>
                 <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
                   {u.enLabel}
-                </span>
-                <span className="text-[9px] text-ink-soft" lang="ta">
-                  {u.taLabel}
                 </span>
               </div>
             ))}

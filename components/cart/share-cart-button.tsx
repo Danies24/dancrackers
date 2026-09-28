@@ -88,7 +88,7 @@ export function ShareCartButton({ shopSlug, activeLines }: { shopSlug: string; a
         const nameTa = l.validated?.name_ta ? ` (${l.validated.name_ta})` : "";
         return `${l.validated!.name_en}${nameTa} — ${l.qty}`;
       });
-    const text = ["என் கோலாகலம் கார்ட் / My Kolagalam cart:", "", ...lines].join("\n");
+    const text = ["My Kolagalam cart:", "", ...lines].join("\n");
     await copyToClipboard(text);
     show("Cart copied as text!");
     setOpen(false);
@@ -106,9 +106,7 @@ export function ShareCartButton({ shopSlug, activeLines }: { shopSlug: string; a
       <Sheet open={open} onClose={() => setOpen(false)} ariaLabel="Share cart">
         <div className="p-6">
           <h2 className="font-display text-lg font-semibold text-ink">Share cart</h2>
-          <p className="mt-1 text-sm text-ink-soft">
-            உங்கள் கார்ட்டை நண்பர்களுடன் பகிரவும் / Share your cart with someone else
-          </p>
+          <p className="mt-1 text-sm text-ink-soft">Share your cart with someone else</p>
           <div className="mt-5 flex flex-col gap-2">
             <Button size="full" onClick={handleShare} disabled={building}>
               Share…

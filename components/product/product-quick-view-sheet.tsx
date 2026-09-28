@@ -104,11 +104,6 @@ export function ProductQuickViewSheet({
 
           <div className="mt-4">
             <h2 className="font-display text-lg font-bold text-ink">{product.name_en}</h2>
-            {product.name_ta && (
-              <p lang="ta" className="mt-0.5 text-sm text-ink-soft">
-                {product.name_ta}
-              </p>
-            )}
             <p className="mt-1 text-xs text-muted">
               {product.pack ?? formatUnit(product.unit)} · {product.category?.name_en}
             </p>
