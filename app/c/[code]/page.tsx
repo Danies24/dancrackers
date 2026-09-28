@@ -26,7 +26,7 @@ export default function ReferralLandingPage({ params }: { params: Promise<{ code
       keepalive: true,
     }).catch(() => {});
 
-    router.replace("/products?welcome=1");
+    router.replace("/?welcome=1");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawCode]);
 
