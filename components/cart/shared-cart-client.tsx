@@ -64,6 +64,7 @@ export function SharedCartView({
   const [lines, setLines] = useState(initialLines);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<"load" | "enquiry" | null>(null);
+  const [previewLine, setPreviewLine] = useState<SharedCartEditableLine | null>(null);
 
   const deliveryConfig = getShopDeliveryConfig(shop.slug);
   const totals = computeTotals(
@@ -155,7 +156,12 @@ export function SharedCartView({
             <div className="divide-y divide-border rounded-lg border border-border bg-surface">
               {group.lines.map((line) => (
                 <div key={line.productId} className="flex gap-3 p-3">
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-cream">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLine(line)}
+                    aria-label={`View photo of ${line.name_en}`}
+                    className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-cream"
+                  >
                     {line.image_url ? (
                       <Image src={line.image_url} alt={line.name_en} fill className="object-cover" />
                     ) : (
@@ -163,7 +169,7 @@ export function SharedCartView({
                         {line.name_en.charAt(0)}
                       </div>
                     )}
-                  </div>
+                  </button>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-ink">{line.name_en}</p>
                     <p className="tabular-nums text-xs text-muted">
@@ -275,6 +281,26 @@ export function SharedCartView({
             </>
           )}
         </div>
+      </Sheet>
+
+      <Sheet open={!!previewLine} onClose={() => setPreviewLine(null)} ariaLabel="Product photo">
+        {previewLine && (
+          <div className="p-6">
+            <div className="relative mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-cream">
+              {previewLine.image_url ? (
+                <Image src={previewLine.image_url} alt={previewLine.name_en} fill className="object-contain" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center font-display text-3xl font-semibold text-maroon-ink">
+                  {previewLine.name_en.charAt(0)}
+                </div>
+              )}
+            </div>
+            <p className="mt-4 text-center text-sm font-semibold text-ink">{previewLine.name_en}</p>
+            <p className="text-center text-xs text-muted">
+              {formatRupees(previewLine.price)} per {formatUnit(previewLine.unit)}
+            </p>
+          </div>
+        )}
       </Sheet>
     </div>
   );
