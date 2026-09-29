@@ -198,41 +198,47 @@ export default function CartPage() {
                 <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
               )}
             </div>
-            {isOrderDeadlineBlocked() ? (
-              <div className="flex flex-col gap-2">
-                <Button size="full" disabled variant="secondary">
-                  {brandConfig.orderDeadline.labels.en.closedTitle}
-                </Button>
-                <div className="flex items-center justify-center gap-3 text-xs">
-                  <a
-                    href={getWhatsAppLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-whatsapp hover:underline"
-                  >
-                    WhatsApp Us
-                  </a>
-                  <span className="text-muted">·</span>
-                  <a
-                    href={`tel:+${getPhoneE164()}`}
-                    className="font-semibold text-maroon-ink hover:underline"
-                  >
-                    Call {getPhoneDisplay()}
-                  </a>
+            {/* pr-20 keeps the CTA clear of the floating WhatsApp button (fixed bottom-right,
+                z-50 — see components/layout/floating-whatsapp.tsx), which otherwise sits on
+                top of this row's right edge on mobile and intercepts taps meant for the
+                button underneath it. Reverts on md: since the bar itself goes non-fixed there. */}
+            <div className="pr-20 md:pr-0">
+              {isOrderDeadlineBlocked() ? (
+                <div className="flex flex-col gap-2">
+                  <Button size="full" disabled variant="secondary">
+                    {brandConfig.orderDeadline.labels.en.closedTitle}
+                  </Button>
+                  <div className="flex items-center justify-center gap-3 text-xs">
+                    <a
+                      href={getWhatsAppLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-whatsapp hover:underline"
+                    >
+                      WhatsApp Us
+                    </a>
+                    <span className="text-muted">·</span>
+                    <a
+                      href={`tel:+${getPhoneE164()}`}
+                      className="font-semibold text-maroon-ink hover:underline"
+                    >
+                      Call {getPhoneDisplay()}
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ) : belowMinimum ? (
-              <Button size="full" disabled>
-                Continue to Enquiry →
-              </Button>
-            ) : (
-              <Link
-                href="/enquiry"
-                onClick={() => trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length })}
-              >
-                <Button size="full">Continue to Enquiry →</Button>
-              </Link>
-            )}
+              ) : belowMinimum ? (
+                <Button size="full" disabled>
+                  Continue to Enquiry →
+                </Button>
+              ) : (
+                <Link
+                  href="/enquiry"
+                  onClick={() => trackEvent("begin_enquiry", { cart_value: totals.grandTotal, item_count: items.length })}
+                >
+                  <Button size="full">Continue to Enquiry →</Button>
+                </Link>
+              )}
+            </div>
             <p className="mt-2 text-center text-xs text-ink-soft">
               {brandConfig.orderDeadline.enabled ? (
                 getOrderDeadlineStatus(brandConfig.orderDeadline.iso).isClosed ? (

@@ -45,7 +45,12 @@ export function StickyCartBar() {
       ) : (
         <CartProgressBanner subtotal={totals.subtotal} shopSlug={shopSlug} />
       )}
-      <div className="flex h-16 items-center justify-between bg-maroon px-4 text-white shadow-lg">
+      {/* pr-20 keeps "View Cart" clear of the floating WhatsApp button (fixed
+          bottom-right, z-50 — components/layout/floating-whatsapp.tsx), which
+          otherwise sits on top of this edge-to-edge bar's right edge. This bar
+          has no max-width container to fall back on for clearance, unlike
+          /cart's and /cart/shared's bottom bars. */}
+      <div className="flex h-16 items-center justify-between bg-maroon px-4 pr-20 text-white shadow-lg">
         <span className="text-sm font-medium">
           {itemCount} item{itemCount === 1 ? "" : "s"} · {formatRupees(totals.grandTotal)}
         </span>

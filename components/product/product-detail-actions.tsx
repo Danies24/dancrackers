@@ -64,9 +64,12 @@ export function ProductDetailActions({ productId, sku, price, name, shop }: Prop
         )}
       </div>
 
-      {/* Sticky mobile action bar */}
+      {/* Sticky mobile action bar. pr-20 keeps the right-side control clear of
+          the floating WhatsApp button (fixed bottom-right, z-50 —
+          components/layout/floating-whatsapp.tsx), which otherwise sits on
+          top of it. */}
       <div
-        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-border bg-surface px-4 py-3 shadow-lg md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-border bg-surface px-4 pr-20 py-3 shadow-lg md:hidden"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
       >
         <span className="tabular-nums text-lg font-bold text-ink">{formatRupees(price)}</span>

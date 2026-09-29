@@ -240,7 +240,10 @@ export function SharedCartView({
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
       >
-        <div className="mx-auto flex max-w-3xl gap-2">
+        {/* pr-20 keeps both buttons clear of the floating WhatsApp button (fixed
+            bottom-right, z-50 — components/layout/floating-whatsapp.tsx), which
+            otherwise sits on top of "Send enquiry"'s right edge on mobile. */}
+        <div className="mx-auto flex max-w-3xl gap-2 pr-20 md:pr-0">
           <Button size="full" variant="secondary" onClick={() => startAction("load")}>
             Load into my cart
           </Button>
