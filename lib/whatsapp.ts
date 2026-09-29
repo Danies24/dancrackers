@@ -44,32 +44,29 @@ export interface CustomerMessageInput {
   name: string;
   phone: string;
   items: WhatsAppOrderItem[];
-  /** Item subtotal, before packaging/delivery — omit charge lines entirely when not given. */
+  /** Item subtotal, before packaging — omit the charge lines entirely when not given. */
   subtotal?: number;
   packagingCharge?: number;
-  deliveryCharge?: number;
   grandTotal: number;
   address: string;
   /** false hides the packaging-charge line entirely (Gurusamy has no packaging charge at all). Defaults to true. */
   packagingEnabled?: boolean;
-  /** e.g. the Gurusamy wholesale/delivery-charge notice — appended as its own line when given. */
-  deliveryNotice?: string;
 }
 
-/** Message 1 — customer to us (§17.3). Secondary action; the enquiry is already saved. */
+/**
+ * Message 1 — customer to us (§17.3). Secondary action; the enquiry is
+ * already saved. Deliberately never mentions a delivery charge — the site
+ * never advertises one, for any shop; `grandTotal` already includes it.
+ */
 export function buildCustomerMessage(input: CustomerMessageInput): string {
   const packagingEnabled = input.packagingEnabled ?? true;
   const chargeLines: string[] = [];
-  if (input.subtotal != null && ((packagingEnabled && input.packagingCharge) || input.deliveryCharge)) {
+  if (input.subtotal != null && packagingEnabled && input.packagingCharge != null) {
     chargeLines.push("", `Item subtotal: ${formatRupees(input.subtotal)}`);
-    if (packagingEnabled) {
-      chargeLines.push(
-        `Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%): ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
-      );
-    }
-    chargeLines.push(`Delivery charge: ${input.deliveryCharge ? formatRupees(input.deliveryCharge) : "Free"}`);
+    chargeLines.push(
+      `Packaging charge (${brandConfig.cartCharges.packagingChargePercent}%): ${input.packagingCharge ? formatRupees(input.packagingCharge) : "Free"}`,
+    );
   }
-  if (input.deliveryNotice) chargeLines.push("", input.deliveryNotice);
 
   return [
     brandConfig.messages.whatsappGreeting,

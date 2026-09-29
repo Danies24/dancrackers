@@ -6,8 +6,6 @@ import { useCart } from "@/components/cart/cart-provider";
 import { formatRupees } from "@/lib/format";
 import { computeTotals } from "@/lib/pricing";
 import { CartProgressBanner } from "@/components/cart/cart-progress-banner";
-import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
-import { isGurusamyShop } from "@/config/deliveryConfig";
 import { useEffect, useState } from "react";
 
 /**
@@ -50,13 +48,7 @@ export function StickyCartBar() {
       className={`fixed inset-x-0 bottom-0 z-30 ${isProductDetailPage ? "hidden md:block" : ""}`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {isGurusamyShop(shopSlug) ? (
-        <div className="border-b border-border bg-cream px-4 py-2">
-          <GurusamyDeliveryNotice subtotal={totals.subtotal} compact />
-        </div>
-      ) : (
-        <CartProgressBanner subtotal={totals.subtotal} shopSlug={shopSlug} />
-      )}
+      <CartProgressBanner subtotal={totals.subtotal} shopSlug={shopSlug} />
       {/* pr-20 keeps "View Cart" clear of the floating WhatsApp button (fixed
           bottom-right, z-50 — components/layout/floating-whatsapp.tsx), which
           otherwise sits on top of this edge-to-edge bar's right edge. This bar

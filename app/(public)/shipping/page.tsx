@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PackageCheck, Truck, Clock, ShieldAlert, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
-import { brandConfig, getCanonicalUrl, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
-import { SHOP_DELIVERY_CONFIG } from "@/config/deliveryConfig";
+import { getCanonicalUrl, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getPrimaryEmail } from "@/config/brandConfig";
 import { formatRupees } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -39,14 +38,6 @@ const SHIPPING_POINTS = [
     // page is treated as final.
     en: `Minimum order value is ${formatRupees(getMinimumOrderValue())} (after discount), the same across every state — no separate Tamil Nadu / other-state minimum.`,
     icon: CheckCircle2,
-  },
-  {
-    en: `Sri Ram Crackers: packaging is free above ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].packaging.waiverThreshold)} and delivery is free on orders of ${formatRupees(SHOP_DELIVERY_CONFIG["sri-ram-crackers"].delivery.freeThreshold ?? 0)} and above. Below that, the packaging/delivery charges shown in your cart apply.`,
-    icon: CheckCircle2,
-  },
-  {
-    en: `Gurusamy Fireworks: wholesale factory-direct pricing, no packaging charge at all, and a flat ${formatRupees(SHOP_DELIVERY_CONFIG["gurusamy-fireworks"].delivery.flatCharge)} delivery charge on every order — this is never waived.`,
-    icon: MapPin,
   },
   {
     en: "After your order is successfully placed and dispatched, the products will be delivered within 4 to 5 working days.",

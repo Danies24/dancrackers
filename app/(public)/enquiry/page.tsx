@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
-import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { formatRupees } from "@/lib/format";
@@ -25,7 +24,7 @@ import {
   stateSchema,
 } from "@/lib/validation";
 import { brandConfig, getMinimumOrderValue, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
-import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 import { INDIAN_STATES } from "@/lib/indian-states";
 import { trackEnquirySubmitState, trackEvent } from "@/lib/analytics";
 import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
@@ -134,10 +133,6 @@ export default function EnquiryPage() {
 
   const whatsappSame = watch("whatsappSame");
 
-  const gurusamyNoticeText = isGurusamyShop(shopSlug)
-    ? `Wholesale factory direct sale – delivery charges applicable (${formatRupees(deliveryConfig.delivery.flatCharge)})`
-    : undefined;
-
   function buildFallbackWhatsAppUrl(formValues: FormValues): string {
     const message = buildCustomerMessage({
       orderRef: "(not yet saved)",
@@ -151,11 +146,9 @@ export default function EnquiryPage() {
       })),
       subtotal: totals.subtotal,
       packagingCharge: totals.packagingCharge,
-      deliveryCharge: totals.deliveryCharge,
       grandTotal: totals.grandTotal,
       address: formValues.address,
       packagingEnabled: deliveryConfig.packaging.enabled,
-      deliveryNotice: gurusamyNoticeText,
     });
     return buildWhatsAppUrl(getPhoneE164().replace(/^91/, ""), message);
   }
@@ -255,12 +248,6 @@ export default function EnquiryPage() {
         </p>
       )}
 
-      {!loading && isGurusamyShop(shopSlug) && (
-        <div className="mt-3">
-          <GurusamyDeliveryNotice subtotal={totals.subtotal} />
-        </div>
-      )}
-
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>
         {/* Honeypot — hidden from real users, any value silently drops the submission (§30.2) */}
         <input
@@ -342,10 +329,10 @@ export default function EnquiryPage() {
           </select>
           {errors.state?.message && <p className="text-xs text-red-ink">{errors.state.message}</p>}
           <p className="text-xs text-muted">
-            Minimum order {formatRupees(getMinimumOrderValue())}.{" "}
-            {deliveryConfig.packaging.enabled && deliveryConfig.delivery.freeThreshold != null
-              ? `Packaging is free above ${formatRupees(deliveryConfig.packaging.waiverThreshold)} and delivery is free above ${formatRupees(deliveryConfig.delivery.freeThreshold)}.`
-              : `A flat delivery charge of ${formatRupees(deliveryConfig.delivery.flatCharge)} applies to every order.`}
+            Minimum order {formatRupees(getMinimumOrderValue())}.
+            {deliveryConfig.packaging.enabled && (
+              <> Packaging is free above {formatRupees(deliveryConfig.packaging.waiverThreshold)}.</>
+            )}
           </p>
         </div>
 

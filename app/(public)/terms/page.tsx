@@ -25,12 +25,15 @@ const TERMS_CLAUSES = [
     en: "Goods will be dispatched only after confirmation of full payment. Payment confirmation (transaction screenshot or bank credit confirmation) is mandatory before shipment.",
   },
   {
-    // TODO(legal-review): confirm this wording still reflects the actual
-    // delivery-charge/free-delivery policy before relying on it — it now
-    // depends on config/deliveryConfig.ts rather than a flat customer-pays rule.
+    // TODO(legal-review): confirm this generic wording is sufficient before
+    // relying on it — it deliberately avoids naming delivery/transportation
+    // as a separate line item or claiming any shop offers free delivery,
+    // per a business decision not to advertise delivery charges anywhere
+    // customer-facing. The real charge is still computed and still included
+    // in the total (config/deliveryConfig.ts), just never itemized.
     num: "2",
-    title: "Delivery Charges As Shown In Your Cart",
-    en: "Delivery charges, if any, are exactly what is shown in your cart at the time of your enquiry, and confirmed again on our call. Free delivery only applies where a shop states it and your order value qualifies — it is not offered by every shop on this site.",
+    title: "Your Total Is Confirmed On Our Call",
+    en: "The total confirmed with you on our call is final and reflects everything included in your order. Nothing is added after that confirmation.",
   },
   {
     num: "3",
@@ -113,7 +116,7 @@ export default function TermsPage() {
           <div>
             <h3 className="font-semibold text-ink">8. Shared Cart Links</h3>
             <p className="mt-1">
-              A cart link shared by another customer is only a list of items and quantities — it carries no price, no availability guarantee, and no personal data. Prices, stock and any applicable delivery charge are always recalculated from our live catalogue when the link is opened, and confirmed again by phone before any order is placed.
+              A cart link shared by another customer is only a list of items and quantities — it carries no price, no availability guarantee, and no personal data. Prices and stock are always recalculated from our live catalogue when the link is opened, and the order total is confirmed again by phone before any order is placed.
             </p>
           </div>
 

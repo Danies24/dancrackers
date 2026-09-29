@@ -5,6 +5,11 @@
  * numbers. Always resolves against the item subtotal (before packaging/
  * delivery are added), same basis computeTotals() uses for the charges
  * themselves.
+ *
+ * Delivery is deliberately never a milestone here — the site doesn't
+ * advertise a delivery charge or a free-delivery threshold anywhere
+ * customer-facing, for any shop. Only the flat minimum order and (where a
+ * shop has one) the packaging waiver are ever nudged/celebrated.
  */
 import { brandConfig } from "@/config/brandConfig";
 import { getShopDeliveryConfig } from "@/config/deliveryConfig";
@@ -17,9 +22,9 @@ export interface CartProgressMilestone {
   remaining: number;
   /** 0-100, subtotal's progress toward `threshold`. */
   progressPercent: number;
-  /** e.g. "Add ₹99 more for FREE delivery" */
+  /** e.g. "Add ₹99 more to reach the minimum order" */
   message: string;
-  /** Short badge label, e.g. "FREE DELIVERY" */
+  /** Short badge label, e.g. "FREE PACKAGING" */
   tag: string;
 }
 
@@ -37,7 +42,7 @@ interface MilestoneDef {
 
 export function getCartProgress(subtotal: number, shopSlug?: string | null): CartProgressState {
   const { minimumOrderValue } = brandConfig.cartCharges;
-  const { packaging, delivery } = getShopDeliveryConfig(shopSlug);
+  const { packaging } = getShopDeliveryConfig(shopSlug);
 
   const milestones: MilestoneDef[] = [
     {
@@ -51,13 +56,6 @@ export function getCartProgress(subtotal: number, shopSlug?: string | null): Car
       threshold: packaging.waiverThreshold,
       tag: "FREE PACKAGING",
       message: (remaining) => `Add ${remaining} more to avail zero packaging charges`,
-    });
-  }
-  if (delivery.freeThreshold != null) {
-    milestones.push({
-      threshold: delivery.freeThreshold,
-      tag: "FREE DELIVERY",
-      message: (remaining) => `Add ${remaining} more to avail zero delivery charges`,
     });
   }
 
@@ -78,23 +76,21 @@ export function getCartProgress(subtotal: number, shopSlug?: string | null): Car
 }
 
 /**
- * Which of the three milestones the subtotal currently clears: 0 (none),
- * 1 (minimum order), 2 (+ zero packaging), 3 (+ free delivery — fully done).
- * A rising tier is exactly the moment to fire the crossing celebration —
- * see components/cart/use-cart-milestone-celebration.ts.
+ * Which of the two milestones the subtotal currently clears: 0 (none),
+ * 1 (minimum order), 2 (+ zero packaging — fully done). A rising tier is
+ * exactly the moment to fire the crossing celebration — see
+ * components/cart/use-cart-milestone-celebration.ts.
  */
-export function getCartTier(subtotal: number, shopSlug?: string | null): 0 | 1 | 2 | 3 {
+export function getCartTier(subtotal: number, shopSlug?: string | null): 0 | 1 | 2 {
   const { minimumOrderValue } = brandConfig.cartCharges;
-  const { packaging, delivery } = getShopDeliveryConfig(shopSlug);
-  if (delivery.freeThreshold != null && subtotal >= delivery.freeThreshold) return 3;
+  const { packaging } = getShopDeliveryConfig(shopSlug);
   if (packaging.enabled && subtotal >= packaging.waiverThreshold) return 2;
   if (subtotal >= minimumOrderValue) return 1;
   return 0;
 }
 
 /** One-line celebratory copy shown briefly when a tier is first reached. */
-export const CART_TIER_CELEBRATION: Record<1 | 2 | 3, string> = {
+export const CART_TIER_CELEBRATION: Record<1 | 2, string> = {
   1: "Minimum order reached!",
   2: "Zero packaging charges unlocked!",
-  3: "Free delivery unlocked!",
 };

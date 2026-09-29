@@ -19,11 +19,11 @@ const CELEBRATION_MS = 800;
 
 /**
  * Fires once per render tree, exactly when `subtotal` newly crosses a cart
- * milestone (minimum order → zero packaging → free delivery) — never on
- * mount with an already-qualifying cart, and never while merely sitting
- * above a threshold. Plays the synthesized visil (whistle) sound and
- * returns the celebration to render (burst particles + a one-line message)
- * for `CELEBRATION_MS`, then clears itself so the next sentence can show.
+ * milestone (minimum order → zero packaging) — never on mount with an
+ * already-qualifying cart, and never while merely sitting above a
+ * threshold. Plays the synthesized visil (whistle) sound and returns the
+ * celebration to render (burst particles + a one-line message) for
+ * `CELEBRATION_MS`, then clears itself so the next sentence can show.
  */
 export function useCartMilestoneCelebration(subtotal: number, shopSlug?: string | null): MilestoneCelebration | null {
   const previousTierRef = useRef<number | null>(null);
@@ -38,7 +38,7 @@ export function useCartMilestoneCelebration(subtotal: number, shopSlug?: string 
     if (previousTier === null || tier <= previousTier) return;
 
     keyRef.current += 1;
-    setCelebration({ key: keyRef.current, label: CART_TIER_CELEBRATION[tier as 1 | 2 | 3] });
+    setCelebration({ key: keyRef.current, label: CART_TIER_CELEBRATION[tier as 1 | 2] });
     playVisilSound();
 
     const timeout = setTimeout(() => setCelebration(null), CELEBRATION_MS);

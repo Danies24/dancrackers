@@ -441,6 +441,8 @@ export async function POST(request: Request) {
   }
 
   // ── Notifications (§16.5 step 9, §18) — failures never affect the response ──
+  // deliveryNoticeLine is staff-only (the admin email/Telegram alert below) —
+  // the customer-facing WhatsApp message never mentions a delivery charge.
   const deliveryNoticeLine = isGurusamyShop(shopSlug)
     ? `Wholesale factory direct sale – delivery charges applicable (${formatRupees(deliveryConfig.delivery.flatCharge)})`
     : undefined;
@@ -461,11 +463,9 @@ export async function POST(request: Request) {
           })),
           subtotal: totals.subtotal,
           packagingCharge: totals.packagingCharge,
-          deliveryCharge: totals.deliveryCharge,
           grandTotal: totals.grandTotal,
           address: input.customer.address,
           packagingEnabled: deliveryConfig.packaging.enabled,
-          deliveryNotice: deliveryNoticeLine,
         }),
       )
     : null;

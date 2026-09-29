@@ -13,8 +13,10 @@ import { useCartMilestoneCelebration } from "@/components/cart/use-cart-mileston
  * milestone math with the /cart page's thin CartProgressBar via
  * lib/cart-progress.ts. The bar itself only ever *transitions* width in the
  * background glow — the only animation that plays is the one-shot cracker
- * blast, fired exactly when `subtotal` newly crosses ₹2,999 / ₹3,499 /
- * ₹3,999 (use-cart-milestone-celebration.ts), never on a loop.
+ * blast, fired exactly when `subtotal` newly crosses the minimum-order or
+ * packaging-waiver threshold (use-cart-milestone-celebration.ts), never on
+ * a loop. Deliberately never mentions delivery — the site never advertises
+ * a delivery charge or a free-delivery threshold, for any shop.
  */
 export function CartProgressBanner({ subtotal, shopSlug }: { subtotal: number; shopSlug?: string | null }) {
   const progress = getCartProgress(subtotal, shopSlug);
@@ -41,7 +43,7 @@ export function CartProgressBanner({ subtotal, shopSlug }: { subtotal: number; s
             {celebration
               ? `🎉 ${celebration.label}`
               : progress.done
-                ? "You've unlocked zero packaging & free delivery! 🎉"
+                ? "You're ready to checkout! 🎉"
                 : progress.message}
           </p>
           <div className="relative mt-1.5">

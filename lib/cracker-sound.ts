@@ -5,9 +5,8 @@
  * ends in a tiny closing pop, synthesized with the Web Audio API rather
  * than a shipped audio file, so there's no asset to fetch, license, or
  * ship, and it still works offline. Fired once per cart milestone crossed
- * (minimum order, zero packaging, free delivery) — see
- * use-cart-milestone-celebration.ts. Silently does nothing if Web Audio
- * isn't available (older Safari, SSR).
+ * (minimum order, zero packaging) — see use-cart-milestone-celebration.ts.
+ * Silently does nothing if Web Audio isn't available (older Safari, SSR).
  */
 
 let sharedContext: AudioContext | null = null;

@@ -7,7 +7,6 @@ import { useCart } from "@/components/cart/cart-provider";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
 import { ReferralCodeField } from "@/components/cart/referral-code-field";
 import { CartProgressBar } from "@/components/cart/cart-progress-bar";
-import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
 import { ShareCartButton } from "@/components/cart/share-cart-button";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
@@ -15,7 +14,7 @@ import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { brandConfig, getPhoneDisplay, getPhoneE164, getWhatsAppLink } from "@/config/brandConfig";
-import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 import { getOrderDeadlineStatus, isOrderDeadlineBlocked } from "@/lib/order-deadline";
 
 /** Mirrors the real cart line-item layout below, so the initial load doesn't jump. */
@@ -173,12 +172,6 @@ export default function CartPage() {
                 free={totals.packagingCharge === 0}
               />
             )}
-            <Row
-              label="Delivery charge"
-              value={totals.deliveryCharge}
-              muted={totals.deliveryCharge === 0}
-              free={totals.deliveryCharge === 0}
-            />
             <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
               <span className="font-semibold text-ink">Total</span>
               <span className="tabular-nums text-2xl font-bold text-ink">{formatRupees(totals.grandTotal)}</span>
@@ -192,11 +185,7 @@ export default function CartPage() {
             style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
           >
             <div className="mb-3">
-              {isGurusamyShop(shopSlug) ? (
-                <GurusamyDeliveryNotice subtotal={totals.subtotal} />
-              ) : (
-                <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
-              )}
+              <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
             </div>
             {/* pr-20 keeps the CTA clear of the floating WhatsApp button (fixed bottom-right,
                 z-50 — see components/layout/floating-whatsapp.tsx), which otherwise sits on
@@ -277,7 +266,7 @@ function Row({
   value: number;
   muted?: boolean;
   strike?: boolean;
-  /** Renders "Free" in teal instead of ₹0 — for a waived packaging/delivery charge. */
+  /** Renders "Free" in teal instead of ₹0 — for a waived packaging charge. */
   free?: boolean;
   className?: string;
 }) {

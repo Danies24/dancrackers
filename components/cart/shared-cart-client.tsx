@@ -10,9 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { Stepper } from "@/components/ui/stepper";
 import { ShareCartButton } from "@/components/cart/share-cart-button";
-import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
 import { computeTotals } from "@/lib/pricing";
-import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 import { formatRupees, formatUnit } from "@/lib/format";
 import type { CartShop } from "@/lib/cart";
 
@@ -214,27 +213,11 @@ export function SharedCartView({
             </span>
           </div>
         )}
-        <div className="flex justify-between py-0.5 text-sm text-ink-soft">
-          <span>Delivery charge</span>
-          <span className="tabular-nums">
-            {totals.deliveryCharge === 0 ? (
-              <span className="font-semibold text-teal-ink">Free</span>
-            ) : (
-              formatRupees(totals.deliveryCharge)
-            )}
-          </span>
-        </div>
         <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
           <span className="font-semibold text-ink">Total</span>
           <span className="tabular-nums text-2xl font-bold text-ink">{formatRupees(totals.grandTotal)}</span>
         </div>
       </div>
-
-      {isGurusamyShop(shop.slug) && (
-        <div className="mt-3">
-          <GurusamyDeliveryNotice subtotal={totals.subtotal} />
-        </div>
-      )}
 
       <div
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface p-4"
