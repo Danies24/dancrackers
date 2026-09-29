@@ -4,8 +4,7 @@ import { enquirySchema, normalizePhone } from "@/lib/validation";
 import { computeProductPricing, computeTotals, isBelowMinimumOrder, round2 } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/pricing-settings";
 import { getMinimumOrderValue, getSiteUrl } from "@/config/brandConfig";
-import { getShopDeliveryConfig, isGurusamyShop } from "@/config/deliveryConfig";
-import { formatRupees } from "@/lib/format";
+import { getShopDeliveryConfig } from "@/config/deliveryConfig";
 import { getSettings } from "@/lib/data";
 import { checkEnquiryRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashIp } from "@/lib/hash";
@@ -441,12 +440,6 @@ export async function POST(request: Request) {
   }
 
   // ── Notifications (§16.5 step 9, §18) — failures never affect the response ──
-  // deliveryNoticeLine is staff-only (the admin email/Telegram alert below) —
-  // the customer-facing WhatsApp message never mentions a delivery charge.
-  const deliveryNoticeLine = isGurusamyShop(shopSlug)
-    ? `Wholesale factory direct sale – delivery charges applicable (${formatRupees(deliveryConfig.delivery.flatCharge)})`
-    : undefined;
-
   const whatsappBusinessNumber = String(settings.whatsapp_business_number ?? "");
   const whatsappUrl = whatsappBusinessNumber
     ? buildWhatsAppUrl(
@@ -485,7 +478,6 @@ export async function POST(request: Request) {
       (i, idx) => `${idx + 1}. ${i.name_en} — ${i.quantity} ${i.unit} — ₹${i.line_total}`,
     ),
     adminOrderUrl: `${siteUrl}/admin/orders/${order.id}`,
-    deliveryNoticeLine,
   }).catch((err) => console.error("[enquiry] notifications failed", err));
 
   return NextResponse.json(

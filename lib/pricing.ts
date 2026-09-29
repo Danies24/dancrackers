@@ -28,7 +28,7 @@ export interface PricingResult {
   youSave: number;
   /** 3% of subtotal, waived once subtotal reaches the packaging waiver threshold (§ cartCharges). */
   packagingCharge: number;
-  /** Flat fee, waived once subtotal reaches the delivery waiver threshold (§ cartCharges). */
+  /** Flat delivery fee — currently always 0 for every shop (§ cartCharges, config/deliveryConfig.ts). */
   deliveryCharge: number;
   /** subtotal + packagingCharge + deliveryCharge — what the customer actually pays. */
   grandTotal: number;
@@ -183,9 +183,10 @@ export function computePackagingCharge(subtotal: number, shopSlug?: string | nul
 }
 
 /**
- * Flat delivery fee, waived once the subtotal reaches the shop's delivery
- * waiver threshold (config/deliveryConfig.ts). A shop with `freeThreshold:
- * null` (e.g. Gurusamy) always charges the flat fee, regardless of subtotal.
+ * Flat delivery fee per shop (config/deliveryConfig.ts) — currently 0 for
+ * every shop, by business decision (no shop on this site charges for
+ * delivery). The waiver-threshold logic is kept so a future non-zero
+ * `flatCharge` only needs a config change, not a logic change here.
  */
 export function computeDeliveryCharge(subtotal: number, shopSlug?: string | null): number {
   const { delivery } = getShopDeliveryConfig(shopSlug);

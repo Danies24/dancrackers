@@ -135,14 +135,18 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-md">
           <HomeSearchBar />
 
-          {maxDiscountPercent > 0 && (
-            <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex gap-3">
+            {maxDiscountPercent > 0 && (
               <div className="flex-1 rounded-2xl bg-gradient-festival px-4 py-3 text-left text-on-fill shadow-soft">
                 <p className="font-display text-lg font-extrabold">Upto {Math.max(maxDiscountPercent, 80)}% OFF</p>
                 <p className="text-[11px] font-semibold opacity-90">Branded crackers.</p>
               </div>
+            )}
+            <div className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-left shadow-soft">
+              <p className="font-display text-lg font-extrabold text-ink">Lowest</p>
+              <p className="text-[11px] font-semibold text-ink-soft">Wholesale Prices</p>
             </div>
-          )}
+          </div>
         </div>
       </section>
 

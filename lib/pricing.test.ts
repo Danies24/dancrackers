@@ -151,12 +151,12 @@ describe("computeTotals — edge cases", () => {
     expect(result.totalQuantity).toBe(0);
   });
 
-  it("handles a single item, with packaging + delivery charges below both waiver thresholds", () => {
+  it("handles a single item, with packaging below the waiver threshold and no delivery charge", () => {
     const result = computeTotals([{ price: 99.5, quantity: 3, isDiscountable: true }]);
     expect(result.subtotal).toBe(298.5);
     expect(result.packagingCharge).toBe(8.96); // 3% of 298.5
-    expect(result.deliveryCharge).toBe(400);
-    expect(result.grandTotal).toBe(707.46);
+    expect(result.deliveryCharge).toBe(0);
+    expect(result.grandTotal).toBe(307.46);
   });
 
   it("treats a missing mrp as no saving, never a negative youSave", () => {
@@ -178,7 +178,7 @@ describe("computeTotals — edge cases", () => {
     const result = computeTotals([{ price: 1000, quantity: 1, isDiscountable: false }]);
     expect(result.mrpTotal).toBe(0);
     expect(result.youSave).toBe(0);
-    expect(result.grandTotal).toBe(1430); // 1000 + 3% packaging (30) + 400 delivery
+    expect(result.grandTotal).toBe(1030); // 1000 + 3% packaging (30), no delivery charge
   });
 
   it("handles 50 items without drift", () => {
@@ -193,19 +193,20 @@ describe("computeTotals — edge cases", () => {
   });
 });
 
-describe("computePackagingCharge / computeDeliveryCharge — § cartCharges (2999 / 3499 / 3999)", () => {
-  it("charges 3% packaging and a flat ₹400 delivery below both waiver thresholds", () => {
+describe("computePackagingCharge / computeDeliveryCharge — § cartCharges (2999 / 3499)", () => {
+  it("charges 3% packaging below the waiver threshold; delivery is always 0", () => {
     expect(computePackagingCharge(3000)).toBe(90);
-    expect(computeDeliveryCharge(3000)).toBe(400);
+    expect(computeDeliveryCharge(3000)).toBe(0);
   });
 
-  it("waives packaging at/above ₹3,499 but still charges delivery below ₹3,999", () => {
+  it("waives packaging at/above ₹3,499", () => {
     expect(computePackagingCharge(3499)).toBe(0);
-    expect(computeDeliveryCharge(3499)).toBe(400);
+    expect(computeDeliveryCharge(3499)).toBe(0);
   });
 
-  it("waives delivery at/above ₹3,999", () => {
+  it("delivery is 0 regardless of subtotal — no shop charges for delivery", () => {
     expect(computeDeliveryCharge(3999)).toBe(0);
+    expect(computeDeliveryCharge(100000)).toBe(0);
     expect(computePackagingCharge(3999)).toBe(0);
   });
 
@@ -216,18 +217,18 @@ describe("computePackagingCharge / computeDeliveryCharge — § cartCharges (299
 });
 
 describe("per-shop delivery config (config/deliveryConfig.ts)", () => {
-  it("Gurusamy: never charges packaging, and always charges the flat delivery fee, even far above 3999", () => {
+  it("Gurusamy: never charges packaging, and never charges delivery, even far above 3999", () => {
     expect(computePackagingCharge(10000, "gurusamy-fireworks")).toBe(0);
-    expect(computeDeliveryCharge(10000, "gurusamy-fireworks")).toBe(400);
+    expect(computeDeliveryCharge(10000, "gurusamy-fireworks")).toBe(0);
     expect(computePackagingCharge(100, "gurusamy-fireworks")).toBe(0);
-    expect(computeDeliveryCharge(100, "gurusamy-fireworks")).toBe(400);
+    expect(computeDeliveryCharge(100, "gurusamy-fireworks")).toBe(0);
   });
 
-  it("Sri Ram: unchanged 2999/3499/3999 behaviour when a shop slug is passed explicitly", () => {
+  it("Sri Ram: unchanged 2999/3499 packaging behaviour when a shop slug is passed explicitly; delivery always 0", () => {
     expect(computePackagingCharge(3000, "sri-ram-crackers")).toBe(90);
-    expect(computeDeliveryCharge(3000, "sri-ram-crackers")).toBe(400);
+    expect(computeDeliveryCharge(3000, "sri-ram-crackers")).toBe(0);
     expect(computePackagingCharge(3499, "sri-ram-crackers")).toBe(0);
-    expect(computeDeliveryCharge(3499, "sri-ram-crackers")).toBe(400);
+    expect(computeDeliveryCharge(3499, "sri-ram-crackers")).toBe(0);
     expect(computeDeliveryCharge(3999, "sri-ram-crackers")).toBe(0);
   });
 
@@ -242,14 +243,14 @@ describe("per-shop delivery config (config/deliveryConfig.ts)", () => {
     expect(computeDeliveryCharge(3999, null)).toBe(0);
   });
 
-  it("computeTotals hides packaging (always 0) and never waives delivery for a Gurusamy cart", () => {
+  it("computeTotals: Gurusamy cart has zero packaging and zero delivery — total equals subtotal", () => {
     const result = computeTotals(
       [{ price: 5000, quantity: 1, isDiscountable: true, mrp: 6000 }],
       "gurusamy-fireworks",
     );
     expect(result.packagingCharge).toBe(0);
-    expect(result.deliveryCharge).toBe(400);
-    expect(result.grandTotal).toBe(5400);
+    expect(result.deliveryCharge).toBe(0);
+    expect(result.grandTotal).toBe(5000);
   });
 });
 

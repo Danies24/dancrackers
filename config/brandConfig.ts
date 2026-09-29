@@ -110,14 +110,17 @@ export const brandConfig = {
   // Cart-level minimum and charges — flat across all delivery states.
   // Enforced server-side at enquiry submission (lib/pricing.ts) and mirrored
   // client-side on the cart/enquiry pages so the message shows instantly.
-  // Packaging and delivery charges are computed off the item subtotal
-  // (before either charge is added) and waived once that subtotal reaches
-  // the matching threshold — see computeTotals in lib/pricing.ts.
+  // Packaging is computed off the item subtotal (before either charge is
+  // added) and waived once that subtotal reaches the threshold — see
+  // computeTotals in lib/pricing.ts. deliveryCharge is 0 by business
+  // decision: no shop charges for delivery, so deliveryChargeWaiverThreshold
+  // is unused (kept only so a future re-introduction doesn't need a new
+  // field — see config/deliveryConfig.ts's per-shop flatCharge, also 0).
   cartCharges: {
     minimumOrderValue: 2999,
     packagingChargePercent: 3,
     packagingChargeWaiverThreshold: 3499,
-    deliveryCharge: 400,
+    deliveryCharge: 0,
     deliveryChargeWaiverThreshold: 3999,
   },
 

@@ -5,8 +5,14 @@
  * through getShopDeliveryConfig() instead of hardcoding a number.
  *
  * Sri Ram and Bullet intentionally carry today's brandConfig.cartCharges
- * values unchanged — only Gurusamy's economics are new here (no packaging
- * charge ever, a flat delivery charge that is never waived).
+ * values unchanged — only Gurusamy's packaging is different (no packaging
+ * charge at all, still no delivery charge — see below).
+ *
+ * Delivery is a flat 0 for every shop, by business decision: no shop on
+ * this site charges for delivery, so `delivery.flatCharge` is 0 across the
+ * board and `freeThreshold` is unused (kept so a future re-introduction of
+ * a real delivery charge only needs a number changed here, nothing
+ * structural).
  */
 import { brandConfig } from "@/config/brandConfig";
 
@@ -38,12 +44,12 @@ const DEFAULT_DELIVERY_CONFIG: ShopDeliveryConfig = {
 };
 
 /**
- * Wholesale factory-direct model: no packaging charge at all, and delivery
- * is a flat charge on every order — never waived, regardless of order value.
+ * Wholesale factory-direct model: no packaging charge at all. Delivery is
+ * 0 here too, same as every other shop — see the file-level comment above.
  */
 const GURUSAMY_DELIVERY_CONFIG: ShopDeliveryConfig = {
   packaging: { enabled: false, percent: 0, waiverThreshold: 0 },
-  delivery: { flatCharge: 400, freeThreshold: null },
+  delivery: { flatCharge: 0, freeThreshold: null },
 };
 
 export const SHOP_DELIVERY_CONFIG: Record<string, ShopDeliveryConfig> = {
