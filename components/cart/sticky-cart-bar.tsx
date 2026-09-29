@@ -31,13 +31,25 @@ export function StickyCartBar() {
   if (itemCount === 0) return null;
   if (hideOn.some((p) => pathname?.startsWith(p))) return null;
 
+  // A product detail page (/s/[shopSlug]/p/[slug]) has its own mobile sticky
+  // action bar for adding THIS product (components/product/product-detail-
+  // actions.tsx, md:hidden) — both bars are fixed bottom-0 z-30, so showing
+  // both at once means they visually fight for the same slot. Complementary
+  // breakpoints, not a JS media check: this bar hides on mobile there (the
+  // product's own bar already covers price + add-to-cart/stepper) and keeps
+  // showing on desktop, where the product bar never renders at all.
+  const isProductDetailPage = /^\/s\/[^/]+\/p\/[^/]+/.test(pathname ?? "");
+
   const totals = computeTotals(
     items.map((i) => ({ price: i.priceAtAdd, quantity: i.qty, isDiscountable: true })),
     shopSlug,
   );
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <div
+      className={`fixed inset-x-0 bottom-0 z-30 ${isProductDetailPage ? "hidden md:block" : ""}`}
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       {isGurusamyShop(shopSlug) ? (
         <div className="border-b border-border bg-cream px-4 py-2">
           <GurusamyDeliveryNotice subtotal={totals.subtotal} compact />
