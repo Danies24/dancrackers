@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { buildShareUrl, buildShortShareUrl, exceedsShareUrlLimit, type ShareCartItem } from "@/lib/cart-share";
 import { getWhatsAppLink } from "@/config/brandConfig";
-import type { ResolvedCartLine } from "@/components/cart/use-validated-cart";
+
+/** The minimal shape ShareCartButton needs per line — shape-agnostic so both /cart (via useValidatedCart) and /cart/shared (its own local edit state) can pass it the same way. */
+export interface ShareableLine {
+  slug: string;
+  qty: number;
+  name_en: string;
+  name_ta?: string | null;
+}
 
 /**
  * "Share cart" — builds the compact ?s=&i= link (lib/cart-share.ts) for a
@@ -15,14 +22,12 @@ import type { ResolvedCartLine } from "@/components/cart/use-validated-cart";
  * (60+ items). Never puts prices in the link — /cart/shared recomputes
  * those from the live catalogue.
  */
-export function ShareCartButton({ shopSlug, activeLines }: { shopSlug: string; activeLines: ResolvedCartLine[] }) {
+export function ShareCartButton({ shopSlug, lines }: { shopSlug: string; lines: ShareableLine[] }) {
   const { show } = useToast();
   const [open, setOpen] = useState(false);
   const [building, setBuilding] = useState(false);
 
-  const items: ShareCartItem[] = activeLines
-    .filter((l) => l.validated?.slug)
-    .map((l) => ({ slug: l.validated!.slug!, qty: l.qty }));
+  const items: ShareCartItem[] = lines.map((l) => ({ slug: l.slug, qty: l.qty }));
 
   async function resolveShareUrl(): Promise<string | null> {
     const origin = window.location.origin;
@@ -82,13 +87,11 @@ export function ShareCartButton({ shopSlug, activeLines }: { shopSlug: string; a
   }
 
   async function handleCopyAsText() {
-    const lines = activeLines
-      .filter((l) => l.validated?.name_en)
-      .map((l) => {
-        const nameTa = l.validated?.name_ta ? ` (${l.validated.name_ta})` : "";
-        return `${l.validated!.name_en}${nameTa} — ${l.qty}`;
-      });
-    const text = ["My Kolagalam cart:", "", ...lines].join("\n");
+    const textLines = lines.map((l) => {
+      const nameTa = l.name_ta ? ` (${l.name_ta})` : "";
+      return `${l.name_en}${nameTa} — ${l.qty}`;
+    });
+    const text = ["My Kolagalam cart:", "", ...textLines].join("\n");
     await copyToClipboard(text);
     show("Cart copied as text!");
     setOpen(false);

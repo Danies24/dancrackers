@@ -42,7 +42,7 @@ export function ProductQuickViewSheet({
   const cartItem = product
     ? findItem({ v: 1, updatedAt: 0, shopId: null, shopSlug: null, shopName: null, items }, product.id)
     : undefined;
-  const progress = getCartProgress(subtotal);
+  const progress = getCartProgress(subtotal, product?.shop_slug);
 
   function handleAdd() {
     if (!product?.price) return;

@@ -69,7 +69,19 @@ export default function CartPage() {
           <Link href={`/s/${shopSlug}`} className="inline-block text-sm font-medium text-maroon-ink hover:underline">
             from {shopName} →
           </Link>
-          {!loading && activeLines.length > 0 && <ShareCartButton shopSlug={shopSlug} activeLines={activeLines} />}
+          {!loading && activeLines.length > 0 && (
+            <ShareCartButton
+              shopSlug={shopSlug}
+              lines={activeLines
+                .filter((l) => l.validated?.slug)
+                .map((l) => ({
+                  slug: l.validated!.slug!,
+                  qty: l.qty,
+                  name_en: l.validated!.name_en ?? "",
+                  name_ta: l.validated!.name_ta,
+                }))}
+            />
+          )}
         </div>
       )}
 

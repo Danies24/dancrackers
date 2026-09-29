@@ -8,7 +8,9 @@ import { ProductListRow } from "@/components/product/product-list-row";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { ProductQuickViewSheet } from "@/components/product/product-quick-view-sheet";
 import { CartProgressBar } from "@/components/cart/cart-progress-bar";
+import { GurusamyDeliveryNotice } from "@/components/cart/gurusamy-delivery-notice";
 import { useValidatedCart } from "@/components/cart/use-validated-cart";
+import { isGurusamyShop } from "@/config/deliveryConfig";
 import { ShopCategoryCircles, type CategoryCircleItem } from "@/components/shop/shop-category-circles";
 import { CollapsibleSection } from "@/components/shop/collapsible-section";
 import { ShopMenuFab, type ShopMenuSection } from "@/components/shop/shop-menu-fab";
@@ -184,7 +186,11 @@ export function ShopPlpClient({
   return (
     <div className="pb-24">
       <div className="mx-4 mt-3 rounded-xl bg-teal-tint px-3.5 py-3">
-        <CartProgressBar subtotal={totals.subtotal} />
+        {isGurusamyShop(shopSlug) ? (
+          <GurusamyDeliveryNotice subtotal={totals.subtotal} />
+        ) : (
+          <CartProgressBar subtotal={totals.subtotal} shopSlug={shopSlug} />
+        )}
       </div>
 
       <div ref={stickyRowRef} className="sticky z-20 border-b border-border bg-cream/95 backdrop-blur" style={{ top: HEADER_STACK_HEIGHT }}>
