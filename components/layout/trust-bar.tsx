@@ -10,7 +10,7 @@ export function TrustBar() {
           <div className="hidden h-3 w-px shrink-0 bg-white/20 sm:block" />
           <div className="flex shrink-0 items-center gap-1.5">
             <span className="text-lg leading-none">💰</span>
-            <span>Lowest Wholesale Prices</span>
+            <span>Lowest Retail Prices</span>
           </div>
           <div className="hidden h-3 w-px shrink-0 bg-white/20 md:block" />
           <div className="flex shrink-0 items-center gap-1.5 md:flex">

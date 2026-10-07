@@ -42,7 +42,7 @@ const FAQ_LIST: FAQItem[] = [
   {
     question: "How does Kolagalam bring crackers from Sivakasi?",
     answer:
-      "Kolagalam brings crackers direct from Sivakasi to your area across Tamil Nadu at factory-direct wholesale prices. We visit mills in person, check products, photograph them ourselves, and personally confirm every order over the phone.",
+      "Kolagalam brings crackers direct from Sivakasi to your area across Tamil Nadu at factory-direct retail prices. We visit mills in person, check products, photograph them ourselves, and personally confirm every order over the phone.",
     linkText: "Learn more about us",
     linkHref: "/about",
   },

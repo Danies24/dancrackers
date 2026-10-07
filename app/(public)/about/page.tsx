@@ -6,14 +6,14 @@ import { brandConfig, getCanonicalUrl, getPhoneDisplay, getPhoneE164, getPrimary
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Kolagalam crackers online store — Sivakasi fireworks wholesaler since 2020, now in 2026 expanding to online customers across Tamil Nadu and all of India.",
+    "Kolagalam crackers online store — Sivakasi fireworks retailer since 2020, now in 2026 expanding to online customers across Tamil Nadu and all of India.",
   alternates: {
     canonical: getCanonicalUrl("/about"),
   },
   openGraph: {
     title: `About ${brandConfig.brand.name}`,
     description:
-      "Kolagalam crackers online store — Sivakasi fireworks wholesaler since 2020, now in 2026 expanding to online customers across Tamil Nadu and all of India.",
+      "Kolagalam crackers online store — Sivakasi fireworks retailer since 2020, now in 2026 expanding to online customers across Tamil Nadu and all of India.",
     url: getCanonicalUrl("/about"),
   },
 };
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const HIGHLIGHTS = [
   {
     title: "Since 2020",
-    desc: "Established fireworks wholesaler with our shop in Sivakasi since 2020, now expanding online in 2026.",
+    desc: "Established fireworks retailer with our shop in Sivakasi since 2020, now expanding online in 2026.",
     icon: Award,
   },
   {
@@ -63,14 +63,14 @@ export default function AboutPage() {
         <h2 className="font-display text-xl font-bold text-ink md:text-2xl">About Company</h2>
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-ink-soft md:text-[15px]">
           <p className="rounded-2xl border border-maroon-ink/10 bg-maroon-tint/40 p-4 font-medium text-ink">
-            We are &quot;Kolagalam&quot; crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and has been successfully running our company with selling crackers in all over india. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.
+            We are &quot;Kolagalam&quot; crackers online store, retailer of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and has been successfully running our company with selling crackers in all over india. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.
           </p>
 
           <h3 className="pt-2 font-display text-base font-semibold text-ink">
             Now in 2026: Expanding to Online Customers
           </h3>
           <p>
-            Rooted in our wholesale shop in Sivakasi established in 2020, now in 2026 we are expanding directly to online customers. Through Kolagalam, families across Tamil Nadu and all of India can now explore authentic Sivakasi crackers straight from the manufacturing hub — without middleman markups, travel hassles, or photocopied price lists.
+            Rooted in our retail shop in Sivakasi established in 2020, now in 2026 we are expanding directly to online customers. Through Kolagalam, families across Tamil Nadu and all of India can now explore authentic Sivakasi crackers straight from the manufacturing hub — without middleman markups, travel hassles, or photocopied price lists.
           </p>
           <p>
             We personally visit the mills in Sivakasi to photograph every genuine product and inspect packaging quality. When you place an enquiry, our dedicated team calls you personally to verify every single item and confirm your total. After your payment is completed securely, we carefully pack your crackers in waterproof cartons and dispatch them directly to your nearest transport hub.

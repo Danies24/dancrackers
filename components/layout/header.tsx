@@ -13,7 +13,6 @@ import { brandConfig, getPhoneE164, getPhoneDisplay, getWhatsAppLink } from "@/c
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { href: "/products", label: "Products" },
   { href: "/#shops", label: "Shops" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About Us" },
@@ -21,7 +20,6 @@ const NAV_LINKS = [
 ];
 
 const MOBILE_DRAWER_LINKS = [
-  { href: "/products", label: "Products" },
   { href: "/#shops", label: "Shops" },
   { href: "/shipping", label: "Shipping & Delivery" },
   { href: "/about", label: "About us" },

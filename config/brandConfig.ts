@@ -91,15 +91,15 @@ export const brandConfig = {
   about: {
     headline: "About Kolagalam",
     companySummary:
-      'We are "Kolagalam" crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
+      'We are "Kolagalam" crackers online store, retailer of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
     story: [
-      'We are "Kolagalam" crackers online store, wholesaler of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
-      "Rooted in our Sivakasi wholesale store established in 2020, now in 2026 we are expanding directly to online customers across Tamil Nadu and all of India. With Kolagalam, families get factory-direct wholesale crackers without travel hassles, extra broker commissions, or photocopied lists.",
+      'We are "Kolagalam" crackers online store, retailer of fireworks and crackers owning a shop in Sivakasi, Tamilnadu. We are into this business since 2020 and have been successfully running our company with selling crackers all over India. Since the day of our initiation, we have anticipated largely in making millions of lives happier and lightened up. We feel extremely proud of ourselves for being the very first online retail store to sell crackers.',
+      "Rooted in our Sivakasi retail store established in 2020, now in 2026 we are expanding directly to online customers across Tamil Nadu and all of India. With Kolagalam, families get factory-direct retail crackers without travel hassles, extra broker commissions, or photocopied lists.",
       "We visit the Sivakasi mills in person, verify quality, and photograph products ourselves. Every order is handled by a real person: once you submit your enquiry, we call you to confirm every item and total, guide you with payment via UPI or bank transfer, and arrange waterproof carton dispatch to your nearest transport hub.",
     ],
     whyUs: [
-      "Wholesaler and shop in Sivakasi since 2020, now in 2026 expanding directly to online customers.",
-      "Spreading direct wholesale factory prices straight to online customers across India.",
+      "Retailer and shop in Sivakasi since 2020, now in 2026 expanding directly to online customers.",
+      "Spreading direct factory retail prices straight to online customers across India.",
       "Photographed at Sivakasi mills — real products with authentic supplier printed MRP.",
       "Transparent upfront prices with genuine discounts off printed MRP.",
       "Safe waterproof carton packaging with door/hub delivery through trusted lorry services.",
@@ -167,7 +167,7 @@ export const brandConfig = {
     titleTemplate: "%s | Kolagalam",
     defaultTitle: "Kolagalam — Best Sivakasi Crackers Online",
     defaultDescription:
-      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam. Best place to buy wholesale crackers online.",
+      "Browse authentic and budget friendly Sivakasi crackers price list with photos from Kolagalam. Best place to buy crackers online.",
     keywords: [
       "Kolagalam",
       "Kolagalam crackers",

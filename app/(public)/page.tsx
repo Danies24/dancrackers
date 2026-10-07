@@ -50,8 +50,8 @@ const HERO_SLIDES: HeroBannerSlide[] = [
 
 const TRUST_FEATURES = [
   { icon: ShieldCheck, color: "text-teal-ink bg-teal-tint", title: "Real Mill Photos", body: "Photographed at Sivakasi mills — no photocopied lists." },
-  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Direct to Your Area", body: "Delivered across Tamil Nadu at wholesale rates." },
-  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Wholesale Pricing", body: "Clear upfront prices, discounted straight off the printed MRP." },
+  { icon: Truck, color: "text-blue-ink bg-blue-tint", title: "Direct to Your Area", body: "Delivered across Tamil Nadu at factory-direct retail rates." },
+  { icon: Tag, color: "text-maroon-ink bg-maroon-tint", title: "Retail Pricing", body: "Clear upfront prices, discounted straight off the printed MRP." },
   { icon: Headphones, color: "text-pink-ink bg-pink-tint", title: "Personal Confirmation", body: "We call you to confirm every item and total." },
 ];
 
@@ -144,7 +144,7 @@ export default async function HomePage() {
             )}
             <div className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-left shadow-soft">
               <p className="font-display text-lg font-extrabold text-ink">Lowest</p>
-              <p className="text-[11px] font-semibold text-ink-soft">Wholesale Prices</p>
+              <p className="text-[11px] font-semibold text-ink-soft">Retail Prices</p>
             </div>
           </div>
         </div>
