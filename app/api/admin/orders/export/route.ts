@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
   const supabase = createAdminClient();
   let query = supabase.from("orders").select("*");
 
+  // Same as the list: SPAM (test/dev) orders are exported only when the SPAM filter is picked.
   if (statuses.length > 0) query = query.in("status", statuses);
+  else query = query.neq("status", "SPAM");
   if (city) query = query.eq("city", city);
   if (captainCode) query = query.eq("captain_code", captainCode.toUpperCase());
   if (supplierPaymentStatus) query = query.eq("supplier_payment_status", supplierPaymentStatus);

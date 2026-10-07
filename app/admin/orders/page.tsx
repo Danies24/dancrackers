@@ -35,7 +35,12 @@ export default async function AdminOrdersPage({
 
   const supabase = createAdminClient();
   let query = supabase.from("orders").select("*", { count: "exact" });
+  // SPAM (test/dev) orders stay out of the list unless the SPAM filter is picked.
+  const includeSpam = statuses.includes("SPAM");
+  const withoutSpam = <T extends { neq: (column: string, value: string) => T }>(q: T) =>
+    includeSpam ? q : q.neq("status", "SPAM");
   if (statuses.length > 0) query = query.in("status", statuses);
+  else query = query.neq("status", "SPAM");
   if (city) query = query.eq("city", city);
   if (captain) query = query.eq("captain_code", captain.toUpperCase());
   if (supplierPaymentStatus) query = query.eq("supplier_payment_status", supplierPaymentStatus);
@@ -48,8 +53,8 @@ export default async function AdminOrdersPage({
 
   const [{ data: orders, count }, { data: cityRows }, { data: captainRows }] = await Promise.all([
     query.limit(100),
-    supabase.from("orders").select("city").not("city", "is", null),
-    supabase.from("orders").select("captain_code").not("captain_code", "is", null),
+    withoutSpam(supabase.from("orders").select("city").not("city", "is", null)),
+    withoutSpam(supabase.from("orders").select("captain_code").not("captain_code", "is", null)),
   ]);
 
   const cities = [...new Set((cityRows ?? []).map((r) => r.city))].sort();
