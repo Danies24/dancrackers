@@ -163,7 +163,7 @@ export async function POST(request: Request) {
       // line's name so the owner packing it (and the customer) both see it.
       const { data: giftRows } = await supabase
         .from("combo_pack_items")
-        .select("variety_id, quantity, products(name_en)")
+        .select("variety_id, quantity, products(name_en, price)")
         .eq("is_gift", true)
         .in(
           "variety_id",
@@ -171,8 +171,15 @@ export async function POST(request: Request) {
         );
       const giftByVariety = new Map<string, string>();
       for (const g of giftRows ?? []) {
-        const gift = g.products as { name_en: string } | null;
-        if (gift) giftByVariety.set(g.variety_id, g.quantity > 1 ? `${g.quantity} × ${gift.name_en}` : gift.name_en);
+        const gift = g.products as { name_en: string; price: number | null } | null;
+        if (!gift) continue;
+        // "Worth" is the gift's own shop price, rounded down to the nearest
+        // ₹10 so the claim is never overstated.
+        const worth = gift.price != null ? Math.floor((gift.price * g.quantity) / 10) * 10 : null;
+        giftByVariety.set(
+          g.variety_id,
+          `${g.quantity > 1 ? `${g.quantity} × ` : ""}${gift.name_en}${worth ? ` worth ₹${worth}` : ""}`,
+        );
       }
       for (const c of combos) {
         const pack = packById.get(c.combo_pack_id);
