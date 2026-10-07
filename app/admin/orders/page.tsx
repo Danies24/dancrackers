@@ -57,6 +57,8 @@ export default async function AdminOrdersPage({
 
   const summary = (orders ?? []).reduce(
     (acc, o) => {
+      // Test/dev orders marked SPAM never count toward the money cards.
+      if (o.status === "SPAM") return acc;
       const supplierTotal = Number(o.supplier_total ?? 0);
       if (o.supplier_payment_status !== "paid") acc.payablePending += supplierTotal;
       else acc.paidToSupplier += Number(o.supplier_paid_amount ?? supplierTotal);
