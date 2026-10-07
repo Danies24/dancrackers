@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Gift } from "lucide-react";
 import { ProductDetailActions } from "@/components/product/product-detail-actions";
 import { SparklerIcon } from "@/components/marketing/sparkler-icon";
 import { formatRupees, formatUnit } from "@/lib/format";
@@ -74,6 +75,19 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
           shop={SRI_RAM_SHOP}
         />
       </div>
+
+      {selected.gift && (
+        <div className="mt-4 flex items-center gap-3 rounded-lg border border-maroon bg-surface p-3">
+          <Gift size={22} aria-hidden className="shrink-0 text-maroon" />
+          <div className="text-sm">
+            <p className="font-semibold text-ink">
+              FREE gift with this pack
+              {selected.gift.quantity > 1 ? ` × ${selected.gift.quantity}` : ""}
+            </p>
+            <p className="text-ink-soft">{selected.gift.name_en} gift box</p>
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="mb-3 font-display text-base font-semibold text-ink">What&apos;s inside this pack</h2>

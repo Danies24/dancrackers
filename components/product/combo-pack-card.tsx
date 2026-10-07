@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { useCart } from "@/components/cart/cart-provider";
@@ -134,6 +134,12 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
             </span>
             <span className="text-xs font-normal text-muted">({selected.totalItems} items)</span>
           </div>
+
+          {selected.giftName && (
+            <p className="flex items-center gap-1 text-xs font-semibold text-maroon">
+              <Gift size={12} aria-hidden /> + Free {selected.giftName} gift box
+            </p>
+          )}
 
           <div className="pt-1">
             {cartItem ? (

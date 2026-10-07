@@ -256,6 +256,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          is_gift: boolean
           product_id: string
           quantity: number
           variety_id: string
@@ -264,6 +265,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          is_gift?: boolean
           product_id: string
           quantity: number
           variety_id: string
@@ -272,6 +274,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          is_gift?: boolean
           product_id?: string
           quantity?: number
           variety_id?: string
@@ -1143,6 +1146,7 @@ export type Database = {
           category: Json | null
           display_order: number | null
           id: string | null
+          is_gift: boolean | null
           name_en: string | null
           name_ta: string | null
           quantity: number | null

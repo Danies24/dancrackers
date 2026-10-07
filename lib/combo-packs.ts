@@ -29,6 +29,8 @@ interface PublicComboItemRow {
   name_ta: string | null;
   unit: string;
   category: { name_en: string } | null;
+  /** Free gift for the customer — counted in supplier cost only, never in the pack's price or item count. */
+  is_gift: boolean | null;
 }
 
 /** A variety as the card needs it — no itemGroups, so listing every combo's every variety here never triggers the heavier per-variety item fetch. */
@@ -38,6 +40,8 @@ export interface ComboPackCardVariety {
   tierLabel: string;
   sellingPrice: number;
   totalItems: number;
+  /** Name of the free gift box that comes with this variety, or null. */
+  giftName: string | null;
 }
 
 export interface ComboPackSummary {
@@ -59,6 +63,8 @@ export interface ComboVarietyOption {
   tierLabel: string;
   sellingPrice: number;
   totalItems: number;
+  /** The free gift box that comes with this variety, shown apart from the paid contents. */
+  gift: { name_en: string; quantity: number } | null;
   /** Every sibling's own items, pre-fetched so the Small/Medium/Large switcher
    * can swap instantly client-side with zero extra requests (see
    * components/product/combo-variety-switcher.tsx). */
@@ -123,11 +129,16 @@ export function getComboUiPrice(slug: string, defaultPrice: number): number {
  */
 export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
   const supabase = createPublicClient();
-  const [{ data: packs }, { data: rawVarieties }] = await Promise.all([
+  const [{ data: packs }, { data: rawVarieties }, { data: rawGifts }] = await Promise.all([
     supabase.from("combo_packs").select("*").eq("is_active", true).order("display_order", { ascending: true }),
     supabase.from("public_combo_pack_varieties").select("*").order("display_order", { ascending: true }),
+    supabase.from("public_combo_pack_items").select("variety_id, name_en").eq("is_gift", true),
   ]);
   const varieties = (rawVarieties ?? []) as unknown as PublicComboVarietyRow[];
+  const giftNameByVariety = new Map<string, string>();
+  for (const g of (rawGifts ?? []) as unknown as Array<{ variety_id: string; name_en: string }>) {
+    giftNameByVariety.set(g.variety_id, g.name_en);
+  }
 
   const varietiesByPack = new Map<string, PublicComboVarietyRow[]>();
   for (const v of varieties) {
@@ -147,6 +158,7 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
         tierLabel: v.tier_label,
         sellingPrice: getComboUiPrice(v.slug, v.selling_price),
         totalItems: v.total_items,
+        giftName: giftNameByVariety.get(v.id) ?? null,
       }));
       const fromPrice = Math.min(...varietiesList.map((v) => v.sellingPrice));
       return {
@@ -220,7 +232,12 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
   const items = (rawItems ?? []) as unknown as PublicComboItemRow[];
 
   const groupsByVariety = new Map<string, Map<string, ComboItemGroup>>();
+  const giftByVariety = new Map<string, { name_en: string; quantity: number }>();
   for (const item of items) {
+    if (item.is_gift) {
+      giftByVariety.set(item.variety_id, { name_en: item.name_en, quantity: item.quantity });
+      continue;
+    }
     const varietyGroups = groupsByVariety.get(item.variety_id) ?? new Map<string, ComboItemGroup>();
     const categoryName = item.category?.name_en ?? "Other";
     const group = varietyGroups.get(categoryName) ?? { categoryName, items: [] };
@@ -248,6 +265,7 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
       tierLabel: v.tier_label,
       sellingPrice: getComboUiPrice(v.slug, v.selling_price),
       totalItems: v.total_items,
+      gift: giftByVariety.get(v.id) ?? null,
       itemGroups: [...(groupsByVariety.get(v.id) ?? new Map()).values()],
     })),
     itemGroups: [...(groupsByVariety.get(variety.id) ?? new Map()).values()],
