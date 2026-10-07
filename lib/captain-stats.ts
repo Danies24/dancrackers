@@ -32,6 +32,8 @@ export function computeCaptainStats(orders: CaptainOrderRow[]): Map<string, Capt
 
   for (const order of orders) {
     if (!order.captain_id) continue;
+    // Test/dev orders marked SPAM never count toward a captain's numbers.
+    if (order.status === "SPAM") continue;
     const stats = byCaptain.get(order.captain_id) ?? emptyStats();
     const customers = customersByCaptain.get(order.captain_id) ?? new Set<string>();
 

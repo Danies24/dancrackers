@@ -96,7 +96,7 @@ export default async function AdminOrdersPage({
         <SummaryCard label="Payable to Supplier (pending)" value={formatRupees(summary.payablePending)} tone="amber" />
         <SummaryCard label="Paid to Supplier" value={formatRupees(summary.paidToSupplier)} tone="ink" />
         <SummaryCard label="Commission earned" value={formatRupees(summary.commissionEarned)} tone="teal" />
-        <SummaryCard label="Orders (this view)" value={String(orders?.length ?? 0)} tone="ink" />
+        <SummaryCard label="Orders (this view)" value={String((orders ?? []).filter((o) => o.status !== "SPAM").length)} tone="ink" />
       </div>
 
       <OrdersFilterBar

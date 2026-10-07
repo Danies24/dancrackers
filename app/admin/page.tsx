@@ -13,7 +13,7 @@ async function getTodayData() {
 
   const [{ data: todayOrders }, { count: confirmedToday }, { count: deliveredThisWeek }, { data: newOrders }] =
     await Promise.all([
-      supabase.from("orders").select("id, grand_total").gte("created_at", startOfToday),
+      supabase.from("orders").select("id, grand_total").neq("status", "SPAM").gte("created_at", startOfToday),
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "CONFIRMED").gte("confirmed_at", startOfToday),
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "DELIVERED").gte("delivered_at", startOfWeek),
       supabase.from("orders").select("*").eq("status", "NEW").order("created_at", { ascending: true }),
