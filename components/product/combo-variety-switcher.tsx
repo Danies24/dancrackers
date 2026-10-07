@@ -84,7 +84,10 @@ export function ComboVarietySwitcher({ packName, varieties, initialVarietyId, un
               FREE gift with this pack
               {selected.gift.quantity > 1 ? ` × ${selected.gift.quantity}` : ""}
             </p>
-            <p className="text-ink-soft">{selected.gift.name_en} gift box</p>
+            <p className="text-ink-soft">
+              {selected.gift.name_en} gift box
+              {selected.gift.worth ? <> — worth {formatRupees(selected.gift.worth)}</> : null}
+            </p>
           </div>
         </div>
       )}

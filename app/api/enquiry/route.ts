@@ -11,7 +11,7 @@ import { hashIp } from "@/lib/hash";
 import { buildCustomerMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { sendEnquiryNotifications } from "@/lib/notifications";
 import { isOrderDeadlineBlocked } from "@/lib/order-deadline";
-import { getComboUiPrice } from "@/lib/combo-packs";
+import { getComboUiPrice, giftWorth } from "@/lib/combo-packs";
 import { isShopOrderable } from "@/lib/shops";
 import { SRI_RAM_SHOP } from "@/lib/cart";
 
@@ -173,9 +173,7 @@ export async function POST(request: Request) {
       for (const g of giftRows ?? []) {
         const gift = g.products as { name_en: string; price: number | null } | null;
         if (!gift) continue;
-        // "Worth" is the gift's own shop price, rounded down to the nearest
-        // ₹10 so the claim is never overstated.
-        const worth = gift.price != null ? Math.floor((gift.price * g.quantity) / 10) * 10 : null;
+        const worth = giftWorth(gift.price, g.quantity);
         giftByVariety.set(
           g.variety_id,
           `${g.quantity > 1 ? `${g.quantity} × ` : ""}${gift.name_en}${worth ? ` worth ₹${worth}` : ""}`,

@@ -42,6 +42,8 @@ export interface ComboPackCardVariety {
   totalItems: number;
   /** Name of the free gift box that comes with this variety, or null. */
   giftName: string | null;
+  /** The gift's worth in rupees (see giftWorth), or null. */
+  giftWorth: number | null;
 }
 
 export interface ComboPackSummary {
@@ -64,7 +66,7 @@ export interface ComboVarietyOption {
   sellingPrice: number;
   totalItems: number;
   /** The free gift box that comes with this variety, shown apart from the paid contents. */
-  gift: { name_en: string; quantity: number } | null;
+  gift: { name_en: string; quantity: number; worth: number | null } | null;
   /** Every sibling's own items, pre-fetched so the Small/Medium/Large switcher
    * can swap instantly client-side with zero extra requests (see
    * components/product/combo-variety-switcher.tsx). */
@@ -123,6 +125,27 @@ export function getComboUiPrice(slug: string, defaultPrice: number): number {
 }
 
 /**
+ * What a free gift is "worth" to the customer: its own shop price × quantity,
+ * rounded DOWN to the nearest ₹10 so the claim is never overstated. The one
+ * rule shared by the pack page, the pack card and the order text.
+ */
+export function giftWorth(price: number | null | undefined, quantity = 1): number | null {
+  if (price == null) return null;
+  const worth = Math.floor((price * quantity) / 10) * 10;
+  return worth > 0 ? worth : null;
+}
+
+/** Gift name -> shop price, from the public product view (names are unique within a shop). */
+async function fetchGiftPrices(shopId: string | null, names: string[]): Promise<Map<string, number>> {
+  const prices = new Map<string, number>();
+  if (!shopId || names.length === 0) return prices;
+  const supabase = createPublicClient();
+  const { data } = await supabase.from("public_products").select("name_en, price").eq("shop_id", shopId).in("name_en", names);
+  for (const row of data ?? []) if (row.name_en && row.price != null) prices.set(row.name_en, Number(row.price));
+  return prices;
+}
+
+/**
  * The home showcase — one card per active combo pack, ordered by starting
  * price ascending (lowest active variety selling_price first). Fallback
  * to display_order on ties (§2).
@@ -139,6 +162,7 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
   for (const g of (rawGifts ?? []) as unknown as Array<{ variety_id: string; name_en: string }>) {
     giftNameByVariety.set(g.variety_id, g.name_en);
   }
+  const giftPrices = await fetchGiftPrices(varieties[0]?.shop_id ?? null, [...new Set(giftNameByVariety.values())]);
 
   const varietiesByPack = new Map<string, PublicComboVarietyRow[]>();
   for (const v of varieties) {
@@ -159,6 +183,7 @@ export async function getActiveComboPacks(): Promise<ComboPackSummary[]> {
         sellingPrice: getComboUiPrice(v.slug, v.selling_price),
         totalItems: v.total_items,
         giftName: giftNameByVariety.get(v.id) ?? null,
+        giftWorth: giftWorth(giftPrices.get(giftNameByVariety.get(v.id) ?? "")),
       }));
       const fromPrice = Math.min(...varietiesList.map((v) => v.sellingPrice));
       return {
@@ -232,10 +257,10 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
   const items = (rawItems ?? []) as unknown as PublicComboItemRow[];
 
   const groupsByVariety = new Map<string, Map<string, ComboItemGroup>>();
-  const giftByVariety = new Map<string, { name_en: string; quantity: number }>();
+  const giftByVariety = new Map<string, { name_en: string; quantity: number; worth: number | null }>();
   for (const item of items) {
     if (item.is_gift) {
-      giftByVariety.set(item.variety_id, { name_en: item.name_en, quantity: item.quantity });
+      giftByVariety.set(item.variety_id, { name_en: item.name_en, quantity: item.quantity, worth: null });
       continue;
     }
     const varietyGroups = groupsByVariety.get(item.variety_id) ?? new Map<string, ComboItemGroup>();
@@ -245,6 +270,9 @@ export async function getComboVarietyBySlug(slug: string): Promise<ComboVarietyD
     varietyGroups.set(categoryName, group);
     groupsByVariety.set(item.variety_id, varietyGroups);
   }
+
+  const giftPrices = await fetchGiftPrices(variety.shop_id, [...new Set([...giftByVariety.values()].map((g) => g.name_en))]);
+  for (const gift of giftByVariety.values()) gift.worth = giftWorth(giftPrices.get(gift.name_en), gift.quantity);
 
   return {
     varietyId: variety.id,

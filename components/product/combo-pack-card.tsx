@@ -138,6 +138,7 @@ export function ComboPackCard({ combo }: { combo: ComboPackSummary }) {
           {selected.giftName && (
             <p className="flex items-center gap-1 text-xs font-semibold text-maroon">
               <Gift size={12} aria-hidden /> + Free {selected.giftName} gift box
+              {selected.giftWorth ? ` (worth ${formatRupees(selected.giftWorth)})` : ""}
             </p>
           )}
 
