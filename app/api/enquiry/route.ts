@@ -159,6 +159,21 @@ export async function POST(request: Request) {
       const packIds = [...new Set(combos.map((c) => c.combo_pack_id))];
       const { data: packs } = await supabase.from("combo_packs").select("id, name, is_active").in("id", packIds);
       const packById = new Map((packs ?? []).map((p) => [p.id, p]));
+      // The free gift box that ships with each variety — put in the order
+      // line's name so the owner packing it (and the customer) both see it.
+      const { data: giftRows } = await supabase
+        .from("combo_pack_items")
+        .select("variety_id, quantity, products(name_en)")
+        .eq("is_gift", true)
+        .in(
+          "variety_id",
+          combos.map((c) => c.id),
+        );
+      const giftByVariety = new Map<string, string>();
+      for (const g of giftRows ?? []) {
+        const gift = g.products as { name_en: string } | null;
+        if (gift) giftByVariety.set(g.variety_id, g.quantity > 1 ? `${g.quantity} × ${gift.name_en}` : gift.name_en);
+      }
       for (const c of combos) {
         const pack = packById.get(c.combo_pack_id);
         if (!pack?.is_active) continue;
@@ -166,7 +181,7 @@ export async function POST(request: Request) {
         byId.set(c.id, {
           id: c.id,
           sku: `COMBO-${c.slug.toUpperCase()}`,
-          name_en: `${pack.name} — ${c.tier_label}`,
+          name_en: `${pack.name} — ${c.tier_label}${giftByVariety.has(c.id) ? ` (+ FREE gift box: ${giftByVariety.get(c.id)})` : ""}`,
           name_ta: null,
           unit: "pack",
           price: effectivePrice,
