@@ -139,6 +139,8 @@ export async function POST(request: Request) {
     discount_percent: number;
     net_markup_percent: number;
     status: string;
+    /** Present for catalogue products (not combo varieties) — used to pick the shop's own supplier discount. */
+    shop_id?: string;
   }
 
   const byId = new Map<string, LineProduct>(products.map((p) => [p.id, p]));
@@ -240,6 +242,17 @@ export async function POST(request: Request) {
     shopName = shop.name_en as string;
   }
 
+  // Each shop can have its own supplier discount (e.g. Gurusamy gives 70% off
+  // list); a shop without one falls back to the global pricing setting.
+  const { data: shopDiscountRows } = await supabase
+    .from("shops")
+    .select("id, supplier_discount_percent")
+    .in("id", [...distinctShopIds]);
+  const supplierDiscountByShop = new Map<string, number>();
+  for (const s of shopDiscountRows ?? []) {
+    if (s.supplier_discount_percent != null) supplierDiscountByShop.set(s.id, Number(s.supplier_discount_percent));
+  }
+
   const validLines = input.items
     .map((item) => {
       const product = byId.get(item.productId);
@@ -252,7 +265,9 @@ export async function POST(request: Request) {
             isDiscountable: product.is_discountable,
             discountPercent: Number(product.discount_percent),
             netMarkupPercent: Number(product.net_markup_percent),
-            supplierDiscountPercent: pricingSettings.supplierDiscountPercent,
+            supplierDiscountPercent:
+              (product.shop_id ? supplierDiscountByShop.get(product.shop_id) : undefined) ??
+              pricingSettings.supplierDiscountPercent,
           });
       return { item, product, pricing, comboVarietyId: comboPricing ? item.productId : null };
     })

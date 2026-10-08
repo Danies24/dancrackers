@@ -43,17 +43,21 @@ export function ProductsTable({
   initialPricingSettings,
   shops,
   selectedShopSlug,
+  shopSupplierDiscountPercent = null,
 }: {
   initialProducts: Product[];
   initialPricingSettings: PricingSettings;
   shops: Array<{ id: string; slug: string; name_en: string }>;
   selectedShopSlug: string;
+  /** This shop's own supplier discount (null = the global one applies). */
+  shopSupplierDiscountPercent?: number | null;
 }) {
   const router = useRouter();
   const [products, setProducts] = useState(initialProducts);
   const [supplierDiscountPercent, setSupplierDiscountPercent] = useState(
-    initialPricingSettings.supplierDiscountPercent,
+    shopSupplierDiscountPercent ?? initialPricingSettings.supplierDiscountPercent,
   );
+  const supplierDiscountIsPerShop = shopSupplierDiscountPercent != null;
   const [savingSupplierPercent, setSavingSupplierPercent] = useState(false);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -223,11 +227,13 @@ export function ProductsTable({
               type="number"
               value={supplierDiscountPercent}
               onChange={(e) => setSupplierDiscountPercent(Number(e.target.value))}
+              readOnly={supplierDiscountIsPerShop}
+              title={supplierDiscountIsPerShop ? "This shop has its own supplier discount (set in the database)" : undefined}
               className="w-20 rounded border border-border px-2 py-1 text-sm tabular-nums"
             />
             <button
               onClick={saveSupplierPercent}
-              disabled={savingSupplierPercent}
+              disabled={savingSupplierPercent || supplierDiscountIsPerShop}
               className="rounded-md border border-border px-2 py-1 text-xs font-semibold text-ink disabled:opacity-50"
             >
               {savingSupplierPercent ? "Saving…" : "Save"}

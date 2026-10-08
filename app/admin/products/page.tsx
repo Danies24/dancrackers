@@ -23,6 +23,10 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
   query = selectedShop ? query.eq("shop_id", selectedShop.id) : query.limit(500);
 
   const [{ data: products }, pricingSettings] = await Promise.all([query, getPricingSettings()]);
+  const { data: shopRow } = selectedShop
+    ? await supabase.from("shops").select("supplier_discount_percent").eq("id", selectedShop.id).maybeSingle()
+    : { data: null };
+  const shopSupplierDiscount = shopRow?.supplier_discount_percent != null ? Number(shopRow.supplier_discount_percent) : null;
 
   return (
     <div>
@@ -53,6 +57,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
         initialPricingSettings={pricingSettings}
         shops={shops ?? []}
         selectedShopSlug={selectedShop?.slug ?? "all"}
+        shopSupplierDiscountPercent={shopSupplierDiscount}
       />
     </div>
   );
