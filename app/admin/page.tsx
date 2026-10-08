@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatRupees, hoursSince } from "@/lib/format";
 import { OrderCard } from "@/components/admin/order-card";
+import { getShopNamesById } from "@/lib/admin-shops";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,10 @@ async function getTodayData() {
 }
 
 export default async function AdminTodayPage() {
-  const { enquiriesToday, valueToday, confirmedToday, deliveredThisWeek, newOrders } = await getTodayData();
+  const [{ enquiriesToday, valueToday, confirmedToday, deliveredThisWeek, newOrders }, shopNames] = await Promise.all([
+    getTodayData(),
+    getShopNamesById(),
+  ]);
   const breaching = newOrders.filter((o) => hoursSince(o.created_at) > 2);
   const oldestAge = newOrders.length > 0 ? hoursSince(newOrders[0].created_at) : 0;
 
@@ -55,7 +59,7 @@ export default async function AdminTodayPage() {
           <h2 className="mb-2 text-sm font-bold text-red">SLA breach — over 2 hours, no contact</h2>
           <div className="flex flex-col gap-2">
             {breaching.map((o) => (
-              <OrderCard key={o.id} order={o} highlight />
+              <OrderCard key={o.id} order={o} highlight shopName={shopNames[o.shop_id]} />
             ))}
           </div>
         </div>
@@ -73,7 +77,7 @@ export default async function AdminTodayPage() {
           {newOrders
             .filter((o) => !breaching.includes(o))
             .map((o) => (
-              <OrderCard key={o.id} order={o} />
+              <OrderCard key={o.id} order={o} shopName={shopNames[o.shop_id]} />
             ))}
         </div>
       </div>

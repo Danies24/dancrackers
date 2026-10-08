@@ -39,8 +39,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: { code: "internal_error", message: error.message } }, { status: 500 });
   }
 
+  const { data: shopRows } = await supabase.from("shops").select("id, name_en");
+  const shopNames = new Map((shopRows ?? []).map((s) => [s.id, s.name_en as string]));
+
   const rows = (orders ?? []).map((o) => ({
     order_ref: o.order_ref,
+    shop: shopNames.get(o.shop_id) ?? "",
     created_at: formatIST(o.created_at),
     status: o.status,
     name: o.name,

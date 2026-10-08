@@ -22,7 +22,7 @@ const STATUS_FLOW = [
 
 const LOST_REASONS = ["price", "timing", "already bought", "no delivery to area", "unreachable", "other"];
 
-export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order; items: OrderItem[] }) {
+export function OrderDetailClient({ initialOrder, items, shopName }: { initialOrder: Order; items: OrderItem[]; shopName?: string }) {
   const { show } = useToast();
   const [order, setOrder] = useState(initialOrder);
   const [note, setNote] = useState("");
@@ -103,6 +103,11 @@ export function OrderDetailClient({ initialOrder, items }: { initialOrder: Order
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="font-mono text-lg font-semibold text-ink">{order.order_ref}</h1>
+        {shopName && (
+          <p className="mt-1">
+            <span className="rounded-sm bg-gold-tint px-1.5 py-0.5 text-xs font-semibold text-gold-ink">{shopName}</span>
+          </p>
+        )}
         <p className="text-xs text-muted">{formatIST(order.created_at)}</p>
       </div>
 

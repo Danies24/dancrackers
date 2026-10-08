@@ -17,7 +17,7 @@ const statusColors: Record<string, string> = {
 };
 
 /** §19.2, §19.3. Card: reference · name · city · total · captain · age · [Call] [WhatsApp] [Open]. */
-export function OrderCard({ order, highlight }: { order: Order; highlight?: boolean }) {
+export function OrderCard({ order, highlight, shopName }: { order: Order; highlight?: boolean; shopName?: string }) {
   const age = hoursSince(order.created_at);
 
   return (
@@ -27,6 +27,11 @@ export function OrderCard({ order, highlight }: { order: Order; highlight?: bool
           <Link href={`/admin/orders/${order.id}`} className="font-mono text-sm font-semibold text-maroon-ink">
             {order.order_ref}
           </Link>
+          {shopName && (
+            <span className="ml-2 rounded-sm bg-gold-tint px-1.5 py-0.5 align-middle text-[10px] font-semibold text-gold-ink">
+              {shopName}
+            </span>
+          )}
           <p className="text-sm font-medium text-ink">{order.name}</p>
           <p className="text-xs text-muted">
             {order.city} · {formatIST(order.created_at)}

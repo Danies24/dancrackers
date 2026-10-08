@@ -222,8 +222,9 @@ export async function POST(request: Request) {
   }
   const shopId = [...distinctShopIds][0] ?? null;
   let shopSlug: string | null = null;
+  let shopName: string | undefined;
   if (shopId) {
-    const { data: shop } = await supabase.from("shops").select("slug").eq("id", shopId).maybeSingle();
+    const { data: shop } = await supabase.from("shops").select("slug, name_en").eq("id", shopId).maybeSingle();
     if (!shop || !isShopOrderable(shop.slug)) {
       return NextResponse.json(
         {
@@ -236,6 +237,7 @@ export async function POST(request: Request) {
       );
     }
     shopSlug = shop.slug;
+    shopName = shop.name_en as string;
   }
 
   const validLines = input.items
@@ -486,6 +488,7 @@ export async function POST(request: Request) {
   const siteUrl = getSiteUrl();
   await sendEnquiryNotifications({
     orderRef: order.order_ref,
+    shopName,
     name: input.customer.name,
     phone,
     address: input.customer.address,

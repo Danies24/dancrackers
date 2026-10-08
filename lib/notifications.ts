@@ -22,6 +22,7 @@ import { brandConfig } from "@/config/brandConfig";
 
 export interface NotificationOrder {
   orderRef: string;
+  shopName?: string;
   name: string;
   phone: string;
   address: string;
@@ -81,7 +82,7 @@ async function sendMail(subject: string, html: string, logLabel: string): Promis
 
 async function sendEmailNotification(order: NotificationOrder): Promise<void> {
   await sendMail(
-    `🎆 New enquiry ${order.orderRef} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
+    `🎆 New enquiry ${order.orderRef}${order.shopName ? ` [${order.shopName}]` : ""} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
     buildEmailHtml(order),
     `[notifications] Email for ${order.orderRef}`,
   );
@@ -91,6 +92,7 @@ function buildEmailHtml(order: NotificationOrder): string {
   return `
     <div style="font-family: sans-serif; max-width: 480px;">
       <h2>New enquiry ${order.orderRef}</h2>
+      ${order.shopName ? `<p><strong>Shop: ${order.shopName}</strong></p>` : ""}
       <p><strong>${order.name}</strong> — <a href="tel:+91${order.phone}">${order.phone}</a></p>
       <p>${order.address}<br/>${order.city} ${order.pincode}</p>
       <p>${order.itemLines.join("<br/>")}</p>
@@ -114,6 +116,7 @@ async function sendTelegramNotification(order: NotificationOrder): Promise<void>
 
   const text = [
     `🎆 New enquiry ${order.orderRef} — ${formatRupees(order.grandTotal)} — ${order.city} — via ${order.captainCode ?? "DIRECT"}`,
+    order.shopName ? `Shop: ${order.shopName}` : "",
     "",
     `${order.name} — ${order.phone}`,
     `${order.city} ${order.pincode}`,

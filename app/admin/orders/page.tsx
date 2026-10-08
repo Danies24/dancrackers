@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { OrderCard } from "@/components/admin/order-card";
+import { getShopNamesById } from "@/lib/admin-shops";
 import { OrdersFilterBar } from "@/components/admin/orders-filter-bar";
 import { formatRupees } from "@/lib/format";
 
@@ -51,10 +52,11 @@ export default async function AdminOrdersPage({
   else if (sort === "value") query = query.order("grand_total", { ascending: false });
   else query = query.order("created_at", { ascending: false });
 
-  const [{ data: orders, count }, { data: cityRows }, { data: captainRows }] = await Promise.all([
+  const [{ data: orders, count }, { data: cityRows }, { data: captainRows }, shopNames] = await Promise.all([
     query.limit(100),
     withoutSpam(supabase.from("orders").select("city").not("city", "is", null)),
     withoutSpam(supabase.from("orders").select("captain_code").not("captain_code", "is", null)),
+    getShopNamesById(),
   ]);
 
   const cities = [...new Set((cityRows ?? []).map((r) => r.city))].sort();
@@ -121,7 +123,7 @@ export default async function AdminOrdersPage({
       <div className="mt-4 flex flex-col gap-2">
         {(orders ?? []).length === 0 && <p className="text-sm text-muted">No orders match these filters.</p>}
         {(orders ?? []).map((o) => (
-          <OrderCard key={o.id} order={o} />
+          <OrderCard key={o.id} order={o} shopName={shopNames[o.shop_id]} />
         ))}
       </div>
     </div>

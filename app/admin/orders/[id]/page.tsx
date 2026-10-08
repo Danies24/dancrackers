@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { OrderDetailClient } from "@/components/admin/order-detail-client";
+import { getShopNamesById } from "@/lib/admin-shops";
 
 export const dynamic = "force-dynamic";
 
@@ -15,5 +16,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   if (!order) notFound();
 
-  return <OrderDetailClient initialOrder={order} items={items ?? []} />;
+  const shopName = (await getShopNamesById())[order.shop_id];
+
+  return <OrderDetailClient initialOrder={order} items={items ?? []} shopName={shopName} />;
 }
