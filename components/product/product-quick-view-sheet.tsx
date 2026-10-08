@@ -10,6 +10,7 @@ import { ImageWithSkeleton } from "@/components/product/image-with-skeleton";
 import { useCart } from "@/components/cart/cart-provider";
 import { useToast } from "@/components/ui/toast";
 import { findItem } from "@/lib/cart";
+import { isGurusamyShop } from "@/config/deliveryConfig";
 import { getCartProgress } from "@/lib/cart-progress";
 import { formatRupees, formatUnit } from "@/lib/format";
 import { trackEvent } from "@/lib/analytics";
@@ -95,7 +96,7 @@ export function ProductQuickViewSheet({
                 className="object-contain p-3"
               />
             )}
-            {product.mrp != null && product.price != null && product.mrp > product.price && (
+            {product.mrp != null && product.price != null && product.mrp > product.price && !isGurusamyShop(product.shop_slug) && (
               <span className="absolute left-3 top-3 rounded-lg bg-price-tag-bg px-2 py-1 text-[11px] font-bold text-price-tag-fg">
                 {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
               </span>
@@ -130,9 +131,11 @@ export function ProductQuickViewSheet({
               {product.mrp != null && product.mrp > product.price && (
                 <>
                   <span className="text-sm text-muted line-through">{formatRupees(product.mrp)}</span>
-                  <span className="text-xs font-semibold text-maroon-ink">
-                    You save {formatRupees(product.mrp - product.price)}
-                  </span>
+                  {!isGurusamyShop(product.shop_slug) && (
+                    <span className="text-xs font-semibold text-maroon-ink">
+                      You save {formatRupees(product.mrp - product.price)}
+                    </span>
+                  )}
                 </>
               )}
             </div>

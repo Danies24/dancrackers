@@ -51,7 +51,7 @@ export function getCartProgress(subtotal: number, shopSlug?: string | null): Car
       message: (remaining) => `Add ${remaining} more to reach the ${formatRupees(minimumOrderValue)} minimum order`,
     },
   ];
-  if (packaging.enabled) {
+  if (packaging.enabled && packaging.waiverThreshold != null) {
     milestones.push({
       threshold: packaging.waiverThreshold,
       tag: "FREE PACKAGING",
@@ -84,7 +84,7 @@ export function getCartProgress(subtotal: number, shopSlug?: string | null): Car
 export function getCartTier(subtotal: number, shopSlug?: string | null): 0 | 1 | 2 {
   const { minimumOrderValue } = brandConfig.cartCharges;
   const { packaging } = getShopDeliveryConfig(shopSlug);
-  if (packaging.enabled && subtotal >= packaging.waiverThreshold) return 2;
+  if (packaging.enabled && packaging.waiverThreshold != null && subtotal >= packaging.waiverThreshold) return 2;
   if (subtotal >= minimumOrderValue) return 1;
   return 0;
 }

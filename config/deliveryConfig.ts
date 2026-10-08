@@ -21,8 +21,8 @@ export interface ShopDeliveryConfig {
     enabled: boolean;
     /** Percent of subtotal, only meaningful when enabled. */
     percent: number;
-    /** Subtotal at/above which packaging is waived. Only meaningful when enabled. */
-    waiverThreshold: number;
+    /** Subtotal at/above which packaging is waived. null = never waived. Only meaningful when enabled. */
+    waiverThreshold: number | null;
   };
   delivery: {
     flatCharge: number;
@@ -35,7 +35,8 @@ const DEFAULT_DELIVERY_CONFIG: ShopDeliveryConfig = {
   packaging: {
     enabled: true,
     percent: brandConfig.cartCharges.packagingChargePercent,
-    waiverThreshold: brandConfig.cartCharges.packagingChargeWaiverThreshold,
+    // Business decision: a flat 3% packaging charge on every order, never waived.
+    waiverThreshold: null,
   },
   delivery: {
     flatCharge: brandConfig.cartCharges.deliveryCharge,
@@ -44,11 +45,11 @@ const DEFAULT_DELIVERY_CONFIG: ShopDeliveryConfig = {
 };
 
 /**
- * Wholesale factory-direct model: no packaging charge at all. Delivery is
- * 0 here too, same as every other shop — see the file-level comment above.
+ * Gurusamy now carries the same flat 3% packaging charge as every other
+ * shop. Delivery is 0 here too — see the file-level comment above.
  */
 const GURUSAMY_DELIVERY_CONFIG: ShopDeliveryConfig = {
-  packaging: { enabled: false, percent: 0, waiverThreshold: 0 },
+  packaging: { enabled: true, percent: brandConfig.cartCharges.packagingChargePercent, waiverThreshold: null },
   delivery: { flatCharge: 0, freeThreshold: null },
 };
 

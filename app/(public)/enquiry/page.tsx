@@ -331,7 +331,12 @@ export default function EnquiryPage() {
           <p className="text-xs text-muted">
             Minimum order {formatRupees(getMinimumOrderValue())}.
             {deliveryConfig.packaging.enabled && (
-              <> Packaging is free above {formatRupees(deliveryConfig.packaging.waiverThreshold)}.</>
+              <>
+                {" "}
+                {deliveryConfig.packaging.waiverThreshold != null
+                  ? `Packaging is free above ${formatRupees(deliveryConfig.packaging.waiverThreshold)}.`
+                  : `A ${deliveryConfig.packaging.percent}% packaging charge is added to the total.`}
+              </>
             )}
           </p>
         </div>

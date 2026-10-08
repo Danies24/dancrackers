@@ -26,7 +26,7 @@ export interface PricingResult {
   mrpTotal: number;
   /** mrpTotal - discountableSubtotal, floored at 0. */
   youSave: number;
-  /** 3% of subtotal, waived once subtotal reaches the packaging waiver threshold (§ cartCharges). */
+  /** 3% of subtotal (never waived — see config/deliveryConfig.ts). */
   packagingCharge: number;
   /** Flat delivery fee — currently always 0 for every shop (§ cartCharges, config/deliveryConfig.ts). */
   deliveryCharge: number;
@@ -178,7 +178,8 @@ export function shortfallToMinimumValue(subtotal: number): number {
 export function computePackagingCharge(subtotal: number, shopSlug?: string | null): number {
   const { packaging } = getShopDeliveryConfig(shopSlug);
   if (!packaging.enabled) return 0;
-  if (subtotal <= 0 || subtotal >= packaging.waiverThreshold) return 0;
+  if (subtotal <= 0) return 0;
+  if (packaging.waiverThreshold != null && subtotal >= packaging.waiverThreshold) return 0;
   return round2((subtotal * packaging.percent) / 100);
 }
 
