@@ -28,7 +28,7 @@ export const brandConfig = {
   },
 
   contact: {
-    phones: [{ number: "6363930412", countryCode: "+91", label: "Sales", isWhatsApp: true, isPrimary: true }],
+    phones: [{ number: "8248365737", countryCode: "+91", label: "Sales", isWhatsApp: true, isPrimary: true }],
     emails: [{ address: "kolagalam.contact@gmail.com", label: "General", isPrimary: true }],
     responseTimeText: "A real person calls you within 2 hours",
     // TODO: confirm real business hours.
@@ -56,7 +56,7 @@ export const brandConfig = {
         // canonical 10-digit number, not a "/"-joined pair. This is the
         // configured supplier's primary published contact number — swap
         // here, once, if that ever changes.
-        whatsapp: "6363930412",
+        whatsapp: "8248365737",
         // TODO(confirm): licence number — get in writing from the supplier before this appears on a live page.
         licenceNo: "TODO(confirm)",
         // TODO(confirm): licence validity/expiry date — get in writing from the supplier before this appears on a live page.
@@ -227,7 +227,7 @@ export function getPrimarySupplierWhatsApp(): string {
  * `isPrimary` entry in brandConfig.contact.phones. Never hardcode a number
  * on a public page, and never use getPrimarySupplierWhatsApp() here — that
  * one is the supplier's own number, for the admin panel only.
- * E.164-ish digits with no "+" — e.g. "916363930412".
+ * E.164-ish digits with no "+" — e.g. "918248365737".
  */
 export function getPhoneE164(phone: Phone = getPrimaryPhone()): string {
   return `${phone.countryCode.replace("+", "")}${phone.number}`;
