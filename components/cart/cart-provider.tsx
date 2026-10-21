@@ -25,6 +25,7 @@ import {
   serializeCart,
   setItemQty,
 } from "@/lib/cart";
+import { trackEvent } from "@/lib/analytics";
 import { StartNewCartSheet } from "@/components/cart/start-new-cart-sheet";
 
 const STORAGE_KEY = "dc_cart";
@@ -126,6 +127,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // causes no navigation, only this pending state.
         scrollYRef.current = window.scrollY;
         setPending({ item, qty, shop });
+        trackEvent("cart_conflict_shown", { from: stateRef.current.shopSlug, to: shop.slug });
         return "pending";
       }
       apply((prev) => addItem(prev, item, qty, shop));
@@ -136,11 +138,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const confirmShopSwitch = useCallback(() => {
     if (!pending) return;
+    trackEvent("cart_conflict_clear", { to: pending.shop.slug });
     apply(() => addItem(emptyCart(), pending.item, pending.qty, pending.shop));
     setPending(null);
   }, [pending, apply]);
 
   const cancelShopSwitch = useCallback(() => {
+    trackEvent("cart_conflict_keep", {});
     setPending(null);
     // Restore the scroll position the sheet interrupted (§6 MUST).
     requestAnimationFrame(() => window.scrollTo({ top: scrollYRef.current }));
@@ -213,6 +217,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         open={pending !== null}
         currentShopName={state.shopName}
         newShopName={pending?.shop.name ?? ""}
+        itemCount={itemCount}
         onKeepCurrent={cancelShopSwitch}
         onClearAndAdd={confirmShopSwitch}
       />

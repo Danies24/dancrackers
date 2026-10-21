@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
-import { getShopForCurrentRequest, isShopOrderable } from "@/lib/shops";
+import { getShopForCurrentRequest, getShopPickerCards, isShopOrderable } from "@/lib/shops";
+import { toShopTiles } from "@/lib/shop-picker";
+import { RecordLastShop } from "@/components/shop-picker/record-last-shop";
 import { ShopStickyBar } from "@/components/shop/shop-sticky-bar";
 import { ShopPreviewBanner } from "@/components/shop/shop-preview-banner";
 import { ShopNotOrderableBanner } from "@/components/shop/shop-not-orderable-banner";
@@ -17,13 +19,15 @@ export default async function ShopLayout({
   const result = await getShopForCurrentRequest(shopSlug);
   if (!result) notFound();
   const { shop, isPreview } = result;
+  const tiles = toShopTiles(await getShopPickerCards().catch(() => []), isShopOrderable);
 
   return (
     <div>
       {isPreview && <ShopPreviewBanner />}
       {!isShopOrderable(shop.slug) && <ShopNotOrderableBanner />}
       {isGurusamyShop(shop.slug) && <WholesaleNoticeBanner />}
-      <ShopStickyBar shop={shop} />
+      {!isPreview && <RecordLastShop slug={shop.slug} name={shop.name_en} />}
+      <ShopStickyBar shop={shop} tiles={tiles} />
       {children}
     </div>
   );

@@ -1,5 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rankProducts } from "@/lib/ranking";
@@ -278,6 +279,38 @@ export async function getShopsForHomeShowcase(): Promise<ShopShowcaseCard[]> {
 
   return cards;
 }
+
+export interface ShopPickerCard {
+  shop: ShopRow;
+  productCount: number;
+  maxDiscountPercent: number;
+}
+
+async function loadShopPickerCards(): Promise<ShopPickerCard[]> {
+  const shops = await getShopsForHomeRail();
+  const sorted = [...shops].sort((a, b) => {
+    const aPriority = HOME_SHOWCASE_PRIORITY_SLUGS.indexOf(a.slug);
+    const bPriority = HOME_SHOWCASE_PRIORITY_SLUGS.indexOf(b.slug);
+    if (aPriority !== -1 || bPriority !== -1) {
+      return (aPriority === -1 ? Infinity : aPriority) - (bPriority === -1 ? Infinity : bPriority);
+    }
+    return a.display_order - b.display_order;
+  });
+  return Promise.all(
+    sorted.map(async ({ productCount, ...shop }) => ({
+      shop,
+      productCount,
+      maxDiscountPercent: await getShopMaxActiveDiscountPercent(shop.id),
+    })),
+  );
+}
+
+/**
+ * Counts-only shop list for the shop picker, home row and switch-shop sheet
+ * — same ordering as the home showcase but with no catalogue fetch, so it is
+ * cheap enough for the shop layout. Cached 5 min (public data only).
+ */
+export const getShopPickerCards = unstable_cache(loadShopPickerCards, ["shop-picker-cards"], { revalidate: 300 });
 
 /**
  * The shop PLP's bucketed section list (Swiggy-redesign plan) — one

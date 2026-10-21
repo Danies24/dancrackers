@@ -17,6 +17,8 @@ const buttonVariants = cva(
         secondary:
           "border border-border text-ink bg-transparent hover:-translate-y-0.5 hover:border-maroon-ink hover:glow-orange",
         ghost: "text-maroon-ink bg-transparent hover:bg-maroon-tint",
+        dark: "bg-shop-header-bg text-white hover:-translate-y-0.5",
+        "outline-danger": "border border-red-ink bg-transparent text-red-ink hover:bg-red/10",
         whatsapp: "bg-whatsapp text-white hover:brightness-95 hover:-translate-y-0.5",
       },
       size: {

@@ -10,7 +10,9 @@ import { CategoryGroupTile } from "@/components/shop/category-group-tile";
 import { ProductCard } from "@/components/product/product-card";
 import { ComboPackCard } from "@/components/product/combo-pack-card";
 import { getCategoryWithCounts } from "@/lib/data";
-import { getShopsForHomeShowcase } from "@/lib/shops";
+import { getShopsForHomeShowcase, isShopOrderable } from "@/lib/shops";
+import { toShopTiles } from "@/lib/shop-picker";
+import { ShopPickerRow } from "@/components/shop-picker/shop-picker";
 import { getAllCategoryGroups, getCategoryGroupIdByCategoryId, type CategoryGroupRow } from "@/lib/category-groups";
 import { getCrossShopProducts, type ProductWithShop } from "@/lib/cross-shop";
 import { getActiveComboPacks } from "@/lib/combo-packs";
@@ -161,6 +163,10 @@ export default async function HomePage() {
           <OrderCountdownHero />
         </div>
       </section>
+
+      {shopCards.length > 0 && (
+        <ShopPickerRow tiles={toShopTiles(shopCards, isShopOrderable)} />
+      )}
 
       {/* Our Shops — Gurusamy, then Sri Ram, then any others
           (lib/shops.ts's getShopsForHomeShowcase), each card showing its

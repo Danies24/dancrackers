@@ -5,6 +5,7 @@ import { getCanonicalUrl } from "@/config/brandConfig";
 
 const STATIC_PATHS = [
   "",
+  "/shops",
   "/products",
   "/how-it-works",
   "/safety",
