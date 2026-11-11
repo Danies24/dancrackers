@@ -28,7 +28,15 @@ export async function proxy(request: NextRequest) {
   // routes stay reachable. Flip SITE_CLOSED to "false" to reopen.
   const { pathname: path } = request.nextUrl;
   const isStaffOrApi = path.startsWith("/admin") || path.startsWith("/api");
-  if (process.env.SITE_CLOSED !== "false" && !isStaffOrApi && path !== "/closed") {
+  const isClosed = process.env.SITE_CLOSED !== "false";
+  // No new orders/enquiries (and so no email/Telegram alerts) while closed.
+  if (isClosed && (path === "/api/enquiry" || path === "/api/general-enquiry")) {
+    return NextResponse.json(
+      { error: { code: "season_closed", message: "Season is over. We reopen for Diwali 2027." } },
+      { status: 503 },
+    );
+  }
+  if (isClosed && !isStaffOrApi && path !== "/closed") {
     return NextResponse.rewrite(new URL("/closed", request.url));
   }
 
@@ -105,6 +113,8 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/api/admin/:path*",
+    "/api/enquiry",
+    "/api/general-enquiry",
     "/s/:path*",
     "/((?!api|_next|admin|brand|images|captain-kits|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|opengraph-image).*)",
   ],
