@@ -14,6 +14,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: { code: "unauthorized" } }, { status: 401 });
   }
 
+  // Season is over — the digest (and its SLA-breach alerts) is switched off.
+  // Cron is also removed from vercel.json; set DIGEST_ENABLED=true to bring
+  // both back next season.
+  if (process.env.DIGEST_ENABLED !== "true") {
+    return NextResponse.json({ sent: false, reason: "digest disabled" });
+  }
+
   const supabase = createAdminClient();
 
   const [{ data: newOrders }, { data: confirmedOrders }] = await Promise.all([

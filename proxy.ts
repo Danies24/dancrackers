@@ -24,6 +24,14 @@ const PREVIEW_TOKEN_PATTERN = /^[0-9a-f]{16}$/;
  * intentionally avoids on every request).
  */
 export async function proxy(request: NextRequest) {
+  // Season over: every public page shows the /closed screen. Admin and API
+  // routes stay reachable. Flip SITE_CLOSED to "false" to reopen.
+  const { pathname: path } = request.nextUrl;
+  const isStaffOrApi = path.startsWith("/admin") || path.startsWith("/api");
+  if (process.env.SITE_CLOSED !== "false" && !isStaffOrApi && path !== "/closed") {
+    return NextResponse.rewrite(new URL("/closed", request.url));
+  }
+
   const shopMatch = request.nextUrl.pathname.match(/^\/s\/([^/]+)/);
   if (shopMatch) {
     const queryToken = request.nextUrl.searchParams.get("preview");
@@ -94,5 +102,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*", "/s/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/api/admin/:path*",
+    "/s/:path*",
+    "/((?!api|_next|admin|brand|images|captain-kits|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|opengraph-image).*)",
+  ],
 };
