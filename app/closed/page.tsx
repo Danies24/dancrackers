@@ -11,7 +11,6 @@ const tamil = Noto_Sans_Tamil({ subsets: ["tamil"], weight: ["700"], display: "s
 export const metadata: Metadata = {
   title: { absolute: `${brandConfig.brand.name} — Reopening Diwali 2027` },
   description: "The season is over. Our site reopens for Diwali 2027.",
-  robots: { index: false, follow: false },
 };
 
 const collage = [

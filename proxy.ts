@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { CLOSED_API_PATHS, CLOSED_OPEN_PAGES, CLOSED_RETRY_AFTER_SECONDS, isSiteClosed } from "@/lib/season";
 
 const PREVIEW_TOKEN_PATTERN = /^[0-9a-f]{16}$/;
 
@@ -24,20 +25,24 @@ const PREVIEW_TOKEN_PATTERN = /^[0-9a-f]{16}$/;
  * intentionally avoids on every request).
  */
 export async function proxy(request: NextRequest) {
-  // Season over: every public page shows the /closed screen. Admin and API
-  // routes stay reachable. Flip SITE_CLOSED to "false" to reopen.
   const { pathname: path } = request.nextUrl;
-  const isStaffOrApi = path.startsWith("/admin") || path.startsWith("/api");
-  const isClosed = process.env.SITE_CLOSED !== "false";
-  // No new orders/enquiries (and so no email/Telegram alerts) while closed.
-  if (isClosed && (path === "/api/enquiry" || path === "/api/general-enquiry")) {
-    return NextResponse.json(
-      { error: { code: "season_closed", message: "Season is over. We reopen for Diwali 2027." } },
-      { status: 503 },
-    );
-  }
-  if (isClosed && !isStaffOrApi && path !== "/closed") {
-    return NextResponse.rewrite(new URL("/closed", request.url));
+  const isAdminPath = path.startsWith("/admin") || path.startsWith("/api/admin");
+
+  // Season switch (lib/season.ts): while closed, public pages show /closed
+  // (as a temporary 503 so search engines keep the pages indexed) and the
+  // order/tracking APIs refuse writes. Admin stays reachable.
+  if (isSiteClosed()) {
+    const retryAfter = { "Retry-After": String(CLOSED_RETRY_AFTER_SECONDS) };
+    if (CLOSED_API_PATHS.includes(path)) {
+      return NextResponse.json(
+        { error: { code: "season_closed", message: "Season is over. We reopen for Diwali 2027." } },
+        { status: 503, headers: retryAfter },
+      );
+    }
+    const isPublicPage = !isAdminPath && !path.startsWith("/api") && path !== "/closed";
+    if (isPublicPage && !CLOSED_OPEN_PAGES.includes(path)) {
+      return NextResponse.rewrite(new URL("/closed", request.url), { status: 503, headers: retryAfter });
+    }
   }
 
   const shopMatch = request.nextUrl.pathname.match(/^\/s\/([^/]+)/);
@@ -61,6 +66,10 @@ export async function proxy(request: NextRequest) {
     }
     return response;
   }
+
+  // Public pages need no session refresh — only admin does (avoids a
+  // Supabase round-trip on every page view now that the matcher is broad).
+  if (!isAdminPath) return NextResponse.next();
 
   let response = NextResponse.next({ request });
 
@@ -115,6 +124,8 @@ export const config = {
     "/api/admin/:path*",
     "/api/enquiry",
     "/api/general-enquiry",
+    "/api/cart/share",
+    "/api/track",
     "/s/:path*",
     "/((?!api|_next|admin|brand|images|captain-kits|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|opengraph-image).*)",
   ],

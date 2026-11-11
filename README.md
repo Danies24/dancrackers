@@ -34,3 +34,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Season switch (reopen for Diwali)
+
+- The site is **closed by default**: every public page shows `/closed` (HTTP 503 + Retry-After), and `/api/enquiry`, `/api/general-enquiry`, `/api/cart/share`, `/api/track` refuse writes. `/admin`, `/terms`, `/privacy`, `/compliance` stay reachable. Logic: `lib/season.ts` + `proxy.ts`; page: `app/closed/page.tsx`.
+- **Reopen:** set `SITE_CLOSED=false` in Vercel env vars and redeploy.
+- **Digest/SLA email:** off unless `DIGEST_ENABLED=true`; also re-add the two cron entries (`/api/cron/digest`, `30 3 * * *` and `30 12 * * *`) to `vercel.json`.
+- Update the "Diwali 2027" wording in `app/closed/page.tsx` and the proxy message when the next season's date changes.
